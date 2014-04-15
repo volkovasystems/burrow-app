@@ -43,3 +43,18 @@
 [submodule "revolver"]
 	path = revolver
 	url = https://github.com/volkovasystems/revolver.git
+[submodule "convertToSequenceIndex"]
+	path = convertToSequenceIndex
+	url = https://github.com/volkovasystems/convertToSequenceIndex.git
+[submodule "calculatePartition"]
+	path = calculatePartition
+	url = https://github.com/volkovasystems/calculatePartition.git
+[submodule "permutateLexicographically"]
+	path = permutateLexicographically
+	url = https://github.com/volkovasystems/permutateLexicographically.git
+[submodule "convertToSequence"]
+	path = convertToSequence
+	url = https://github.com/volkovasystems/convertToSequence.git
+[submodule "work"]
+	path = work
+	url = https://github.com/volkovasystems/work.git
