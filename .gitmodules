@@ -61,3 +61,6 @@
 [submodule "convert-to-sequence"]
 	path = convert-to-sequence
 	url = https://github.com/volkovasystems/convert-to-sequence.git
+[submodule "convert-to-sequence-index"]
+	path = convert-to-sequence-index
+	url = https://github.com/volkovasystems/convert-to-sequence-index.git
