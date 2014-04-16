@@ -69,10 +69,16 @@ public class convertToSequence{
 			}else if( remainder.compareTo( BigInteger.ZERO ) == 0 ){
 				sequenceStack.push( dictionaryList[ lastIndex ] );
 			}
+			
+			BigInteger prevIndex = index;
 			index = index.divide( dictionaryLength );
-                        if( index.compareTo( BigInteger.ONE ) == 0 ){
+                      if( index.compareTo( BigInteger.ONE ) == 0 && prevIndex.compareTo(dictionaryLength) == 0){
                             index = BigInteger.ZERO;
                         }
+		
+			
+			
+			
 		}while( index.compareTo( BigInteger.ZERO ) != 0 );
 
 		String sequenceList[ ] = sequenceStack.toArray( ( new String[ ]{ } ) );

@@ -8,7 +8,6 @@ import static main.convertToSequenceIndex.convertToSequenceIndex;
 public class BruteForce {
 	
 	static String dictionary  = "abcdefghijklmnopqrstuvwxyz";
-	static String msg = "abc";
 	static String end_range = "";
 	
 	
@@ -16,36 +15,34 @@ public class BruteForce {
 	
 	public static void main(String ... parameter){
 		
-		
-		MD5 md5_hash = new MD5( msg );
-		
-		System.out.print( msg +  "= " );
-		// md5_hash.Print_md5();
-		
-		md5_hash.hash();
-		 
-		 String hashed = md5_hash.getHashed();
-		 System.out.println(hashed);
-		
-		 //convert to sequence given range
-		 
-		 
+		try
+		{
+		String msg = parameter[0];
+		int length = Integer.parseInt(parameter[1]);
+		 		 
 		 String start_range = "a";
 		 BigInteger startIndex = convertToSequenceIndex( start_range, dictionary , null );
 		 
-		String end_range = Generator( msg.length() );
+		String end_range = Generator( length );
 		 BigInteger endIndex = convertToSequenceIndex( end_range, dictionary , null );
 		 
 		 
-		 
-		BruteForce_method(hashed  , startIndex , endIndex);
-			
+		long initialTime =   System.currentTimeMillis( );
+		
+		String result = BruteForce_method(msg  , startIndex , endIndex);
+		
+		long durationTime =    System.currentTimeMillis( ) - initialTime;
+		System.out.print( "{'result':'" + result + "','duration':" + durationTime + "}"  );
+		}
+		catch(Exception exception){
+			System.err.print(exception.getMessage());
+		}
+		
 	}
 
 	
-	public static void BruteForce_method( String hash_value , BigInteger startIndex , BigInteger  endIndex ){
+	public static String BruteForce_method( String hash_value , BigInteger startIndex , BigInteger  endIndex ){
 		
-			System.out.println( endIndex.toString() );
 		
 		for(BigInteger x = startIndex; x.compareTo(endIndex) < 0 ; x = x.add(BigInteger.ONE)){
 			
@@ -57,16 +54,18 @@ public class BruteForce {
 			   newHash.hash();
 			   String val = newHash.getHashed();
 			 
-			   System.out.println( a + " " + val );
+			
 			   
 			   if(val.equals(hash_value))
 			   {
-				   System.out.println("equals" );
+				 
+				   return val;
 			   }
 			   
 			
 		}
 		
+		return null;
 		
 	}
 	
