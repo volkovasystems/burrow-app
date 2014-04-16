@@ -49,9 +49,6 @@
 [submodule "calculatePartition"]
 	path = calculatePartition
 	url = https://github.com/volkovasystems/calculatePartition.git
-[submodule "permutateLexicographically"]
-	path = permutateLexicographically
-	url = https://github.com/volkovasystems/permutateLexicographically.git
 [submodule "convertToSequence"]
 	path = convertToSequence
 	url = https://github.com/volkovasystems/convertToSequence.git
@@ -64,3 +61,6 @@
 [submodule "convert-to-sequence-index"]
 	path = convert-to-sequence-index
 	url = https://github.com/volkovasystems/convert-to-sequence-index.git
+[submodule "permutate-lexicographically"]
+	path = permutate-lexicographically
+	url = https://github.com/volkovasystems/permutate-lexicographically.git
