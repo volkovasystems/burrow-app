@@ -3,17 +3,15 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Stack;
 
+
 /*
 	NOTE: Always compile with '-d .' 
 		And always run with <package-name>.<class-name> format
 */
 public class convertToSequence{
-	
-	private static final String DEFAULT_SEPARATOR = ",";
 	private static final String EMPTY_STRING = "";
 
 	public static void main( String... parameters ){
-		
 		String sequenceIndex = parameters[ 0 ];
 		String dictionary = parameters[ 1 ];
 		String separator = EMPTY_STRING;
@@ -31,11 +29,11 @@ public class convertToSequence{
 	}
 
 	public static final String convertToSequence( String sequenceIndex, String dictionary, String separator ){
-		if( separator == null || EMPTY_STRING.equals( separator ) ){
-			separator = DEFAULT_SEPARATOR;
-		}
-
-		/*
+		
+            if (separator == null)
+            {separator = EMPTY_STRING;
+            }
+            /*
 			We need to split the dictionary
 				so that we can use the capabilities of arrays in java.
 		*/
@@ -58,7 +56,7 @@ public class convertToSequence{
 
 		Integer dictionarySequenceLength = dictionaryList.length;
 		BigInteger dictionaryLength = new BigInteger( dictionarySequenceLength.toString( ) );
-		int lastIndex = dictionarySequenceLength - 1;
+                int lastIndex = dictionarySequenceLength - 1;
 
 		BigInteger index = new BigInteger( sequenceIndex );
 		BigInteger remainder = BigInteger.ZERO;
@@ -72,15 +70,15 @@ public class convertToSequence{
 				sequenceStack.push( dictionaryList[ lastIndex ] );
 			}
 			index = index.divide( dictionaryLength );
+                        if( index.compareTo( BigInteger.ONE ) == 0 ){
+                            index = BigInteger.ZERO;
+                        }
 		}while( index.compareTo( BigInteger.ZERO ) != 0 );
 
 		String sequenceList[ ] = sequenceStack.toArray( ( new String[ ]{ } ) );
-		
-		System.out.println( Arrays.toString( sequenceList ).replaceAll( ", ", separator ) );
-		
-		separator = "";
-		
 		String sequence = Arrays.toString( sequenceList ).replaceAll( ", ", separator ).replaceAll( "\\[|\\]|\\s", "" );
-		return sequence;
+		StringBuilder sb = new StringBuilder(sequence);
+                
+                return sb.reverse().toString();
 	}
 }

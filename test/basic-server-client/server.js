@@ -20,7 +20,7 @@ server.on( "request",
 
 		var string = urlData.query.string;
 		var hash = md5Hash( string );
-		var command = "java bruteforce " + hash + " " + string.length;
+		var command = "javac bruteforce.java"; //		 + hash + " " + string.length;
 
 		work( command, 
 			function callback( error, isValid, output ){
