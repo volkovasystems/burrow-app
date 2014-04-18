@@ -52,6 +52,3 @@
 [submodule "convert-to-sequence-index"]
 	path = convert-to-sequence-index
 	url = https://github.com/volkovasystems/convert-to-sequence-index.git
-[submodule "permutate-lexicographically"]
-	path = permutate-lexicographically
-	url = https://github.com/volkovasystems/permutate-lexicographically.git
