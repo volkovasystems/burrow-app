@@ -34,7 +34,7 @@ var requestBruteforce = function requestBruteforce( string, callback ){
 
 					callback(null, data);
 					} );
-		} )+
+		} )
 		.on( "error",
 			function onError( error ) {
 
