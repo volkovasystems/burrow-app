@@ -1,54 +1,54 @@
 [submodule "add-big-number"]
 	path = add-big-number
-	url = https://github.com/volkovasystems/add-big-number.git
+	url = C:\\Users\\userpc\\Dropbox\\code\\web\\burrow-app\\add-big-number
 [submodule "divide-big-number"]
 	path = divide-big-number
-	url = https://github.com/volkovasystems/divide-big-number.git
+	url = C:\\Users\\userpc\\Dropbox\\code\\web\\burrow-app\\divide-big-number
 [submodule "multiply-big-number"]
 	path = multiply-big-number
-	url = https://github.com/volkovasystems/multiply-big-number.git
+	url = C:\\Users\\userpc\\Dropbox\\code\\web\\burrow-app\\multiply-big-number
 [submodule "modulo-big-number"]
 	path = modulo-big-number
-	url = https://github.com/volkovasystems/modulo-big-number.git
+	url = C:\\Users\\userpc\\Dropbox\\code\\web\\burrow-app\\modulo-big-number
 [submodule "half-page"]
 	path = half-page
-	url = https://github.com/volkovasystems/half-page.git
+	url = C:\\Users\\userpc\\Dropbox\\code\\web\\burrow-app\\half-page
 [submodule "node_modules"]
 	path = node_modules
-	url = https://github.com/volkovasystems/node_modules.git
+	url = C:\\Users\\userpc\\Dropbox\\code\\web\\burrow-app\\node_modules
 [submodule "library"]
 	path = library
-	url = https://github.com/volkovasystems/library.git
+	url = C:\\Users\\userpc\\Dropbox\\code\\web\\burrow-app\\library
 [submodule "nth-root"]
 	path = nth-root
-	url = https://github.com/volkovasystems/nth-root.git
+	url = C:\\Users\\userpc\\Dropbox\\code\\web\\burrow-app\\nth-root
 [submodule "generate-random-port-number"]
 	path = generate-random-port-number
-	url = https://github.com/volkovasystems/generate-random-port-number.git
+	url = C:\\Users\\userpc\\Dropbox\\code\\web\\burrow-app\\generate-random-port-number
 [submodule "generate-random-mean-time"]
 	path = generate-random-mean-time
-	url = https://github.com/volkovasystems/generate-random-mean-time.git
+	url = C:\\Users\\userpc\\Dropbox\\code\\web\\burrow-app\\generate-random-mean-time
 [submodule "ng-bind-dom"]
 	path = ng-bind-dom
-	url = https://github.com/volkovasystems/ng-bind-dom.git
+	url = C:\\Users\\userpc\\Dropbox\\code\\web\\burrow-app\\ng-bind-dom
 [submodule "ng-safe-apply"]
 	path = ng-safe-apply
-	url = https://github.com/volkovasystems/ng-safe-apply.git
+	url = C:\\Users\\userpc\\Dropbox\\code\\web\\burrow-app\\ng-safe-apply
 [submodule "absurd-compiler"]
 	path = absurd-compiler
-	url = https://github.com/volkovasystems/absurd-compiler.git
+	url = C:\\Users\\userpc\\Dropbox\\code\\web\\burrow-app\\absurd-compiler
 [submodule "absurd-reset"]
 	path = absurd-reset
-	url = https://github.com/volkovasystems/absurd-reset.git
+	url = C:\\Users\\userpc\\Dropbox\\code\\web\\burrow-app\\absurd-reset
 [submodule "revolver"]
 	path = revolver
-	url = https://github.com/volkovasystems/revolver.git
+	url = C:\\Users\\userpc\\Dropbox\\code\\web\\burrow-app\\revolver
 [submodule "work"]
 	path = work
-	url = https://github.com/volkovasystems/work.git
+	url = C:\\Users\\userpc\\Dropbox\\code\\web\\burrow-app\\work
 [submodule "convert-to-sequence"]
 	path = convert-to-sequence
-	url = https://github.com/volkovasystems/convert-to-sequence.git
+	url = C:\\Users\\userpc\\Dropbox\\code\\web\\burrow-app\\convert-to-sequence
 [submodule "convert-to-sequence-index"]
 	path = convert-to-sequence-index
-	url = https://github.com/volkovasystems/convert-to-sequence-index.git
+	url = C:\\Users\\userpc\\Dropbox\\code\\web\\burrow-app\\convert-to-sequence-index
