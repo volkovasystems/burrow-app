@@ -1,17 +1,10 @@
 var http = require( "http" );
 var async = require( "async" );
 
-var stringList = [
-	"apple",
-	"apple",
-	"apple",
-	"apple",
-	"apple",
-	"apple",
-	"apple",
-	"apple",
-	"apple"];
-
+/*var stringList = [
+	"apple"
+	];
+*/
 var requestBruteforce = function requestBruteforce( string, callback ){
 	var options = {
 	  "host": "127.0.0.1",
@@ -43,7 +36,7 @@ var requestBruteforce = function requestBruteforce( string, callback ){
 	  			console.log("Got error: " + error.message);
 			} );
 };
-
+/*
 var bruteForceEngineList = [ ];
 
 for(index=0; index<stringList.length;index++){
@@ -63,3 +56,4 @@ async.series( bruteForceEngineList,
 
 	} );
 
+*/

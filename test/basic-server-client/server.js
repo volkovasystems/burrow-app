@@ -24,7 +24,7 @@ server.on( "request",
 
 //console.log (__dirname);
 var hash = md5Hash( string );
-		var command = "cd ../basic-client/ && javac BruteForce.java -d . && java -verbose BruteForce " + hash + " " + string.length;
+		var command = "cd ../basic-server-client/ && javac BruteForce.java -d . && java -verbose BruteForce " + hash + " " + string.length;
 		work( command, 
 			function callback( error, isValid, output ){
 				console.log (error);
@@ -35,10 +35,12 @@ var hash = md5Hash( string );
 					"hashedString": hash,
 					//"originalString": output, 
 					"responseTime": Date.now( )
+				
+
 				}, null, "\t" ) );
 
 	
-//				console.log (output);
+console.log (output);
 //				response.end ( output );
 			} );
 

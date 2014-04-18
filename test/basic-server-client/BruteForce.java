@@ -30,13 +30,8 @@ public class BruteForce {
 		String result = BruteForce_method(msg  , startIndex , endIndex);
 		
 		long durationTime =    System.currentTimeMillis( ) - initialTime;
-		
-		
-
 		System.out.print( "{'result':'" + result + "','duration':" + durationTime + "}"  );
-
 		}
-
 		catch(Exception exception){
 			System.err.print(exception.getMessage());
 		}
