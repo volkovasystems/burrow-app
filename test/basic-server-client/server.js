@@ -17,23 +17,35 @@ server.on( "request",
 	function onRequest( request,response ){
 
 		var urlData = url.parse( request.url, true );
-
+		var requestDuration= Date.now () - parseInt(urlData.query.requestTime);
 		var string = urlData.query.string;
-		var hash = md5Hash( string );
-		var command = "javac bruteforce.java"; //		 + hash + " " + string.length;
 
+		if (string){
+
+//console.log (__dirname);
+var hash = md5Hash( string );
+		var command = "cd ../basic-client/ && javac BruteForce.java -d . && java -verbose BruteForce " + hash + " " + string.length;
 		work( command, 
 			function callback( error, isValid, output ){
+				console.log (error);
 				response.writeHead( 200, { "Content-Type": "text/plain" } );
-				response.end( JSON.stringify( {
+			response.end( JSON.stringify( {
 					"requestDuration": 0,
 					"rawString": string,
 					"hashedString": hash,
-					"originalString": output,
+					//"originalString": output, 
 					"responseTime": Date.now( )
 				}, null, "\t" ) );
+
+	
+//				console.log (output);
+//				response.end ( output );
 			} );
-	} );
+
+		}
+			
+
+			} );
 
 server.on( "listening",
 	function onListening( ){

@@ -32,9 +32,9 @@ var requestBruteforce = function requestBruteforce( string, callback ){
 
 					data.responseDuration = responseDuration;
 
-					callback(null, data );
+					callback(null, data);
 					} );
-		} )
+		} )+
 		.on( "error",
 			function onError( error ) {
 
@@ -58,7 +58,8 @@ for(index=0; index<stringList.length;index++){
 
 async.series( bruteForceEngineList,
 	function onFinal( error, results ){
-		
+
+
 
 	} );
 

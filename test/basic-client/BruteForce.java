@@ -1,9 +1,8 @@
-package main;
 import java.math.BigInteger;
 
-import static main.convertToSequence.convertToSequence;
-import static main.convertToSequenceIndex.convertToSequenceIndex;
-
+import main.convertToSequence.*;
+import main.convertToSequenceIndex.*;
+import main.MD5;
 
 public class BruteForce {
 	
@@ -21,10 +20,10 @@ public class BruteForce {
 		int length = Integer.parseInt(parameter[1]);
 		 		 
 		 String start_range = "a";
-		 BigInteger startIndex = convertToSequenceIndex( start_range, dictionary , null );
+		 BigInteger startIndex = main.convertToSequenceIndex.convertToSequenceIndex( start_range, dictionary , null );
 		 
 		String end_range = Generator( length );
-		 BigInteger endIndex = convertToSequenceIndex( end_range, dictionary , null );
+		 BigInteger endIndex = main.convertToSequenceIndex.convertToSequenceIndex( end_range, dictionary , null );
 		 
 		 
 		long initialTime =   System.currentTimeMillis( );
@@ -48,7 +47,7 @@ public class BruteForce {
 			
 				MD5 newHash = new MD5();
 			
-			   String a = convertToSequence( x.toString() , dictionary, null );
+			   String a = main.convertToSequence.convertToSequence( x.toString() , dictionary, null );
 			   
 			   newHash.setString( a );
 			   newHash.hash();

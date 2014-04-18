@@ -1,7 +1,9 @@
 package main;
+
 import java.security.MessageDigest;
 import java.io.FileInputStream;
 import java.security.MessageDigest;
+
 
 //exceptions
 import java.io.UnsupportedEncodingException;
