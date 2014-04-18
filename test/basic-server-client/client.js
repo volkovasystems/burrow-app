@@ -1,30 +1,21 @@
 var http = require( "http" );
 var async = require( "async" );
-
+/*
 var stringList = [
-	"apple",
-	"apple",
-	"apple",
-	"apple",
-	"apple",
-	"apple",
-	"apple",
-	"apple",
-	"apple"];
-
+	"apple", "mangoes"
+	];
+*/
 var requestBruteforce = function requestBruteforce( string, callback ){
 	var options = {
 	  "host": "127.0.0.1",
 	  "port": 8080,
-	  "path": "?string=" +  string + "&responseTime="+ Date.now()
+	   "path": "?requestTime = "+Date.now()
 	};
-
 	http.get( options, 
 		function onResponse( response ){
 			response.on( "data",
 				function onData( data ){
 					data = JSON.parse (data);
-					
 					var rawString = data.rawString;				// string from permutation matched with hash
 					var hashedString = data.hashedString;		// hash of rawString from permutation matched from rawString 
 					var originalString = data.originalString;	// string from server
@@ -44,6 +35,7 @@ var requestBruteforce = function requestBruteforce( string, callback ){
 			} );
 };
 
+/*
 var bruteForceEngineList = [ ];
 
 for(index=0; index<stringList.length;index++){
@@ -59,7 +51,8 @@ for(index=0; index<stringList.length;index++){
 async.series( bruteForceEngineList,
 	function onFinal( error, results ){
 
-
+console.log (results);
 
 	} );
 
+*/

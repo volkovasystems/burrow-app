@@ -30,13 +30,8 @@ public class BruteForce {
 		String result = BruteForce_method(msg  , startIndex , endIndex);
 		
 		long durationTime =    System.currentTimeMillis( ) - initialTime;
-		
-		
-
-		System.out.print( "{'result':'" + result + "','duration':" + durationTime + "}"  );
-
+	System.out.print( "{\"result\":\""+ result + "\",\"duration\":\"" + durationTime + "\"}"  );
 		}
-
 		catch(Exception exception){
 			System.err.print(exception.getMessage());
 		}
@@ -55,6 +50,7 @@ public class BruteForce {
 			   
 			   newHash.setString( a );
 			   newHash.hash();
+			   
 			   String val = newHash.getHashed();
 			 
 			
@@ -62,7 +58,7 @@ public class BruteForce {
 			   if(val.equals(hash_value))
 			   {
 				 
-				   return val;
+				   return a;
 			   }
 			   
 			
