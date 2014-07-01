@@ -1,5 +1,8 @@
 package permutatelexicographically;
 
+package permutatelexicographically;
+
+import java.io.*;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Collection;
@@ -15,7 +18,7 @@ import static permutatelexicographically.convertToSequence.convertToSequence;
 public class permutateLexicographically{
 	public static final String EMPTY_STRING = "";
 
-	public static void main( String... parameters ){
+	public static void main( String... parameters ) throws FileNotFoundException, IOException{
 		/*
 			Parameters: 
 				startingIndex
@@ -39,20 +42,34 @@ public class permutateLexicographically{
 			System.err.print( exception.getMessage( ) );
 			return;
 		}
-		
+                
+                
+                //System.out.print(sequenceList.toString());
+                //System.out.print(sequenceList.containsValue("z,a"));
+                //
+                PrintWriter writer1 = new PrintWriter("hashes_Unordered.txt", "UTF-8");
+                writer1.println(sequenceList.toString());
+                writer1.close();
+                
                 
 //		if( sequenceList.size( ) > 0 ){
 //			Collection<String> sequenceResultList = sequenceList.values( );
                 
+                  
                 BigInteger index = BigInteger.ZERO;
                 Integer a = sequenceList.size();
-                BigInteger l = new BigInteger (a.toString());
+                BigInteger lastIndex = new BigInteger (a.toString());
+                PrintWriter writer2 = new PrintWriter("hashes_Ordered.txt", "UTF-8");
                 
-                while ( l.compareTo(index)!=0)
+                while ( lastIndex.compareTo(index)!=0)
                 {
                     System.out.println( sequenceList.get(index));
+                    writer2.println(index +"-"+sequenceList.get(index));
+                  
                     index= index.add(BigInteger.ONE);
                 }
+                
+                writer2.close();
         }
 	
 
@@ -74,7 +91,7 @@ public class permutateLexicographically{
 			do{
 				String sequence = convertToSequence( currentIndex.toString( ), dictionary, separator );
 			
-                                System.out.println ("Sequence: "+ sequence);
+                    //            System.out.println ("Sequence: "+ sequence);
                                 
                                 sequenceList.put( currentIndex, sequence );
 
