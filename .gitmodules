@@ -34,12 +34,6 @@ url=https://github.com/volkovasystems/ng-bind-dom.git
 [submodule "ng-safe-apply"]
 	path = ng-safe-apply
 url=https://github.com/volkovasystems/ng-safe-apply.git
-[submodule "absurd-compiler"]
-	path = absurd-compiler
-url=https://github.com/volkovasystems/absurd-compiler.git
-[submodule "absurd-reset"]
-	path = absurd-reset
-url=https://github.com/volkovasystems/absurd-reset.git
 [submodule "revolver"]
 	path = revolver
 url=https://github.com/volkovasystems/revolver.git
