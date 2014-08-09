@@ -1,0 +1,16 @@
+MongoDB 2.4 database added.  Please make note of these credentials:
+
+   Root User:     admin
+   Root Password: cj2ayWM1Y7rE
+   Database Name: reinvent
+
+Connection URL: mongodb://$OPENSHIFT_MONGODB_DB_HOST:$OPENSHIFT_MONGODB_DB_PORT/
+
+Please make note of these MongoDB credentials:
+  RockMongo User: admin
+  RockMongo Password: cj2ayWM1Y7rE
+URL: https://reinvent-rrpmm101.rhcloud.com/rockmongo/
+
+var mongoUrl = "mongodb://admin:mX7NDTe4syJ4@127.0.0.1:27017/reinvent"
+
+mongodb://admin:cj2ayWM1Y7rE@reinvent-rrpmm101.rhcloud.com/reinvent:27017/reinvent
