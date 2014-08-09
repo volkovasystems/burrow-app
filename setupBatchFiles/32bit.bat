@@ -43,7 +43,7 @@ echo Installing git quietly >> %USERPROFILE%\Documents\grid_downloads\install_lo
 echo Installation done >> %USERPROFILE%\Documents\grid_downloads\install_log.txt
 
 echo Setup git "path"
-set path=%path%;"C:\Program Files (x86)\Git\cmd"
+set path=%path%;"C:\Program Files\Git\cmd"
 echo Done. >> %USERPROFILE%\Documents\grid_downloads\install_log.txt
 
 echo Changing "path" to application folder >> %USERPROFILE%\Documents\grid_downloads\install_log.txt
