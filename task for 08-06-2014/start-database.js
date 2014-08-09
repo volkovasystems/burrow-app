@@ -27,8 +27,8 @@
 	@module-configuration:
 		{
 			"packageName": "burrow-app/task for 08-06-2014",
-			"fileName": "get-value.js",
-			"moduleName": "getValue",
+			"fileName": "start-database.js",
+			"moduleName": "startDatabase",
 			"authorName": "Regynald Reiner Ventura",
 			"authorEMail": "regynaldventura@gmail.com",
 			"contributorList": [
@@ -42,7 +42,7 @@
 				}
 			],
 			"repository": "git@github.com:volkovasystems/burrow-app.git",
-			"testCase": "get-value-test.js",
+			"testCase": "start-database-test.js",
 			"isGlobal": true
 		}
 	@end-module-configuration
@@ -53,21 +53,18 @@
 
 	@include:
 		{			
-			"util@nodejs": "util",
-			"cabinetkv@npm": "cabinet",
-			"mongoose@npm": "mongoose"
+			"child_process@nodejs": "util"
 		}
 	@end-include
 */
-var getValue = function getValue( key, collectionName, databaseName, databaseHost, databasePort, callback ){
+
+var startDatabase = function startDatabase( host, port, databasePath, callback ){
 	/*:
 		@meta-configuration:
 			{
-				"key:required": "string",
-				"collectionName:required": "string",
-				"databaseName:required": "string",
-				"databaseHost:required": "string",
-				"databasePort:required": "number",
+				"host:required": "string",
+				"port:required": "string",
+				"databasePath:required": "string",
 				"callback:optional": "function"
 			}
 		@end-meta-configuration
@@ -76,49 +73,17 @@ var getValue = function getValue( key, collectionName, databaseName, databaseHos
 	//NOOP override.
 	callback = callback || function( ){ };
 
-	var mongoDatabaseURL = [ 
-		"mongodb://",
-		databaseHost, ":",
-		databasePort, "/",
-		databaseName 
-	].join( "" );
-
-	//Create a connection using the mongo database url.
-	var connection = mongoose.connect( mongoDatabaseURL );
-		
-	//When connected, bind to cabinetkv.
-	connection.on( "connected",
-		function onConnected( ){
-			var cabinetObject = new cabinet( collectionName, mongoose );
-
-			cabinetObject.get( key,
-				function onResult( error, value ){
-					mongoose.connection.close( );
-
-					if( error ){
-						console.error( error );
-						
-						callback( error );
-
-					}else{
-						var encodedValue = new Buffer( util.inspect( value, { "depth": null } ) ).toString( "base64" );
-						console.log( encodedValue );
-
-						callback( null, value );
-					}
-				} );
+	cmd.stdout.on( "data",
+		function ( data ){
+			console.log( "" + data );
 		} );
 
-	connection.on( "error",
-		function onError( error ){
-			console.error( error );
-
-			callback( error );
-		} );
+	cmd.stdin.write( "mongod --rest --bind_ip " + host + " --port " + port + " --dbpath \"" + databasePath + "\"" + " \n" );
+	cmd.stdin.end( );
+	callback ();
 };
 
-var util = require( "util" );
-var cabinet = require( "cabinetkv" );
-var mongoose = require( "mongoose" );
+var cmd = require( "child_process" ).spawn( "cmd" );
 
-exports.getValue = getValue;
+exports.startDatabase = startDatabase;
+

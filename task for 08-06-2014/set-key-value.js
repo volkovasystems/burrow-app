@@ -27,8 +27,8 @@
 	@module-configuration:
 		{
 			"packageName": "burrow-app/task for 08-06-2014",
-			"fileName": "get-value.js",
-			"moduleName": "getValue",
+			"fileName": "set-key-value.js",
+			"moduleName": "setKeyValue",
 			"authorName": "Regynald Reiner Ventura",
 			"authorEMail": "regynaldventura@gmail.com",
 			"contributorList": [
@@ -42,7 +42,7 @@
 				}
 			],
 			"repository": "git@github.com:volkovasystems/burrow-app.git",
-			"testCase": "get-value-test.js",
+			"testCase": "set-key-value-test.js",
 			"isGlobal": true
 		}
 	@end-module-configuration
@@ -59,11 +59,14 @@
 		}
 	@end-include
 */
-var getValue = function getValue( key, collectionName, databaseName, databaseHost, databasePort, callback ){
+
+
+var setKeyValue = function setKeyValue( key, value, collectionName, databaseName, databaseHost, databasePort, callback ){
 	/*:
 		@meta-configuration:
 			{
 				"key:required": "string",
+				"value:required": "string",
 				"collectionName:required": "string",
 				"databaseName:required": "string",
 				"databaseHost:required": "string",
@@ -82,7 +85,7 @@ var getValue = function getValue( key, collectionName, databaseName, databaseHos
 		databasePort, "/",
 		databaseName 
 	].join( "" );
-
+	
 	//Create a connection using the mongo database url.
 	var connection = mongoose.connect( mongoDatabaseURL );
 		
@@ -91,8 +94,8 @@ var getValue = function getValue( key, collectionName, databaseName, databaseHos
 		function onConnected( ){
 			var cabinetObject = new cabinet( collectionName, mongoose );
 
-			cabinetObject.get( key,
-				function onResult( error, value ){
+			cabinetObject.set( key, value,
+				function onSet( error, key ){
 					mongoose.connection.close( );
 
 					if( error ){
@@ -101,14 +104,14 @@ var getValue = function getValue( key, collectionName, databaseName, databaseHos
 						callback( error );
 
 					}else{
-						var encodedValue = new Buffer( util.inspect( value, { "depth": null } ) ).toString( "base64" );
+						var encodedValue = new Buffer( util.inspect( key, { "depth": null } ) ).toString( "base64" );
 						console.log( encodedValue );
 
-						callback( null, value );
+						callback( null, key );
 					}
 				} );
 		} );
-
+	
 	connection.on( "error",
 		function onError( error ){
 			console.error( error );
@@ -118,7 +121,7 @@ var getValue = function getValue( key, collectionName, databaseName, databaseHos
 };
 
 var util = require( "util" );
-var cabinet = require( "cabinetkv" );
+var cabinet = require("cabinetkv");
 var mongoose = require( "mongoose" );
 
-exports.getValue = getValue;
+exports.setKeyValue = setKeyValue;
