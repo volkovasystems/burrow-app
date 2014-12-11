@@ -1,6 +1,0 @@
-@echo OFF
-start cmd /k portForward.bat
-set /p DUMMY=Hit ENTER to continue...
-echo "Port forwarded... "
-set /p DUMMY=Hit ENTER to "exit"...
-exit
