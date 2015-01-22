@@ -99,6 +99,12 @@ gulp.task( "copy-library",
 	function copyTask( ){
 		return gulp
 			.src( [
+				"!bower_components/mathjs/lib/**/*.js",
+				"!bower_components/socket.io-client/lib/*.js",
+				"!**/Gruntfile.js",
+				"!**/index.js",
+				"!**/main.css",
+
 				"bower_components/*/*.css",
 				"bower_components/*/*.map",
 				"bower_components/*/*.js",
@@ -121,10 +127,8 @@ gulp.task( "copy-library",
 				"bower_components/*/fonts/*.svg",
 				"bower_components/*/fonts/*.ttf",
 				"bower_components/*/fonts/*.woff",
-				"!bower_components/mathjs/lib/**/*.js",
-				"!**/Gruntfile.js",
-				"!**/index.js",
-				"!**/main.css"
+
+				"bower_components/jsSHA/src/*.js"
 			] )
 			.pipe( plumber( ) )
 			.pipe( flatten( ) )

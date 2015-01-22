@@ -9,10 +9,6 @@ var serverData = serverSet[ "static" ];
 var host = argv.host ||  serverData.host;
 var port = parseInt( argv.port || 0 ) || serverData.port;
 
-var resolveURL = require( "./resolve-url.js" ).resolveURL;
-resolveURL( serverSet.media );
-var mediaServer = serverSet.media;
-
 var app = express( );
 
 require( "./configure-app.js" ).configureApp( app );

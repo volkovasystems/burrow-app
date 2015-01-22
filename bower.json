@@ -38,7 +38,10 @@
     "pubsub.js": "https://github.com/Sahadar/pubsub.js.git",
     "angular-loading-bar": "~0.6.0",
     "jquery.storage.js": "https://github.com/yckart/jquery.storage.js.git#~0.0.3",
-    "jquery.cookie": "https://github.com/carhartl/jquery-cookie.git#~1.4.1"
+    "jquery.cookie": "https://github.com/carhartl/jquery-cookie.git#~1.4.1",
+    "socket.io-client": "~1.3.2",
+    "jsSHA": "https://github.com/Caligatio/jsSHA.git#~1.5.0",
+    "node-uuid": "https://github.com/broofa/node-uuid.git#~1.4.1"
   },
   "resolutions": {
     "react": "~0.12.0"

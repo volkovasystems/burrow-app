@@ -21,11 +21,43 @@ var io = socketIO( server );
 
 require( "./configure-app.js" ).configureApp( app );
 
-io.on('connection', function (socket) {
-  socket.emit('news', { hello: 'world' });
-  socket.on('my other event', function (data) {
-    console.log(data);
-  });
-});
+app.get( "/ping",
+	function onPing( request, response ){
+		response
+			.status( 200 )
+			.json( {
+				"status": "success"
+			} );
+	} );
+
+var socketList = [ ];
+
+var holeSet = { };
+
+var Hole = require( "./hole.js" ).Hole;
+
+io.on( "connection",
+	function onConnection( socket ){
+		socketList.push( socket );
+
+		socket.emit( "pair" );
+		
+		socket.on( "pair",
+			function onPair( pairID ){
+				var hole = io.of( [ "/", pairID ].join( "" ) );
+
+				holeSet[ pairID ] = new Hole( hole, holeSet );
+
+				socket.emit( "pair", pairID );
+			} );
+
+		socket.on( "disconnect",
+			function onDisconnect( ){
+				_.each( socketList,
+					function onEachSocketList( socket, index ){
+						socketList.splice( index, 1 );
+					} );
+			} );
+	} );
 
 require( "./start-app.js" ).startApp( null, port, host, server );
