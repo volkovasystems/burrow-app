@@ -35,7 +35,7 @@ Hole.prototype.setSocket = function setSocket( socket ){
 };
 
 Hole.prototype.getSocket = function getSocket( ){
-	return this.getSocket( );
+	return this.socket;
 };
 
 Hole.prototype.removeSocket = function removeSocket( ){
