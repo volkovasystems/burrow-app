@@ -70,7 +70,7 @@ Hole.prototype.listenToCommand = function listenToCommand( ){
 };
 
 Hole.prototype.findCommand = function findCommand( ){
-	var 
+	
 };
 
 Hole.prototype.executeCommand = function executeCommand( ){

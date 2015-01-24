@@ -19,6 +19,11 @@
 		<!--: @include-style:"library/loading-bar.min.css" -->
 	</head>
 	<body>
+		<!--
+			You can add sections here to be interpreted by react modules.
+		-->
+		<section class="hello-world">
+		</section>
 		
 		
 		<!--: @include-script:"library/jquery.min.js" -->
@@ -39,34 +44,6 @@
 		<!--: @include-script:"library/sha.js" -->
 		<!--: @include-script:"library/uuid.js" -->
 
-		<script type="text/javascript">
-			var socket = io( "http://localhost:9000" );
-
-			socket.on( "pair", 
-				function onPair( pairID ) {
-					if( _.isEmpty( pairID ) ){
-						var pairID = ( new jsSHA( [ 
-								uuid.v1( ), 
-								uuid.v4( )
-							].join( "-" ), "TEXT" ) )
-							.getHash( "SHA-512", "HEX" );
-
-						socket.emit( "pair", pairID );	
-					
-					}else{
-						pairedSocket = io.connect( [
-							"http://localhost:9000",
-							pairID
-						].join( "/" ) );
-
-						pairedSocket.emit( "ping" );
-
-						pairedSocket.on( "ping",
-							function onPing( date ){
-								console.log( "paired: " + pairID, date );
-							} );
-					}
-				} );
-		</script>
+		<!--: @include-script:"script/burrow-app.min.js" -->
 	</body>
 </html>
