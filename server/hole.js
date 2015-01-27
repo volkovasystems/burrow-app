@@ -3,6 +3,8 @@ var fs = require( "fs" );
 var path = require( "path" );
 var _ = require( "lodash" );
 
+var command = require( "./command.js" ).command;
+
 var Hole = function Hole( hole, holeSet ){
 	this.initialize( hole, holeSet );
 
@@ -45,21 +47,13 @@ Hole.prototype.removeSocket = function removeSocket( ){
 Hole.prototype.listenToCommand = function listenToCommand( ){
 	this.getSocket( )
 		.on( "command",
-			function onCommand( command, callback ){
+			function onCommand( commandPhrase, callback ){
 				async.waterfall( [
-					function findCommand( callback ){
-
-					},
-
-					function extractParameterSet( callback ){
-
-					},
-
 					function executeCommand( callback ){
-
+						command( ).execute( commandPhrase, callback );
 					},
 
-					function compileResult( callback ){
+					function compileResult( result, callback ){
 
 					}
 				],
@@ -67,14 +61,6 @@ Hole.prototype.listenToCommand = function listenToCommand( ){
 
 					} );
 			} );
-};
-
-Hole.prototype.findCommand = function findCommand( ){
-	
-};
-
-Hole.prototype.executeCommand = function executeCommand( ){
-
 };
 
 exports.Hole = Hole;
