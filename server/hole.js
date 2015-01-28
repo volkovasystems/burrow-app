@@ -5,19 +5,21 @@ var _ = require( "lodash" );
 
 var command = require( "./command.js" ).command;
 
-var Hole = function Hole( hole, holeSet ){
-	this.initialize( hole, holeSet );
+var Hole = function Hole( hole, holeSet, referenceID ){
+	this.initialize( hole, holeSet, referenceID );
 
-	this.configure( hole, holeSet );
+	this.configure( hole, holeSet, referenceID );
 };
 
-Hole.prototype.initialize = function initialize( hole, holeSet ){
+Hole.prototype.initialize = function initialize( hole, holeSet, referenceID ){
 	this.hole = hole;
 
 	this.holeSet = holeSet;
+
+	this.referenceID = referenceID;
 };
 
-Hole.prototype.configure = function configure( hole, holeSet ){
+Hole.prototype.configure = function configure( hole, holeSet, referenceID ){
 	var self = this;
 
 	hole.on( "connection",
@@ -27,6 +29,8 @@ Hole.prototype.configure = function configure( hole, holeSet ){
 			self.listenToCommand( );
 
 			self.listenToDisconnection( );
+
+			self.listenToGetReference( );
 
 			self.listenToPing( );
 		} );
@@ -53,7 +57,6 @@ Hole.prototype.listenToCommand = function listenToCommand( ){
 	this.getSocket( )
 		.on( "command",
 			function onCommand( commandPhrase ){
-				console.log( "COMMAND: ", commandPhrase );
 				command( )
 					.execute( commandPhrase,
 						function callback( error, result, command ){
@@ -78,6 +81,19 @@ Hole.prototype.listenToPing = function listenToPing( ){
 		.on( "ping",
 			function onPing( clientDate ){
 				self.getSocket( ).emit( "ping", clientDate, Date.now( ) );
+			} );
+};
+
+Hole.prototype.listenToGetReference = function listenToGetReference( ){
+	var self = this;
+	this.getSocket( )
+		.on( "get-reference",
+			function onGetReference( ){
+				self.getSocket( )
+					.emit( "output", null, {
+						"type": "text",
+						"text": "your pair reference is " + self.referenceID
+					} );
 			} );
 };
 

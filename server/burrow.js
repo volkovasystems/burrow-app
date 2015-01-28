@@ -46,7 +46,11 @@ io.on( "connection",
 			function onPropose( pairID ){
 				var hole = io.of( [ "/", pairID ].join( "" ) );
 
-				holeSet[ pairID ] = new Hole( hole, holeSet );
+				var referenceID = pairID.substring( 0, 5 );
+
+				holeSet[ pairID ] = new Hole( hole, holeSet, referenceID );
+
+				holeSet[ referenceID ] = pairID;
 
 				socket.emit( "accept", pairID );
 			} );

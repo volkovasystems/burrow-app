@@ -17,6 +17,11 @@
 
 				pairedSocket.emit( "ping", Date.now( ) );
 
+				pubsub.subscribe( "bound-socket",
+					function onBoundSocket( ){
+						pairedSocket.emit( "get-reference" );
+					} );
+
 				pairedSocket.on( "ping",
 					function onPing( clientDate, serverDate ){
 						clientDate = moment( clientDate );
@@ -42,6 +47,15 @@
 							"type": "text",
 							"text": pingDescription
 						} ] );
+					} );
+
+				pairedSocket.on( "load",
+					function onLoad( error, URL ){
+						if( error ){
+
+						}else{
+							pubsub.publish( "load", [ URL ] );
+						}
 					} );
 			} );
 	};

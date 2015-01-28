@@ -36,8 +36,8 @@ Command.prototype.find = function find( commandPhrase ){
 	return this;
 };
 
-Command.prototype.extractParameterList = function extractParameterList( ){
-
+Command.prototype.extractParameterList = function extractParameterList( commandPhrase ){
+	this.parameterList = _.rest( commandPhrase.split( " " ) ) || [ ];
 };
 
 Command.prototype.execute = function execute( commandPhrase, callback ){
@@ -52,7 +52,7 @@ Command.prototype.execute = function execute( commandPhrase, callback ){
 		return this;
 	}
 
-	this.extractParameterList( );
+	this.extractParameterList( commandPhrase );
 
 	var commandName = S( this.selectedCommand.commandName ).camelize( ).toString( );
 
@@ -60,8 +60,8 @@ Command.prototype.execute = function execute( commandPhrase, callback ){
 		
 	commandExecutor
 		.apply( null, this.parameterList.concat( [
-			function delegateCallback( error, result ){
-				callback( error, result );
+			function delegateCallback( error, result, command ){
+				callback( error, result, command );
 			}
 		] ) );
 

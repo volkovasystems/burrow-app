@@ -13,6 +13,12 @@
 				function onCommand( commandPhrase ){
 					socket.emit( "command", commandPhrase );
 				} );
+
+			var timeout = setTimeout( function onTimeout( ){
+				pubsub.publish( "bound-socket" );
+
+				clearTimeout( timeout );
+			}, 0 );
 		},
 
 		"getInitialState": function getInitialState( ){
@@ -40,7 +46,7 @@
 				var self = this;
 				pubsub.publish( "command", [ inputText,
 					function callback( ){
-						
+				
 						outputList.push( {
 							"type": "text",
 							"text": inputText
@@ -101,6 +107,10 @@
 			}
 		},
 
+		"componentWillMount": function componentWillMount( ){
+
+		},
+
 		"render": function onRender( ){
 			var inputText = this.state.inputText;
 			var outputList = this.state.outputList;
@@ -137,6 +147,13 @@
 		"componentDidMount": function componentDidMount( ){
 			var self = this;
 
+			pubsub.subscribe( "bind",
+				function onBind( socket ){
+					self.setState( {
+						"socket": socket
+					} );
+				} );
+
 			pubsub.subscribe( "output",
 				function onOutput( error, result ){
 					var outputList = _.clone( self.state.outputList );
@@ -153,13 +170,6 @@
 
 					self.setState( {
 						"outputList": outputList
-					} );
-				} );
-
-			pubsub.subscribe( "bind",
-				function onBind( socket ){
-					self.setState( {
-						"socket": socket
 					} );
 				} );
 
