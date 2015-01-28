@@ -5,11 +5,11 @@ var S = require( "string" );
 
 var Command = function Command( ){
 	Command.commandList = Command.commandList || 
-		_.map( fs.readdirSync( "./command" ),
+		_.map( fs.readdirSync( "./server/command" ),
 			function onEachFilePath( filePath ){
 				var commandData = {
-					"path": path.resolve( "./command", filePath ),
-					"commandName": filePath.replace( /\.*+$/, "" )
+					"path": path.resolve( "./server/command", filePath ),
+					"commandName": filePath.replace( /\..+$/, "" )
 				};
 
 				return commandData;
@@ -43,14 +43,25 @@ Command.prototype.extractParameterList = function extractParameterList( ){
 Command.prototype.execute = function execute( commandPhrase, callback ){
 	this.find( commandPhrase );
 
+	if( _.isEmpty( this.selectedCommand ) ){
+		callback( null, {
+			"type": "text",
+			"text": commandPhrase
+		} );
+
+		return this;
+	}
+
 	this.extractParameterList( );
 
 	var commandName = S( this.selectedCommand.commandName ).camelize( ).toString( );
 
-	commandExecutor = require( this.selectedCommand.path )[ commandName ]
+	commandExecutor = require( this.selectedCommand.path )[ commandName ];
+		
+	commandExecutor
 		.apply( null, this.parameterList.concat( [
-			function callback( error, result ){
-				callback( error, callback );
+			function delegateCallback( error, result ){
+				callback( error, result );
 			}
 		] ) );
 

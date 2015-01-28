@@ -3,11 +3,16 @@ var argv = require( "yargs" ).argv;
 var express = require( "express" );
 var path = require( "path" );
 var querystring = require( "querystring" );
+var fs = require( "fs" );
 
 var serverSet = require( "./package.js" ).packageData.serverSet;
 var serverData = serverSet[ "static" ];
 var host = argv.host ||  serverData.host;
 var port = parseInt( argv.port || 0 ) || serverData.port;
+
+var resolveURL = require( "./resolve-url.js" ).resolveURL;
+resolveURL( serverSet.burrow );
+var burrowServer = serverSet.burrow;
 
 var app = express( );
 
@@ -24,12 +29,26 @@ if( argv.production ){
 	staticDirectory = "deploy";
 }
 
-app.get( "/action/:action/:actionType/:actionValue",
+app.get( "/action/:action/:actionType/:actionValue([^]+)*",
 	function onAction( request, response ){
-		var action = request.param( "action" );
-		var actionType = request.param( "actionType" );
-		var actionValue = request.param( "actionValue" );
+		var action = request.params.action;
+		var actionType = request.params.actionType;
+		var actionValue = request.params.actionValue;
 
+		if( action == "download" && 
+			actionType == "installer" )
+		{
+			var installerPath = path.resolve( __dirname, "../", actionType, actionValue );
+
+			if( fs.existsSync( installerPath ) ){
+				response
+					.status( 200 )
+					.download( installerPath );
+
+				return;
+			}
+		}
+		
 		response.redirect( "/" );
 	} );
 

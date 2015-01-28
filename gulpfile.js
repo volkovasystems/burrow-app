@@ -128,7 +128,8 @@ gulp.task( "copy-library",
 				"bower_components/*/fonts/*.ttf",
 				"bower_components/*/fonts/*.woff",
 
-				"bower_components/jsSHA/src/*.js"
+				"bower_components/jsSHA/src/*.js",
+				"bower_components/URIjs/src/*.js"
 			] )
 			.pipe( plumber( ) )
 			.pipe( flatten( ) )

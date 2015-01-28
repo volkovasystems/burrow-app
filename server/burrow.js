@@ -42,13 +42,13 @@ io.on( "connection",
 
 		socket.emit( "pair" );
 		
-		socket.on( "pair",
-			function onPair( pairID ){
+		socket.on( "propose",
+			function onPropose( pairID ){
 				var hole = io.of( [ "/", pairID ].join( "" ) );
 
 				holeSet[ pairID ] = new Hole( hole, holeSet );
 
-				socket.emit( "pair", pairID );
+				socket.emit( "accept", pairID );
 			} );
 
 		socket.on( "disconnect",
