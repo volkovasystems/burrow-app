@@ -7,7 +7,8 @@
     "preinstall": "npm install gulp bower forever -g",
     "postinstall": "bower install",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": ""
+    "start": "node ./utility/server.js",
+    "client": "node ./utility/client.js"
   },
   "repository": {
     "type": "git",

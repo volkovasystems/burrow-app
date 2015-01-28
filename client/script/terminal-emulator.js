@@ -27,7 +27,7 @@
 				"inputList": [ ],
 				"inputText": "",
 				"socket": null
-			}
+			};
 		},
 
 		"onChangeInputText": function onChangeInputText( event ){
