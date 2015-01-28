@@ -304,18 +304,29 @@ echo "Installing dependencies installed via npm..." >> "%USERPROFILE%\Documents\
 echo "Installing dependencies installed via npm..."
 goto startApp
 
-:startApp
-echo "Starting application." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
-cls
-"npm run-script client --client-mode="
-echo "Application running" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
-goto end
-
 :errorPackage
 echo "ERROR: package.json not found" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "ERROR: package.json not found."  
 echo "Please make sure you have a package.json file for your application." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Please make sure you have a package.json file for your application."
+goto end
+
+:startApp
+echo "Starting application." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
+cls
+
+if /i %1==client goto client
+
+:server
+npm run-script server --host=%2
+goto appRunning
+
+:client
+npm run-script client --client-"mode"=%2 --host=%3
+goto appRunning
+
+:appRunning
+echo "Application running" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 goto end
 
 :end
