@@ -1,14 +1,17 @@
 @ECHO OFF
 TITLE "SETUP --> Burrow-App Installer"
 
+echo "Installing Burrow-App application and dependencies" > "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
+echo "Installing Burrow-App application and dependencies, please wait....."
+
 if exist "%USERPROFILE%\Documents\GridInstallers" goto checkFolderExist
 mkdir "%USERPROFILE%\Documents\GridInstallers"
-echo "Folder created." > "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
+echo "Folder created." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Download location: %USERPROFILE%\Documents\GridInstallers" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 goto detectArchitecture
 
 :checkFolderExist
-echo "Folder already exists." > "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
+echo "Folder already exists." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Download location: %USERPROFILE%\Documents\GridInstallers" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 
 :detectArchitecture
@@ -21,7 +24,6 @@ if "%PROCESSOR_ARCHITECTURE%"=="AMD64" goto 64bit
 
 
 
-
 :32bit
 echo "System Architecture: 32-bit OS" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 cd \
@@ -29,66 +31,31 @@ cd "%USERPROFILE%\Documents\GridInstallers"
 goto wgetDownload32
  
 :wgetDownload32
+if exist "%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe" goto checkWget
 echo "Downloading GNU WGET" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Downloading wget, please wait"
 
 bitsadmin /reset
 bitsadmin /transfer "Download wget" /download /priority HIGH "https://dl.dropboxusercontent.com/s/f7yc4vao7ceg731/wget-1.11.4-1-setup.exe" "%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe"
 
-:CHECK_DOWNLOAD
-bitsadmin /getState "Download wget" | findstr %DOWNLOAD_STATUS_LIST% > "download-status"
-set /p DOWNLOAD_STATUS=< "download-status"
+:checkWget
+setlocal
+set file="%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe"
+set fileSize=3012464
 
-bitsadmin /info "Download wget" /verbose | findstr "TRANSFERRED" > "download-status"
-set /p DOWNLOAD_STATUS=< "download-status"
+for /f "usebackq" %%A IN ('%file%') DO set size=%%~zA
 
-if "%DOWNLOAD_STATUS%"=="CONNECTING" (
-	echo | set /p loading="-"
-	goto CHECK_DOWNLOAD
+if %size% LSS %fileSize% (
+	del "%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe"
+	goto wgetDownload32
+) else if %size% GTR %fileSize% (
+	del "%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe"
+	goto wgetDownload32
+) else (
+	goto wgetInstall32
 )
-
-if "%DOWNLOAD_STATUS%"=="QUEUED" (
-	echo | set /p loading="~"
-	goto CHECK_DOWNLOAD
-)
-
-if "%DOWNLOAD_STATUS%"=="TRANSFERRING" (
-	echo | set /p loading="+"
-	goto CHECK_DOWNLOAD
-)
-
-if "%DOWNLOAD_STATUS%"=="TRANSIENT_ERROR" (
-	echo | set /p loading="!"
-	goto CHECK_DOWNLOAD
-)
-
-if "%DOWNLOAD_STATUS%"=="ERROR" goto DOWNLOAD_STOPPED
-if "%DOWNLOAD_STATUS%"=="CANCELLED" goto DOWNLOAD_STOPPED
-
-if "%DOWNLOAD_STATUS%"=="COMPLETE" goto DOWNLOAD_COMPLETE
-if "%DOWNLOAD_STATUS%"=="ACKNOWLEDGED" goto DOWNLOAD_COMPLETE
-
-if not !DOWNLOAD_STATUS:TRANSFERRED!==!DOWNLOAD_STATUS! (
-	echo | set /p loading="[ok]"
-	bitsadmin /complete "Download wget" > nul
-	goto DOWNLOAD_COMPLETE
-)
-
-:DOWNLOAD_STOPPED
-echo %DOWNLOAD_STATUS% > "download-status"
-echo "Download has stopped." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
-echo "Download has stopped."
-del "%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe"
-goto wgetDownload32
-
-:DOWNLOAD_COMPLETE
-echo "Downloading has completed" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
-del "download-status"
-echo "Downloading has completed."
-goto wgetInstall32
 
 :wgetInstall32
-if not exist "%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe" goto wgetDownload32
 echo "Installing GNU WGET" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Installing GNU wget, please wait..."
 wget-1.11.4-1-setup.exe /sp /silent /nocancel
@@ -103,7 +70,6 @@ wget --no-check-certificate "https://dl.dropboxusercontent.com/s/r5ww8zrjblqzmth
 goto javaInstall32
 
 :javaInstall32
-if not exist "%USERPROFILE%\Documents\GridInstallers\jdk-8u25-windows-i586_2.exe"  goto javaDownload32
 echo "Installing java JDK" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Installing JAVA JDK, please wait..."
 jdk-8u25-windows-i586_2.exe /s
@@ -118,7 +84,6 @@ wget --no-check-certificate "https://dl.dropboxusercontent.com/s/t69wd8oyid7ogti
 goto gitInstall32
 
 :gitInstall32
-if not exist "%USERPROFILE%\Documents\GridInstallers\Git-1.9.5-preview20141217.exe" goto gitDownload32
 echo "Installing gitbash" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Installing gitbash, please wait..."
 Git-1.9.5-preview20141217.exe /silent /norestart
@@ -133,14 +98,23 @@ wget --no-check-certificate "https://dl.dropboxusercontent.com/s/lisgylftb89i81y
 goto nodejsInstall32
 
 :nodejsInstall32
-if not exist "%USERPROFILE%\Documents\GridInstallers\node-v0.10.35-x86.msi" goto nodejsDownload32
 echo "Installing nodejs" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Installing nodejs, please wait..."
 msiexec.exe /i "%USERPROFILE%\Documents\GridInstallers\node-v0.10.35-x86.msi" /quiet /passive /qb
 SET PATH=%PATH%;%PROGRAMFILES%\nodejs
 echo "Installed nodejs" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
-goto appCheck
+goto setPath32
 
+:setPath32
+echo "Setting path to executables..." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
+echo "Setting path to executables..." 
+SET PATH=%PATH%;%PROGRAMFILES%\GnuWin32\bin
+SET PATH=%PATH%;%PROGRAMFILES%\Java\jdk1.8.0_25\bin
+SET PATH=%PATH%;%PROGRAMFILES%\Git\"cmd"
+SET PATH=%PATH%;%PROGRAMFILES%\nodejs
+echo "Done..." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
+echo "Done..."
+goto appCheck
 
 
 
@@ -153,66 +127,31 @@ cd "%USERPROFILE%\Documents\GridInstallers"
 goto wgetDownload64
  
 :wgetDownload64
+if exist "%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe" goto checkWget
 echo "Downloading GNU WGET" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Downloading wget, please wait"
 
 bitsadmin /reset
 bitsadmin /transfer "Download wget" /download /priority HIGH "https://dl.dropboxusercontent.com/s/f7yc4vao7ceg731/wget-1.11.4-1-setup.exe" "%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe"
 
-:CHECK_DOWNLOAD
-bitsadmin /getState "Download wget" | findstr %DOWNLOAD_STATUS_LIST% > "download-status"
-set /p DOWNLOAD_STATUS=< "download-status"
+:checkWget
+setlocal
+set file="%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe"
+set fileSize=3012464
 
-bitsadmin /info "Download wget" /verbose | findstr "TRANSFERRED" > "download-status"
-set /p DOWNLOAD_STATUS=< "download-status"
+for /f "usebackq" %%A IN ('%file%') DO set size=%%~zA
 
-if "%DOWNLOAD_STATUS%"=="CONNECTING" (
-	echo | set /p loading="-"
-	goto CHECK_DOWNLOAD
+if %size% LSS %fileSize% (
+	del "%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe"
+	goto wgetDownload64
+) else if %size% GTR %fileSize% (
+	del "%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe"
+	goto wgetDownload64
+) else (
+	goto wgetInstall64
 )
-
-if "%DOWNLOAD_STATUS%"=="QUEUED" (
-	echo | set /p loading="~"
-	goto CHECK_DOWNLOAD
-)
-
-if "%DOWNLOAD_STATUS%"=="TRANSFERRING" (
-	echo | set /p loading="+"
-	goto CHECK_DOWNLOAD
-)
-
-if "%DOWNLOAD_STATUS%"=="TRANSIENT_ERROR" (
-	echo | set /p loading="!"
-	goto CHECK_DOWNLOAD
-)
-
-if "%DOWNLOAD_STATUS%"=="ERROR" goto DOWNLOAD_STOPPED
-if "%DOWNLOAD_STATUS%"=="CANCELLED" goto DOWNLOAD_STOPPED
-
-if "%DOWNLOAD_STATUS%"=="COMPLETE" goto DOWNLOAD_COMPLETE
-if "%DOWNLOAD_STATUS%"=="ACKNOWLEDGED" goto DOWNLOAD_COMPLETE
-
-if not !DOWNLOAD_STATUS:TRANSFERRED!==!DOWNLOAD_STATUS! (
-	echo | set /p loading="[ok]"
-	bitsadmin /complete "Download wget" > nul
-	goto DOWNLOAD_COMPLETE
-)
-
-:DOWNLOAD_STOPPED
-echo %DOWNLOAD_STATUS% > "download-status"
-echo "Download has stopped." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
-echo "Download has stopped."
-del "%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe"
-goto wgetDownload64
-
-:DOWNLOAD_COMPLETE
-echo "Downloading has completed" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
-del "download-status"
-echo "Downloading has completed."
-goto wgetInstall64
 
 :wgetInstall64
-if not exist "%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe" goto wgetDownload64
 echo "Installing GNU WGET" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Installing GNU wget, please wait..."
 wget-1.11.4-1-setup.exe /sp /silent /nocancel
@@ -227,7 +166,6 @@ wget --no-check-certificate "https://dl.dropboxusercontent.com/s/ulv5zu9g9yv98xb
 goto javaInstall64
 
 :javaInstall64
-if not exist "%USERPROFILE%\Documents\GridInstallers\jdk-8u25-windows-x64.exe" goto javaDownload64
 echo "Installing java JDK" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Installing JAVA JDK, please wait..."
 jdk-8u25-windows-x64.exe /s
@@ -242,7 +180,6 @@ wget --no-check-certificate "https://dl.dropboxusercontent.com/s/t69wd8oyid7ogti
 goto gitInstall64
 
 :gitInstall64
-if not exist "%USERPROFILE%\Documents\GridInstallers\Git-1.9.5-preview20141217.exe" goto gitDownload64
 echo "Installing gitbash" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Installing gitbash, please wait..."
 Git-1.9.5-preview20141217.exe /silent /norestart
@@ -257,12 +194,22 @@ wget --no-check-certificate "https://dl.dropboxusercontent.com/s/e1nxd7719ybgsxu
 goto nodejsInstall64
 
 :nodejsInstall64
-if not exist "%USERPROFILE%\Documents\GridInstallers\node-v0.10.35-x64.msi" goto nodejsDownload64
 echo "Installing nodejs" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Installing nodejs, please wait..."
 msiexec.exe /i "%USERPROFILE%\Documents\GridInstallers\node-v0.10.35-x64.msi" /quiet /passive /qb
 SET PATH=%PATH%;%PROGRAMFILES%\nodejs
 echo "Installed nodejs" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
+goto setPath64
+
+:setPath64
+echo "Setting path to executables..." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
+echo "Setting path to executables..." 
+SET PATH=%PATH%;%PROGRAMFILES(x86)%\GnuWin32\bin
+SET PATH=%PATH%;%PROGRAMFILES%\Java\jdk1.8.0_25\bin
+SET PATH=%PATH%;%PROGRAMFILES(x86)%\Git\"cmd"
+SET PATH=%PATH%;%PROGRAMFILES%\nodejs
+echo "Done..." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
+echo "Done..."
 goto appCheck
 
 
@@ -297,19 +244,19 @@ echo "Burrow-App cloned..."
 cd "%USERPROFILE%\Documents\burrow-app"
 
 :package
-if not exist "%USERPROFILE%\Documents\burrow-app\package.json" goto errorPackage
-echo "Installing dependencies..." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
-npm install
-echo "Installing dependencies installed via npm..." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
-echo "Installing dependencies installed via npm..."
-goto startApp
-
-:errorPackage
+if exist "%USERPROFILE%\Documents\burrow-app\package.json" goto installPackage
 echo "ERROR: package.json not found" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "ERROR: package.json not found."  
 echo "Please make sure you have a package.json file for your application." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Please make sure you have a package.json file for your application."
 goto end
+
+:installPackage
+echo "Installing dependencies..." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
+npm install
+echo "Installing dependencies installed via npm..." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
+echo "Installing dependencies installed via npm..."
+goto startApp
 
 :startApp
 echo "Starting application." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
