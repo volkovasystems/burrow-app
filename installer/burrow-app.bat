@@ -60,7 +60,7 @@ if %size% LSS %fileSize% (
 echo "Installing GNU WGET" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Installing GNU wget, please wait..."
 wget-1.11.4-1-setup.exe /sp /silent /nocancel /norestart
-SET PATH=%pathH%;%PROGRAMFILES%\GnuWin32\bin
+SET PATH=%PATH%;%PROGRAMFILES%\GnuWin32\bin
 echo Installed GNU WGET >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 goto javaDownload32
 
