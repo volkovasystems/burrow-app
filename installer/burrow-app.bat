@@ -1,7 +1,9 @@
 @ECHO OFF
 TITLE "SETUP --> Burrow-App Installer"
-
-echo "Installing Burrow-App application and dependencies" > "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
+echo "Parameters:" %1 %2 %3 > "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
+echo ""
+echo %1 %2 %3
+echo "Installing Burrow-App application and dependencies" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Installing Burrow-App application and dependencies, please wait....."
 
 if exist "%USERPROFILE%\Documents\GridInstallers" goto checkFolderExist
@@ -39,7 +41,6 @@ bitsadmin /reset
 bitsadmin /transfer "Download wget" /download /priority HIGH "https://dl.dropboxusercontent.com/s/f7yc4vao7ceg731/wget-1.11.4-1-setup.exe" "%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe"
 
 :checkWget
-setlocal
 set file="%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe"
 set fileSize=3012464
 
@@ -58,8 +59,8 @@ if %size% LSS %fileSize% (
 :wgetInstall32
 echo "Installing GNU WGET" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Installing GNU wget, please wait..."
-wget-1.11.4-1-setup.exe /sp /silent /nocancel
-SET PATH=%PATH%;%PROGRAMFILES%\GnuWin32\bin
+wget-1.11.4-1-setup.exe /sp /silent /nocancel /norestart
+SET PATH=%pathH%;%PROGRAMFILES%\GnuWin32\bin
 echo Installed GNU WGET >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 goto javaDownload32
 
@@ -86,8 +87,9 @@ goto gitInstall32
 :gitInstall32
 echo "Installing gitbash" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Installing gitbash, please wait..."
-Git-1.9.5-preview20141217.exe /silent /norestart
-SET PATH=%PATH%;%PROGRAMFILES%\Git\"cmd"
+echo "If you re-install gitbash without uninstalling, a prompt will appear, just click YES.."
+Git-1.9.5-preview20141217.exe /sp /silent /nocancel /norestart
+SET PATH=%PATH%;%PROGRAMFILES%\Git\bin
 echo "Installed gitbash" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 goto nodejsDownload32
 
@@ -103,14 +105,13 @@ echo "Installing nodejs, please wait..."
 msiexec.exe /i "%USERPROFILE%\Documents\GridInstallers\node-v0.10.35-x86.msi" /quiet /passive /qb
 SET PATH=%PATH%;%PROGRAMFILES%\nodejs
 echo "Installed nodejs" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
-goto setPath32
 
 :setPath32
 echo "Setting path to executables..." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Setting path to executables..." 
 SET PATH=%PATH%;%PROGRAMFILES%\GnuWin32\bin
 SET PATH=%PATH%;%PROGRAMFILES%\Java\jdk1.8.0_25\bin
-SET PATH=%PATH%;%PROGRAMFILES%\Git\"cmd"
+SET PATH=%PATH%;%PROGRAMFILES%\Git\bin
 SET PATH=%PATH%;%PROGRAMFILES%\nodejs
 echo "Done..." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Done..."
@@ -154,9 +155,9 @@ if %size% LSS %fileSize% (
 :wgetInstall64
 echo "Installing GNU WGET" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Installing GNU wget, please wait..."
-wget-1.11.4-1-setup.exe /sp /silent /nocancel
+wget-1.11.4-1-setup.exe /sp /silent /nocancel /norestart
 SET PATH=%PATH%;%PROGRAMFILES(x86)%\GnuWin32\bin
-echo Installed GNU WGET >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
+echo "Installed GNU WGET" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 goto javaDownload64
 
 :javaDownload64
@@ -182,8 +183,9 @@ goto gitInstall64
 :gitInstall64
 echo "Installing gitbash" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Installing gitbash, please wait..."
-Git-1.9.5-preview20141217.exe /silent /norestart
-SET PATH=%PATH%;%PROGRAMFILES(x86)%\Git\"cmd"
+echo "If you re-install gitbash without uninstalling, a prompt will appear, just click YES.."
+Git-1.9.5-preview20141217.exe /sp /silent /nocancel /norestart
+SET PATH=%PATH%;%PROGRAMFILES(x86)%\Git\bin
 echo "Installed gitbash" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 goto nodejsDownload64
 
@@ -199,14 +201,13 @@ echo "Installing nodejs, please wait..."
 msiexec.exe /i "%USERPROFILE%\Documents\GridInstallers\node-v0.10.35-x64.msi" /quiet /passive /qb
 SET PATH=%PATH%;%PROGRAMFILES%\nodejs
 echo "Installed nodejs" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
-goto setPath64
 
 :setPath64
 echo "Setting path to executables..." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Setting path to executables..." 
 SET PATH=%PATH%;%PROGRAMFILES(x86)%\GnuWin32\bin
 SET PATH=%PATH%;%PROGRAMFILES%\Java\jdk1.8.0_25\bin
-SET PATH=%PATH%;%PROGRAMFILES(x86)%\Git\"cmd"
+SET PATH=%PATH%;%PROGRAMFILES(x86)%\Git\bin
 SET PATH=%PATH%;%PROGRAMFILES%\nodejs
 echo "Done..." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Done..."
@@ -253,29 +254,39 @@ echo "Please make sure you have a package.json file for your application."
 goto end
 
 :installPackage
-echo "Installing dependencies..." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
-npm install
-echo "Installing dependencies installed via npm..." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
-echo "Installing dependencies installed via npm..."
-goto startApp
+cd "%USERPROFILE%\Documents\burrow-app"
+echo "Installing dependencies via npm..." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
+echo "Installing dependencies via npm..."
+cmd /c "npm install" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
+echo "Installed dependencies, you application should start now..." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
+echo "Installed dependencies, you application should start now..."
 
 :startApp
-echo "Starting application." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 cls
 
 if /i %1==client goto client
 
 :server
+echo "Starting application." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
+echo ""
+echo "Command:" burrow-app.bat %1 %2 >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 npm run-script server --host=%2
-goto appRunning
+echo "Application running as --->" %1 "on" %2 >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
+echo ""
+echo "Application running as --->" %1 ":" %2
+goto end
 
 :client
+echo "Starting application." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
+echo ""
+echo "Command:" burrow-app.bat %1 %2 %3 >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 npm run-script client --client-"mode"=%2 --host=%3
-goto appRunning
-
-:appRunning
-echo "Application running" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
+echo "Application running as --->" %1 "on" %3 "in mode" %2 >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
+echo ""
+echo "Application running as --->" %1 ":" %3 "mode: " %2
 goto end
+
+
 
 :end
 echo "Exiting installer." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
