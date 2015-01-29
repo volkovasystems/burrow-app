@@ -7,7 +7,7 @@
     "preinstall": "npm install gulp bower forever -g",
     "postinstall": "bower install",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node ./utility/server.js",
+    "server": "node ./utility/server.js",
     "client": "node ./utility/client.js"
   },
   "repository": {
@@ -30,8 +30,11 @@
     "express": "^4.11.0",
     "express-session": "^1.10.1",
     "lodash": "^2.4.1",
+    "moment": "^2.9.0",
     "mongoose": "^3.8.21",
+    "node-uuid": "^1.4.2",
     "socket.io": "^1.2.1",
+    "socket.io-client": "^1.3.2",
     "string": "^3.0.0",
     "unirest": "^0.4.0",
     "yargs": "^1.3.3"

@@ -1,14 +1,20 @@
+var _ = require( "lodash" );
 var async = require( "async" );
 var fs = require( "fs" );
+var uuid = require( "node-uuid" );
 var path = require( "path" );
-var _ = require( "lodash" );
+
 
 var command = require( "./command.js" ).command;
 
 var Hole = function Hole( hole, holeSet, referenceID ){
-	this.initialize( hole, holeSet, referenceID );
+	if( _( arguments ).toArray( ).isEmpty( ) ){
+		console.log( "empty hole!" );
+	}else{
+		this.initialize( hole, holeSet, referenceID );
 
-	this.configure( hole, holeSet, referenceID );
+		this.configure( hole, holeSet, referenceID );	
+	}
 };
 
 Hole.prototype.initialize = function initialize( hole, holeSet, referenceID ){
@@ -17,6 +23,8 @@ Hole.prototype.initialize = function initialize( hole, holeSet, referenceID ){
 	this.holeSet = holeSet;
 
 	this.referenceID = referenceID;
+
+	return this;
 };
 
 Hole.prototype.configure = function configure( hole, holeSet, referenceID ){
@@ -26,14 +34,12 @@ Hole.prototype.configure = function configure( hole, holeSet, referenceID ){
 		function onConnection( socket ){
 			self.setSocket( socket );
 
-			self.listenToCommand( );
-
-			self.listenToDisconnection( );
-
-			self.listenToGetReference( );
-
-			self.listenToPing( );
+			if( self.socket === socket ){
+				self.attachAllListener( );	
+			}
 		} );
+
+	return this;
 };
 
 Hole.prototype.saveSocket = function saveSocket( ){
@@ -41,7 +47,22 @@ Hole.prototype.saveSocket = function saveSocket( ){
 };
 
 Hole.prototype.setSocket = function setSocket( socket ){
-	this.socket = socket;
+	if( _.isEmpty( this.socket ) ){
+		this.socket = socket;	
+
+	}else{
+		//: Special transfer of the hole. This is just a copy but with different socket.
+		var pairID = this.holeSet[ this.referenceID ];
+
+		var hole = ( new Hole( ) )
+			.initialize( this.hole, this.holeSet, this.referenceID )
+			.setSocket( socket )
+			.attachAllListener( );
+
+		this.holeSet[ pairID ] = _.flatten( [ this.holeSet[ pairID ] ] ).concat( [ hole ] );
+	}
+
+	return this;
 };
 
 Hole.prototype.getSocket = function getSocket( ){
@@ -50,6 +71,16 @@ Hole.prototype.getSocket = function getSocket( ){
 
 Hole.prototype.removeSocket = function removeSocket( ){
 	this.socket = null;
+};
+
+Hole.prototype.attachAllListener = function attachAllListener( ){
+	this.listenToCommand( );
+
+	this.listenToDisconnection( );
+
+	this.listenToGetReference( );
+
+	this.listenToPing( );
 };
 
 Hole.prototype.listenToCommand = function listenToCommand( ){

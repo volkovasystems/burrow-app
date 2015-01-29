@@ -307,7 +307,7 @@ goto startApp
 :startApp
 echo "Starting application." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 cls
-"npm run-script client --client-mode="
+"npm run-script client --client-mode="%1
 echo "Application running" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 goto end
 

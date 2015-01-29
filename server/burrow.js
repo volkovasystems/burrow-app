@@ -55,6 +55,11 @@ io.on( "connection",
 				socket.emit( "accept", pairID );
 			} );
 
+		socket.on( "pair",
+			function onPair( referenceID ){
+				socket.emit( "accept", holeSet[ referenceID ] );
+			} );
+
 		socket.on( "disconnect",
 			function onDisconnect( ){
 				_.each( socketList,

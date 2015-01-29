@@ -1,0 +1,52 @@
+.terminal-emulator {
+	position: absolute !important;
+	top: 0px !important;
+	left: 0px !important;
+
+	width: 100% !important;
+	height: 100% !important;
+
+	display: flex !important;
+	justify-content: center !important;
+	align-items: center !important;
+
+	background-color: black;
+
+	.terminal-container {
+		.output-container {
+			width: 100% !important;
+			
+			.output {
+				color: white;
+				font-size: 1.2em;
+				font-family: monospace;
+			}
+		}
+
+		.input-container {
+			width: 100% !important;
+
+			input {
+				width: 100% !important;
+				
+				background-color: black;
+				color: white;
+
+				outline: none;
+				
+				padding-top: 10px;
+				padding-bottom: 10px;
+				line-height: 1;
+				border: 0;
+
+				font-size: 1.2em;
+				font-family: monospace;
+			}
+		}
+
+		.output-container > *,
+		.input-container > * {
+			padding-left: 5px;
+		}
+	}
+}

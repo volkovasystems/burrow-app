@@ -30,6 +30,10 @@
 			};
 		},
 
+		"onBlurInputText": function onBlurInputText( ){
+			$( "input", this.getDOMNode( ) ).focus( );
+		},
+
 		"onChangeInputText": function onChangeInputText( event ){
 			this.setState( {
 				"inputText": event.target.value
@@ -117,7 +121,13 @@
 
 			return (
 				<section
-					className="terminal-container">
+					className={ [
+						"terminal-container",
+						"col-xs-12",
+						"col-sm-6",
+						"col-md-8",
+						"col-lg-4"
+					].join( " " ) } >
 					<section
 						className="output-container">
 						{ outputList.map( this.onEachOutput ) }
@@ -130,7 +140,8 @@
 							placeholder="Enter command here"
 							value ={ inputText }
 							onChange={ this.onChangeInputText }
-							onKeyPress={ this.onKeyPressInputText } />
+							onKeyPress={ this.onKeyPressInputText }
+							onBlur={ this.onBlurInputText } />
 					</section>
 				</section>
 			);
