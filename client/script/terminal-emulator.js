@@ -74,7 +74,7 @@
 			}
 		},
 
-		"onEachOutput": function onEachOutput( outputData ){
+		"onEachOutput": function onEachOutput( outputData, index ){
 			var key = generateHash( );
 
 			var type = outputData.type;
@@ -152,6 +152,28 @@
 				prevState.socket != this.state.socket )
 			{
 				this.attachAllSocketEvent( );
+			}
+
+			if( !_.isEqual( prevState.outputList, this.state.outputList ) ){
+				var self = this;
+
+				if( this.scrollTimeout ){
+					clearTimeout( this.scrollTimeout );
+
+					this.scrollTimeout = null;
+				}
+
+				this.scrollTimeout = setTimeout( function onTimeout( ){
+					var outputContainer = $( ".output-container", self.getDOMNode( ) );
+
+					outputContainer.animate( { 
+						"scrollTop": outputContainer.height( ) 
+					}, "slow" );
+
+					clearTimeout( self.scrollTimeout );
+
+					this.scrollTimeout = null;
+				}, 500 );
 			}
 		},
 

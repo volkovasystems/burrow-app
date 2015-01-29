@@ -36,8 +36,13 @@ div {
   align-items: center !important;
   background-color: black;
 }
+.terminal-emulator .terminal-container {
+  letter-spacing: 0.5px;
+}
 .terminal-emulator .terminal-container .output-container {
   width: 100% !important;
+  overflow-y: auto !important;
+  max-height: 300px;
 }
 .terminal-emulator .terminal-container .output-container .output {
   color: white;
