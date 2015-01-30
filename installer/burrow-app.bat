@@ -220,6 +220,7 @@ goto appCheck
 :appCheck
 echo "Checking Burrow-App..." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Checking Burrow-App, please wait..."
+
 if exist "%USERPROFILE%\Documents\burrow-app" goto deleteApp
 
 :deleteApp
@@ -227,7 +228,12 @@ echo "Burrow-App repository folder present, will now delete for a clean install"
 echo "Burrow-App repository folder present, will now delete for a clean install"
 echo "Deleting Burrow-App repository folder" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Deleting Burrow-App repository folder, please wait..."
-rd %USERPROFILE%\Documents\burrow-app /s /q
+::rmdir %USERPROFILE%\Documents\burrow-app /s /q
+::rmdir %USERPROFILE%\Documents\burrow-app /s
+rmdir %USERPROFILE%\Documents\burrow-app\build /s /q
+rmdir %USERPROFILE%\Documents\burrow-app\node_modules /s /q
+rmdir %USERPROFILE%\Documents\burrow-app\bower_components /s /q
+
 echo "Burrow-app folder removed, will now proceed to clean install." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Burrow-app folder removed, will now proceed to clean install."
 goto cloneApp
@@ -240,7 +246,7 @@ echo "Cloning Burrow-App repository from github.com, please wait..."
 echo "Cloning Burrow-App repository from github.com" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "link: --> https://github.com/volkovasystems/burrow-app.git" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 ::git clone "https://github.com/volkovasystems/burrow-app.git"
-git clone -b develop "https://github.com/volkovasystems/burrow-app.git"
+::git clone -b develop "https://github.com/volkovasystems/burrow-app.git"
 echo "Burrow-App cloned..." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Burrow-App cloned..."
 cd "%USERPROFILE%\Documents\burrow-app"
