@@ -7,7 +7,7 @@ var getPcInfo = function getPcInfo( callback ){
 	wmic = execute( "wmic os get csname, caption, osarchitecture /format:list &" +
 		"wmic computersystem get model /format:list &" +
 		"wmic cpu get name /format:list &" +
-		"wmic memphysical get maxcapacity /format:list",
+		"wmic memorychip get capacity /format:list",
 
 		function ( error, stdout, stderr ){
 			if (error !== null) {
@@ -17,14 +17,10 @@ var getPcInfo = function getPcInfo( callback ){
 
 				var systemInformation = stdout.toString();
 				var systemInfos = systemInformation.split(/\r\n|\r|\n/g);
-				var specifications = [ ];
-				var specs = [ ];
-				var systemData = [ ];
-				var data = [ ];
-				
+				var specifications = [ ];				
 				var index = 0;
 
-				var regexFilter = ["(^Caption=)","(^CSName=)","(^OSArchitecture=)","(^Model=)","(^Name=)","(^MaxCapacity=)"];
+				var regexFilter = ["(^Caption=)","(^CSName=)","(^OSArchitecture=)","(^Model=)","(^Name=)","(^Capacity=)"];
 
 				for(var i=0; i<systemInfos.length; i++){
 					var filter = new RegExp ( regexFilter[ index ] );
@@ -33,28 +29,52 @@ var getPcInfo = function getPcInfo( callback ){
 					}
 				}
 
+				var cleanSpecifications = [ ];
+				var slots = 0;
 				index = 0;
-							
+
 				for(var i=0; i<specifications.length; i++){
-					var filter = new RegExp ( regexFilter[ index ] );
-					specs[ index++ ] = specifications[ i ].split( filter );					
+					if( specifications[ i ] != "" && specifications[ i ] != null ){
+						cleanSpecifications[ index++ ] = specifications[ i ];
+						if( /(^Capacity=)/.test( specifications[ i ]) ){
+							slots++;
+						}						
+					}
 				}
 
+				var specs = [ ];				
 				index = 0;
 
+				for(var i=0; i<cleanSpecifications.length; i++){
+					if(/^Capacity/.test( cleanSpecifications[ i ] ) ){
+						specs[ index++ ] = cleanSpecifications[ i ].split( /(^Capacity=)/ );
+
+					} else {
+						var filter = new RegExp ( regexFilter[ index ] );
+						specs[ index++ ] = cleanSpecifications[ i ].split( filter );					
+					}
+				}
+
+				var systemData = [ ];				
+				index = 0;
+				
 				for(var i=0; i<specs.length; i++){
 					systemData[ index++ ] = specs[ i ][ 2 ];
 				}
 
-				index = 0;
+				index = specs.length-slots;
 
-				for(var i=0; i<systemData.length; i++){
-					if( systemData[ i ] != null ){
-						data [ index++ ] = systemData[ i ];
-					}				
+				for(var i=index; i<specs.length-1; i++){
+					systemData[ index ] = parseInt(systemData[ index ]) + parseInt(systemData[ i ]); 
 				}
+
+				var data = [ ];				
+				for(var i=0; i<5; i++){
+					data[ i ] = systemData[ i ]; 
+				}
+
 			}
-			callback ( data );
+			callback ( systemData );
 		} );
 };
 
@@ -69,37 +89,41 @@ var getIpconfig = function getIpconfig( callback ){
 
 				var systemInformation = stdout.toString("utf8");
 				var systemInfos = systemInformation.split(/\r\n|\n|\s\:\s|\s/g);
-				var bluetoothFlag = false;
+				var flag = 0;
 				var systemData = [ ];
 				var index = 0;
 
 				for(var i=0; i<systemInfos.length; i++){
 
 					if( systemInfos[ i ] != "" && systemInfos[ i ] != "." && systemInfos[ i ] != "::"){
-						if (/Bl\w+/.test(systemInfos[i]) ) {
-							bluetoothFlag = true;
-						}
+						
 
 						if (!(/^[A-Z][a-z]/.test(systemInfos[i]))){
 							if (/(\w{2}[:-]){5}(\w{2})|(\d{1,3}[\.]){3}(\d{1,3}\(Pr\w+\))|(\w{1,4}[:]{2}(\w{1,4}[:])+((\w{1,4})+)[%]\w{1,2})/.test( systemInfos[ i ] ) ){
-								if (systemInfos[i].match(/(\(Pr\w+\))/)){
-									var temporary = systemInfos[ i ].split(/(\(Pr\w+\))/);
-									systemData[ index++ ] = temporary[ 0 ];
-								}else{
-									systemData[ index++ ] = systemInfos[ i ];
-								}
+								systemData[ index++ ] = systemInfos[ i ];
 							}
 						}
 					}
 				}
 			}
+			index = 0;
 
-			if( bluetoothFlag ){
-				var data = [ systemData [ 1 ], systemData [ 2 ], systemData [ 3 ], "," ];			
-			}else{
-				var data = [ systemData [ 0 ], systemData [ 1 ], systemData [ 2 ], "," ];
+			for(var i=0; i<systemData.length; i++){
+				if( /(\d{1,3}[\.]){3}(\d{1,3}\(Pr\w+\))/.test( systemData[ i ] ) ){
+					flag = i;
+				}
 			}
+			var cleanFlag = [ ];
+			index = 0;
 
+			for(var i=0; i<flag+1; i++){
+				if ( /\(\Pr\w+\)$/.test( systemData[i] ) || /(\w{2}[:-]){5}(\w{2})/.test(systemData[ i ]) ){
+					var temporary = systemData[ i ].split(/\(\Pr\w+\)$/);
+					cleanFlag[ index++ ] = temporary[ 0 ]
+									}
+			}	
+			
+			var data = [ cleanFlag [ flag - 2 ], cleanFlag [ flag - 1 ], cleanFlag [ flag ], "," ];			
 			callback( data );
 		} );	
 };
@@ -120,12 +144,11 @@ var cleanData = function cleanData( callback ){
 
 				var data = [ nodeSpecs[ 5 ],
 							nodeSpecs[ 2 ],
-							nodeSpecs[ 1 ],
 							nodeSpecs[ 0 ],
 							nodeSpecs[ 4 ] + " " + nodeSpecs[ 6 ],
 							nodeSpecs[ 7 ],
 							nodeSpecs[ 8],
-							parseInt(nodeSpecs[ 9 ])/1024/1024 + ".00 GB"];
+							Math.round( parseInt(nodeSpecs[ 9 ] ) / 1070000000 ) + ".00 GB"];
 				callback ( data );
 			} , 3000);
 		}
@@ -133,20 +156,23 @@ var cleanData = function cleanData( callback ){
 
 };
 
-var getSystemData = function getSystemData( callback ){
+var getPCData = function getPCData( callback ){
 
 	cleanData( function( data ){
 		var specsObject = {
 			"name": data[ 0 ],
 			"ipAddress": data[ 1 ],
-			"macAddress": data[ 3 ],
-			"operatingSystem": data[ 4 ],
-			"systemModel": data[ 5 ],
-			"processor": data[ 6 ],
-			"memory": data[ 7 ]
+			"macAddress": data[ 2 ],
+			"operatingSystem": data[ 3 ],
+			"systemModel": data[ 4 ],
+			"processor": data[ 5 ],
+			"memory": data[ 6 ]
 		};
 		callback( specsObject );
 	} );					
 };
+module.exports = getPCData;
 
-exports.getSystemData = getSystemData;
+getPCData( function onGetPCData( specsObject ){
+	console.log( specsObject );
+} );
