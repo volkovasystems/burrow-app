@@ -1,8 +1,10 @@
+package nthRoot;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 
-import static nthPower.nthPower;
+import static nthPower.nthPower.nthPower;
 
 /*
 	NOTE: Always compile with '-d .' 

@@ -1,8 +1,10 @@
+package revertHashAtRange;
+
 import java.security.MessageDigest;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import static convertToSequence.convertToSequence;
+import static convertToSequence.convertToSequence.convertToSequence;
 
 /*:
 	@module-license:

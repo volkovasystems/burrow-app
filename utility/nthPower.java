@@ -1,6 +1,8 @@
+package nthPower;
+
 import java.math.BigDecimal;
 
-import static nthRoot.nthRoot;
+import static nthRoot.nthRoot.nthRoot;
 
 /*
 	NOTE: Always compile with '-d .'

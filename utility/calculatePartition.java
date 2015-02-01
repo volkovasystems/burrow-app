@@ -1,7 +1,9 @@
+package calculatePartition;
+
 import java.math.RoundingMode;
 import java.math.BigDecimal;
 
-import static nthRoot.nthRoot;
+import static nthRoot.nthRoot.nthRoot;
 
 /*                                                          ll
 	NOTE: Always compile with '-d .' 

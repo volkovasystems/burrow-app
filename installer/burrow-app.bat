@@ -229,11 +229,7 @@ echo "Burrow-App repository folder present, will now delete for a clean install"
 echo "Deleting Burrow-App repository folder" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Deleting Burrow-App repository folder, please wait..."
 ::rmdir %USERPROFILE%\Documents\burrow-app /s /q
-::rmdir %USERPROFILE%\Documents\burrow-app /s
 rmdir %USERPROFILE%\Documents\burrow-app\build /s /q
-rmdir %USERPROFILE%\Documents\burrow-app\node_modules /s /q
-rmdir %USERPROFILE%\Documents\burrow-app\bower_components /s /q
-
 echo "Burrow-app folder removed, will now proceed to clean install." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Burrow-app folder removed, will now proceed to clean install."
 goto cloneApp
@@ -245,11 +241,18 @@ cd "%USERPROFILE%\Documents"
 echo "Cloning Burrow-App repository from github.com, please wait..."
 echo "Cloning Burrow-App repository from github.com" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "link: --> https://github.com/volkovasystems/burrow-app.git" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
-::git clone "https://github.com/volkovasystems/burrow-app.git"
 ::git clone -b develop "https://github.com/volkovasystems/burrow-app.git"
 echo "Burrow-App cloned..." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Burrow-App cloned..."
-cd "%USERPROFILE%\Documents\burrow-app"
+
+:compileJava
+cd "%USERPROFILE%\Documents\burrow-app\utility"
+echo "Compiling JAVA classes" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
+echo "Compiling JAVA classes"
+javac -d ./ *.java
+echo "Compiling done..." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
+echo "Compiling Done."
+cd ..
 
 :package
 if exist "%USERPROFILE%\Documents\burrow-app\package.json" goto installPackage
@@ -262,14 +265,13 @@ goto end
 :installPackage
 cd "%USERPROFILE%\Documents\burrow-app"
 echo "Installing dependencies via npm..." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
-echo "Installing dependencies via npm..."
-cmd /c "npm install" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
+echo "Installing dependencies via npm..." 
+::cmd /c npm install ::>> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Installed dependencies, you application should start now..." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Installed dependencies, you application should start now..."
 
 :startApp
-cls
-
+::cls
 if /i %1==client goto client
 
 :server

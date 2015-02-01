@@ -1,10 +1,12 @@
+package revertHashByPartition;
+
 import java.math.RoundingMode;
 import java.math.BigDecimal;
 import java.util.Stack;
 
-import static calculatePartition.calculatePartition;
-import static revertHashAtRange.revertHashAtRange;
-import static convertToSequenceIndex.convertToSequenceIndex;
+import static calculatePartition.calculatePartition.calculatePartition;
+import static revertHashAtRange.revertHashAtRange.revertHashAtRange;
+import static convertToSequenceIndex.convertToSequenceIndex.convertToSequenceIndex;
 
 /*:
 	@module-license:
