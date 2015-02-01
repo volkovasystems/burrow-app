@@ -83,6 +83,16 @@
 
 			var type = outputData.type;
 
+			var duration = outputData.duration;
+
+			var durationPhrase = [
+				duration.requestDuration,
+				duration.responseDuration,
+				duration.totalDuration
+			].join( "|" );
+
+			var reference = outputData.reference;
+
 			switch( type ){
 				case "text":
 					return (
@@ -90,6 +100,14 @@
 							key={ key }
 							className="output text">
 							{ outputData.text }
+							<span
+								className="reference">
+								{ reference }
+							</span>
+							<span 
+								className="duration">
+								{ durationPhrase }			
+							</span>
 						</div>
 					);
 
@@ -102,6 +120,14 @@
 							key={ key }
 							className="output error">
 							{ outputData.error }
+							<span
+								className="reference">
+								{ reference }
+							</span>
+							<span 
+								className="duration">
+								{ durationPhrase }			
+							</span>
 						</div>
 					);
 
@@ -130,7 +156,7 @@
 						"col-xs-12",
 						"col-sm-6",
 						"col-md-8",
-						"col-lg-4"
+						"col-lg-6"
 					].join( " " ) } >
 					<section
 						className="output-container">
@@ -193,17 +219,24 @@
 
 			pubsub.subscribe( "output",
 				function onOutput( error, result, durationData, reference ){
+					durationData = _.clone( durationData );
+
 					durationData = requestResponseDuration( durationData );
 
 					var outputList = _.clone( self.state.outputList );
 
 					if( error ){
 						outputList.push( {
+							"duration": durationData,
+							"reference": reference,
 							"type": "error",
 							"error": error.message
 						} );
 
 					}else{
+						result.duration = durationData;
+						result.reference = reference;
+
 						outputList.push( result );
 					}
 

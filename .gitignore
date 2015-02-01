@@ -4,3 +4,4 @@ build/
 client/library/
 client/fonts/
 burrowdb/
+*.log

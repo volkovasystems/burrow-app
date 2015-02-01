@@ -1,4 +1,4 @@
-var gridCompute = function gridCompute( ){
+var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLength ){
 
 };
 

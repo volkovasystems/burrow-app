@@ -35,11 +35,24 @@
 					} );
 
 				pairedSocket.on( "load",
-					function onLoad( error, URL ){
+					function onLoad( error, URL, durationData, reference ){
 						if( error ){
-							
+							pubsub.publish( "output", [ 
+								null, 
+								{ "type": "error", "error": error.message },
+								durationData,
+								reference
+							] );
+
 						}else{
 							pubsub.publish( "load", [ URL ] );
+
+							pubsub.publish( "output", [ 
+								null, 
+								{ "type": "text", "text": "loading: " + URL },
+								durationData,
+								reference
+							] );
 						}
 					} );
 			} );

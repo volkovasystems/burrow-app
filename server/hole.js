@@ -92,6 +92,8 @@ Hole.prototype.listenToCommand = function listenToCommand( ){
 
 	var referenceID = this.referenceID;
 
+	var pairID = this.holeSet[ referenceID ];
+
 	socket
 		.on( "command",
 			function onCommand( commandPhrase, 
@@ -99,6 +101,8 @@ Hole.prototype.listenToCommand = function listenToCommand( ){
 				durationData,
 				reference )
 			{
+				var holeList = self.holeSet[ pairID ];
+
 				durationData.responseTime = Date.now( );
 
 				command( null, referenceID, socket, durationData, reference )
@@ -107,7 +111,15 @@ Hole.prototype.listenToCommand = function listenToCommand( ){
 							command = command || "output";
 
 							if( ( /^broadcast/ ).test( command ) ){
-								command = command.split( ":" )[ 1 ];
+								command = command.split( ":" )[ 1 ];	
+							}
+
+							if( holeList instanceof Array && 
+								holeList.length > 1 )
+							{
+								console.log( "BROADCAST HOLE LIST LENGTH: " + holeList.length );
+
+								console.log( "BROADCAST command: " + command );
 
 								socket.broadcast.emit( command, 
 									error, 
@@ -116,6 +128,8 @@ Hole.prototype.listenToCommand = function listenToCommand( ){
 									reference );
 
 							}else{
+								console.log( "HOLE LIST LENGTH: " + holeList.length );
+
 								socket.emit( command, 
 									error, 
 									result, 
