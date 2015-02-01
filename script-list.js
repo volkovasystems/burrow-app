@@ -4,6 +4,9 @@ var fs = require( "fs" );
 var scriptList = [
 	"generate-hash.js",
 	"resolve-url.js",
+	"generate-reference.js",
+	"get-request-time.js",
+	"request-response-duration.js",
 	"burrow-app.js",
 	"socket-engine.js",
 	"terminal-emulator.js"

@@ -156,11 +156,11 @@ var cleanData = function cleanData( callback ){
 
 };
 
-var getPCData = function getPCData( callback ){
+var getSystemData = function getSystemData( callback ){
 
 	cleanData( function( data ){
 		var specsObject = {
-			"name": data[ 0 ],
+			"systemName": data[ 0 ],
 			"ipAddress": data[ 1 ],
 			"macAddress": data[ 2 ],
 			"operatingSystem": data[ 3 ],
@@ -171,8 +171,5 @@ var getPCData = function getPCData( callback ){
 		callback( specsObject );
 	} );					
 };
-module.exports = getPCData;
 
-getPCData( function onGetPCData( specsObject ){
-	console.log( specsObject );
-} );
+exports.getSystemData = getSystemData;

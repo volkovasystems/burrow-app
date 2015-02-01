@@ -16,12 +16,15 @@ var burrowHost = burrowServer.joinPath( "" ).replace( "localhost", host );
 
 var socket = io( burrowHost );
 
+console.log( "client engine pairing" );
 socket.emit( "pair", referenceID );
 
-var socketData = { "pairID": "" };
+global.socketData = { "pairID": "" };
 
 socket.on( "accept",
 	function onAccept( pairID ){
+		console.log( "pair id accepted" );
+		
 		if( _.isEmpty( socketData.pairID ) ){
 			socketData.pairID = pairID;
 			
@@ -30,7 +33,8 @@ socket.on( "accept",
 			require( "./socket-engine.js" ).socketEngine( pairedSocket );
 		
 		}else{
-
+			console.log( "no pair id" );
+			process.exit( );
 		}
 	} );
 

@@ -286,7 +286,7 @@ goto end
 echo "Starting application." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo ""
 echo "Command:" burrow-app.bat %1 %2 %3 >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
-npm run-script client --client-"mode"=%2 --host=%3
+npm run-script client --reference=%2 --host=%3
 echo "Application running as --->" %1 "on" %3 "in mode" %2 >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo ""
 echo "Application running as --->" %1 ":" %3 "mode: " %2

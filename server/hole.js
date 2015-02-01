@@ -51,15 +51,17 @@ Hole.prototype.setSocket = function setSocket( socket ){
 		this.socket = socket;	
 
 	}else{
+		var holeSet = this.holeSet;
+
 		//: Special transfer of the hole. This is just a copy but with different socket.
-		var pairID = this.holeSet[ this.referenceID ];
+		var pairID = holeSet[ this.referenceID ];
 
 		var hole = ( new Hole( ) )
-			.initialize( this.hole, this.holeSet, this.referenceID )
+			.initialize( this.hole, holeSet, this.referenceID )
 			.setSocket( socket )
 			.attachAllListener( );
 
-		this.holeSet[ pairID ] = _.flatten( [ this.holeSet[ pairID ] ] ).concat( [ hole ] );
+		holeSet[ pairID ] = _.flatten( [ holeSet[ pairID ] ] ).concat( [ hole ] );
 	}
 
 	return this;
@@ -85,13 +87,41 @@ Hole.prototype.attachAllListener = function attachAllListener( ){
 
 Hole.prototype.listenToCommand = function listenToCommand( ){
 	var self = this;
-	this.getSocket( )
+	
+	var socket = this.getSocket( );
+
+	var referenceID = this.referenceID;
+
+	socket
 		.on( "command",
-			function onCommand( commandPhrase ){
-				command( )
-					.execute( commandPhrase,
+			function onCommand( commandPhrase, 
+				commandData, 
+				durationData,
+				reference )
+			{
+				durationData.responseTime = Date.now( );
+
+				command( null, referenceID, socket, durationData, reference )
+					.execute( commandPhrase, commandData,
 						function callback( error, result, command ){
-							self.getSocket( ).emit( command || "output", error, result );
+							command = command || "output";
+
+							if( ( /^broadcast/ ).test( command ) ){
+								command = command.split( ":" )[ 1 ];
+
+								socket.broadcast.emit( command, 
+									error, 
+									result, 
+									durationData, 
+									reference );
+
+							}else{
+								socket.emit( command, 
+									error, 
+									result, 
+									durationData, 
+									reference );
+							}
 						} );
 			} );
 };
@@ -110,21 +140,35 @@ Hole.prototype.listenToPing = function listenToPing( ){
 	var self = this;
 	this.getSocket( )
 		.on( "ping",
-			function onPing( clientDate ){
-				self.getSocket( ).emit( "ping", clientDate, Date.now( ) );
+			function onPing( durationData, reference ){
+				durationData.responseTime = Date.now( );
+
+				self.getSocket( ).emit( "ping", durationData, reference );
 			} );
 };
 
 Hole.prototype.listenToGetReference = function listenToGetReference( ){
 	var self = this;
-	this.getSocket( )
+	
+	var socket = this.getSocket( );
+
+	var referenceID = this.referenceID;
+
+	socket
 		.on( "get-reference",
-			function onGetReference( ){
-				self.getSocket( )
-					.emit( "output", null, {
-						"type": "text",
-						"text": "your pair reference is " + self.referenceID
-					} );
+			function onGetReference( durationData, reference ){
+				durationData.responseTime = Date.now( );
+
+				var outputData = {
+					"type": "text",
+					"text": "pair reference: " + referenceID
+				};
+
+				socket.emit( "output", 
+					null, 
+					outputData, 
+					durationData, 
+					reference );
 			} );
 };
 

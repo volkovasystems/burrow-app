@@ -15,44 +15,29 @@
 
 				pubsub.publish( "bind", [ pairedSocket ] );
 
-				pairedSocket.emit( "ping", Date.now( ) );
+				pairedSocket.emit( "ping", getRequestTime( ), generateReference( ) );
 
 				pubsub.subscribe( "bound-socket",
 					function onBoundSocket( ){
-						pairedSocket.emit( "get-reference" );
+						pairedSocket.emit( "get-reference", getRequestTime( ), generateReference( ) );
 					} );
 
 				pairedSocket.on( "ping",
-					function onPing( clientDate, serverDate ){
-						clientDate = moment( clientDate );
-						serverDate = moment( serverDate );
+					function onPing( durationData, reference ){
+						durationData = requestResponseDuration( durationData );
 
-						var newClientDate = moment( Date.now( ) );
-
-						var requestDuration = serverDate.diff( clientDate, "seconds", true );
-						var responseDuration = newClientDate.diff( serverDate, "seconds", true );
-						var totalDuration = newClientDate.diff( clientDate, "seconds", true );
-
-						var pingDescription = [ 
-							"ping duration:",
-							[
-								requestDuration,
-								responseDuration,
-								totalDuration
-							].join( "/" ),
-							"seconds"
-						].join( " " );
-
-						pubsub.publish( "output", [ null, {
-							"type": "text",
-							"text": pingDescription
-						} ] );
+						pubsub.publish( "output", [ 
+							null, 
+							{ "type": "text", "text": "ping" },
+							durationData,
+							reference
+						] );
 					} );
 
 				pairedSocket.on( "load",
 					function onLoad( error, URL ){
 						if( error ){
-
+							
 						}else{
 							pubsub.publish( "load", [ URL ] );
 						}

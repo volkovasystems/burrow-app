@@ -5,13 +5,17 @@
 			var socket = this.state.socket;
 
 			socket.on( "output",
-				function onOutput( error, result ){
-					pubsub.publish( "output", [ error, result ] );
+				function onOutput( error, result, durationData, reference ){
+					pubsub.publish( "output", [ error, result, durationData, reference ] );
 				} );
 
 			pubsub.subscribe( "command",
-				function onCommand( commandPhrase ){
-					socket.emit( "command", commandPhrase );
+				function onCommand( commandPhrase, commandData, callback ){
+					socket.emit( "command", 
+						commandPhrase,
+						commandData,
+						getRequestTime( ), 
+						generateReference( ) );
 				} );
 
 			var timeout = setTimeout( function onTimeout( ){
@@ -48,7 +52,7 @@
 				var inputList = _.clone( this.state.inputList );
 				
 				var self = this;
-				pubsub.publish( "command", [ inputText,
+				pubsub.publish( "command", [ inputText, null,
 					function callback( ){
 				
 						outputList.push( {
@@ -188,7 +192,9 @@
 				} );
 
 			pubsub.subscribe( "output",
-				function onOutput( error, result ){
+				function onOutput( error, result, durationData, reference ){
+					durationData = requestResponseDuration( durationData );
+
 					var outputList = _.clone( self.state.outputList );
 
 					if( error ){
@@ -207,7 +213,7 @@
 				} );
 
 			pubsub.subscribe( "command",
-				function onCommand( commandPhrase, callback ){
+				function onCommand( commandPhrase, commandData, callback ){
 					if( _.isEmpty( self.state.socket ) ){
 						callback( );
 					}

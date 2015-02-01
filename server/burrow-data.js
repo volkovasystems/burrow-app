@@ -19,8 +19,8 @@ database.createDatabase( "Burrow", "burrowdb", host, databasePort,
 			mongoose.connect( connectionString );	
 
 			var hole = mongoose.Schema( {
-				"reference": String,
-				"name": String,
+				"reference": [ String ],
+				"systemName": String,
 				"ipAddress": String,
 				"macAddress": String,
 				"operatingSystem": String,
@@ -33,9 +33,10 @@ database.createDatabase( "Burrow", "burrowdb", host, databasePort,
 
 			var grub = mongoose.Schema( {
 				"reference": String,
-				"command": String,
 				"timestamp": Date,
-				"duration": Number,
+				"duration": Object,
+				"command": String,
+				"data": Object,
 				"result": Object
 			} );
 
