@@ -7,20 +7,20 @@ var socketEngine = function socketEngine( socket ){
 	}, Date.now( ), socketData.pairID.substring( 0, 6 ) );
 
 	socket.on( "ping",
-		function onPing( error, result, durationData  ){
+		function onPing( error, result, durationData, reference ){
 			socket.emit( "command", "output", {
 				"outputPhrase": result.text
 			},
 			durationData,
-			socketData.pairID.substring( 0, 6 ) );
+			reference );
 		} );
 	
 	socket.on( "output",
-		function onOutput( error, result, durationData  ){
+		function onOutput( error, result, durationData, reference ){
 			socket.emit( "command", "output", {
 				"outputPhrase": result.text
 			}, durationData,
-			socketData.pairID.substring( 0, 6 ) );
+			reference );
 		} ); 
 		
 	/*socket.emit( "ping", Date.now( ) );

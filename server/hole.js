@@ -108,7 +108,7 @@ Hole.prototype.listenToCommand = function listenToCommand( ){
 				command( null, referenceID, socket, durationData, reference )
 					.execute( commandPhrase, commandData,
 						function callback( error, result, command ){
-							command = command || "output" || "ping";
+							command = command || "output";
 
 							if( ( /^broadcast/ ).test( command ) ){
 								command = command.split( ":" )[ 1 ];	
