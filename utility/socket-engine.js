@@ -6,6 +6,23 @@ var socketEngine = function socketEngine( socket ){
 		"outputPhrase": "client engine initiated"
 	}, Date.now( ), socketData.pairID.substring( 0, 6 ) );
 
+	socket.on( "ping",
+		function onPing( error, result, durationData  ){
+			socket.emit( "command", "output", {
+				"outputPhrase": result.text
+			},
+			durationData,
+			socketData.pairID.substring( 0, 6 ) );
+		} );
+	
+	socket.on( "output",
+		function onOutput( error, result, durationData  ){
+			socket.emit( "command", "output", {
+				"outputPhrase": result.text
+			}, durationData,
+			socketData.pairID.substring( 0, 6 ) );
+		} ); 
+		
 	/*socket.emit( "ping", Date.now( ) );
 
 	socket.on( "ping",
