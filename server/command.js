@@ -1,14 +1,11 @@
 var _ = require( "lodash" );
 var fs = require( "fs" );
+var grub = require( "./grub.js" ).grub;
 var path = require( "path" );
 var S = require( "string" );
 
 var Command = function Command( socketReference, socket, durationData, reference ){
-	this.socketReference = socketReference;
-	this.socket = socket;
-	this.durationData = durationData;
-	this.reference = reference;
-
+	
 	Command.commandList = Command.commandList || 
 		_.map( fs.readdirSync( "./server/command" ),
 			function onEachFilePath( filePath ){
@@ -19,6 +16,15 @@ var Command = function Command( socketReference, socket, durationData, reference
 
 				return commandData;
 			} );
+
+	this.initialize( socketReference, socket, durationData, reference );
+};
+
+Command.prototype.initialize = function initialize( socketReference, socket, durationData, reference ){
+	this.socketReference = socketReference;
+	this.socket = socket;
+	this.durationData = durationData;
+	this.reference = reference;
 
 	this.commandList = Command.commandList;
 };
@@ -57,12 +63,23 @@ Command.prototype.execute = function execute( commandPhrase, commandData, callba
 		return this;
 	}
 
-	this.extractParameterList( commandPhrase );
-
 	var commandName = S( this.selectedCommand.commandName ).camelize( ).toString( );
 
 	commandExecutor = require( this.selectedCommand.path )[ commandName ];
-		
+	
+	if( _.isEmpty( commandExecutor ) ){
+		callback( null, {
+			"type": "error",
+			"error": "command executor does not exists"
+		} );
+
+		return this;	
+	}
+
+	this.commandPhrase = commandPhrase;
+
+	this.extractParameterList( commandPhrase );
+
 	commandData = commandData || { };
 	if( typeof commandData != "object" ){
 		commandData = { };
@@ -73,10 +90,22 @@ Command.prototype.execute = function execute( commandPhrase, commandData, callba
 	commandData.durationData = this.durationData;
 	commandData.reference = this.reference;
 
+	commandData.parameterList = this.parameterList;
+
+	this.commandData = commandData;
+
+	var self = this;
+
 	commandExecutor
 		.apply( commandData, this.parameterList.concat( [
 			function delegateCallback( error, result, command ){
+				self.error = error;
+
+				self.result = result;
+
 				callback( error, result, command );
+
+				grub( this );
 			}
 		] ) );
 

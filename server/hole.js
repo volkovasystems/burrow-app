@@ -8,12 +8,10 @@ var path = require( "path" );
 var command = require( "./command.js" ).command;
 
 var Hole = function Hole( hole, holeSet, referenceID ){
-	if( _( arguments ).toArray( ).isEmpty( ) ){
-		console.log( "empty hole!" );
-	}else{
+	if( ! _( arguments ).toArray( ).isEmpty( ) ){
 		this.initialize( hole, holeSet, referenceID );
 
-		this.configure( hole, holeSet, referenceID );	
+		this.configure( hole, holeSet, referenceID );
 	}
 };
 
@@ -117,10 +115,6 @@ Hole.prototype.listenToCommand = function listenToCommand( ){
 							if( holeList instanceof Array && 
 								holeList.length > 1 )
 							{
-								console.log( "BROADCAST HOLE LIST LENGTH: " + holeList.length );
-
-								console.log( "BROADCAST command: " + command );
-
 								socket.broadcast.emit( command, 
 									error, 
 									result, 
@@ -128,8 +122,6 @@ Hole.prototype.listenToCommand = function listenToCommand( ){
 									reference );
 
 							}else{
-								console.log( "HOLE LIST LENGTH: " + holeList.length );
-
 								socket.emit( command, 
 									error, 
 									result, 

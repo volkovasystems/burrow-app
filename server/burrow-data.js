@@ -37,7 +37,8 @@ database.createDatabase( "Burrow", "burrowdb", host, databasePort,
 				"duration": Object,
 				"command": String,
 				"data": Object,
-				"result": Object
+				"result": Object,
+				"error": String
 			} );
 
 			mongoose.model( "Grub", grub );
