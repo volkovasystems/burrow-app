@@ -8,6 +8,7 @@ echo "Installing Burrow-App application and dependencies, please wait....."
 
 if exist "%USERPROFILE%\Documents\GridInstallers" goto checkFolderExist
 mkdir "%USERPROFILE%\Documents\GridInstallers"
+
 echo "Folder created." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Download location: %USERPROFILE%\Documents\GridInstallers" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 goto detectArchitecture
@@ -218,9 +219,12 @@ goto appCheck
 
 
 :appCheck
+if exist "%APPDATA%\npm" goto checkBurrow 
+mkdir "%APPDATA%\npm"
+
+:checkBurrow
 echo "Checking Burrow-App..." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Checking Burrow-App, please wait..."
-
 if exist "%USERPROFILE%\Documents\burrow-app" goto deleteApp
 
 :deleteApp
@@ -229,7 +233,10 @@ echo "Burrow-App repository folder present, will now delete for a clean install"
 echo "Deleting Burrow-App repository folder" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Deleting Burrow-App repository folder, please wait..."
 ::rmdir %USERPROFILE%\Documents\burrow-app /s /q
-rmdir %USERPROFILE%\Documents\burrow-app\build /s /q
+::rmdir %USERPROFILE%\Documents\burrow-app\build /s /q
+::rmdir %USERPROFILE%\Documents\burrow-app\burrowdb /s /q
+::rmdir %USERPROFILE%\Documents\burrow-app\bower_components /s /q
+::rmdir %USERPROFILE%\Documents\burrow-app\node_modules /s /q
 echo "Burrow-app folder removed, will now proceed to clean install." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Burrow-app folder removed, will now proceed to clean install."
 goto cloneApp
@@ -249,10 +256,10 @@ echo "Burrow-App cloned..."
 cd "%USERPROFILE%\Documents\burrow-app\utility"
 echo "Compiling JAVA classes" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Compiling JAVA classes"
-javac -d ./ *.java
+::javac -d ./ *.java
 echo "Compiling done..." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
-echo "Compiling Done."
 cd ..
+echo "Compiling Done."
 
 :package
 if exist "%USERPROFILE%\Documents\burrow-app\package.json" goto installPackage
@@ -263,10 +270,10 @@ echo "Please make sure you have a package.json file for your application."
 goto end
 
 :installPackage
-cd "%USERPROFILE%\Documents\burrow-app"
 echo "Installing dependencies via npm..." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Installing dependencies via npm..." 
-::cmd /c npm install ::>> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
+cmd /c npm install
+::>> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Installed dependencies, you application should start now..." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 echo "Installed dependencies, you application should start now..."
 

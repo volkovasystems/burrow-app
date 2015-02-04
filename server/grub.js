@@ -21,7 +21,7 @@ Grub.prototype.save = function save( command, callback ){
 		"timestamp": Date.now( ),
 		"duration": command.durationData,
 		"command": command.commandPhrase,
-		"data": command.commandData,
+		"data": _.omit( command.commandData, "socket" ),
 		"result": command.result,
 		"error": command.error
 	} );
@@ -31,20 +31,68 @@ Grub.prototype.save = function save( command, callback ){
 	return this;
 };
 
-Grub.prototype.get = function get( reference ){
+Grub.prototype.get = function get( reference, callback ){
+	
+	var Grub =	mongoose.model( "Grub" );
+	var thisGrub =  { "reference": reference };
 
+	Grub.findOne( thisGrub, 'reference',
+		function onGet( error, result ){
+			callback( result.reference );
+		} );
+
+	return this;
 };
 
-Grub.prototype.getAll = function getAll( referenceList ){
+Grub.prototype.getAll = function getAll( referenceList, callback ){
 
+	var Grub =	mongoose.model( "Grub" );
+	var resultList = [];
+
+	function traverse( reference ){
+		var thisGrub =  { "reference": reference };
+		Grub.findOne( thisGrub, 'reference',
+			function onGetAll( error, result ){
+				resultList.push( result );
+			} );
+	};
+
+	referenceList.map( traverse );
+	callback( referenceList );
+
+	return this;
 };
 
-Grub.prototype.remove = function remove( reference ){
+Grub.prototype.remove = function remove( reference, callback ){
 
+	var Grub =	mongoose.model( "Grub" );
+	var thisGrub =  { "reference": reference };
+
+	Grub.findOneAndRemove( thisGrub,
+		function onRemove( error, result ){
+			callback ( result.reference );
+		} );
+
+	return this;
 };
 
-Grub.prototype.removeAll = function removeAll( referenceList ){
+Grub.prototype.removeAll = function removeAll( referenceList, callback ){
 
+	var Grub =	mongoose.model( "Grub" );
+	var resultList = [];
+
+	function traverse( reference ){
+		var thisGrub =  { "reference": reference };
+		Grub.findOneAndRemove( thisGrub,
+			function onRemoveAll( error, result ){
+				resultList.push( result );
+			} );
+	};
+
+	referenceList.map( traverse );
+	callback( referenceList );
+
+	return this;
 };
 
 var grub = function grub( command ){

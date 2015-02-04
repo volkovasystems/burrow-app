@@ -5,3 +5,4 @@ client/library/
 client/fonts/
 burrowdb/
 *.log
+*.class

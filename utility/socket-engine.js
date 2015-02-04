@@ -23,13 +23,6 @@ var socketEngine = function socketEngine( socket ){
 			reference );
 		} ); 
 		
-	/*socket.emit( "ping", Date.now( ) );
-
-	socket.on( "ping",
-		function onPing( durationData, reference ){
-			
-		} );*/
-
 	socket.on( "get-system-data",
 		function onGetSystemData( durationData, reference ){
 			console.log( "getting system data" );
