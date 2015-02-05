@@ -7,6 +7,7 @@ import java.util.Stack;
 import static calculatePartition.calculatePartition.calculatePartition;
 import static revertHashAtRange.revertHashAtRange.revertHashAtRange;
 import static convertToSequenceIndex.convertToSequenceIndex.convertToSequenceIndex;
+import static convertToSequence.convertToSequence.convertToSequence;
 
 /*:
 	@module-license:
@@ -62,11 +63,14 @@ import static convertToSequenceIndex.convertToSequenceIndex.convertToSequenceInd
 				"rootFactor:required": "number"
 			},
 			{
-				"index:optional": "number"
+				"startIndex:optional": "number"
+			},
+			{
+				"endIndex:optional": "number"
 			},
 			{
 				"size:optional": "number",
-				"@dependent-to-parameter": "index"
+				"@dependent-to-parameter": [ "startIndex", "endIndex" ]
 			},
 			{
 				"separator:optional": "string"
@@ -82,6 +86,7 @@ public class revertHashByPartition{
 	private static final int DEFAULT_LENGTH = 1;
 	private static final String DEFAULT_ROOT_FACTOR = "2";
 	private static final String DEFAULT_STARTING_INDEX = "0";
+	private static final String DEFAULT_ENDING_INDEX = "0";
 	private static final String DEFAULT_PARTITION_SIZE = "0";
 	private static final String DEFAULT_ALGORITHM_TYPE = "md5";
 	
@@ -118,59 +123,69 @@ public class revertHashByPartition{
 
 			}else if( parameterList[ 3 ].toLowerCase( ).matches( "md5|sha" ) ){
 				algorithmType = parameterList[ 3 ];
+			
+			}else if( parameterListLength == 4 ){
+				separator = parameterList[ 3 ];	
 			}
-		}else if( parameterListLength == 4 ){
-			separator = parameterList[ 3 ];	
 		}
 
-		String index = DEFAULT_STARTING_INDEX;
+		String startIndex = DEFAULT_STARTING_INDEX;
 		if( parameterListLength >= 5 ){
 			if( parameterList[ 4 ].matches( "\\d+" ) ){
-				index = parameterList[ 4 ];
+				startIndex = parameterList[ 4 ];
 
 			}else if( parameterList[ 4 ].toLowerCase( ).matches( "md5|sha" ) ){
 				algorithmType = parameterList[ 4 ];
+			
+			}else if( parameterListLength == 5 ){
+				separator = parameterList[ 4 ];	
 			}
-
-		}else if( parameterListLength == 5 ){
-			separator = parameterList[ 4 ];	
 		}
 
-		String size = DEFAULT_PARTITION_SIZE;
+		String endIndex = DEFAULT_ENDING_INDEX;
 		if( parameterListLength >= 6 ){
 			if( parameterList[ 5 ].matches( "\\d+" ) ){
-				size = parameterList[ 5 ];
+				endIndex = parameterList[ 5 ];
 
 			}else if( parameterList[ 5 ].toLowerCase( ).matches( "md5|sha" ) ){
 				algorithmType = parameterList[ 5 ];
-			}
 
-		}else if( parameterListLength == 6 ){
-			separator = parameterList[ 5 ];
+			}else if( parameterListLength == 6 ){
+				separator = parameterList[ 5 ];	
+			}
 		}
 
+		String size = DEFAULT_PARTITION_SIZE;
 		if( parameterListLength >= 7 ){
-			if( parameterList[ 6 ].toLowerCase( ).matches( "md5|sha" ) ){
-				algorithmType = parameterList[ 6 ];
-			}
+			if( parameterList[ 6 ].matches( "\\d+" ) ){
+				size = parameterList[ 6 ];
 
-		}else if( parameterListLength == 7 ){
-			separator = parameterList[ 6 ];
+			}else if( parameterList[ 6 ].toLowerCase( ).matches( "md5|sha" ) ){
+				algorithmType = parameterList[ 6 ];
+			
+			}else if( parameterListLength == 7 ){
+				separator = parameterList[ 6 ];
+			}
 		}
-		
-		if( parameterListLength == 8 ){
-			separator = parameterList[ 7 ];
+
+		if( parameterListLength >= 8 ){
+			if( parameterList[ 7 ].toLowerCase( ).matches( "md5|sha" ) ){
+				algorithmType = parameterList[ 7 ];
+			
+			}else if( parameterListLength == 8 ){
+				separator = parameterList[ 7 ];
+			}
 		}
 
 		try{
-			revertHashByPartition( hash, dictionary, length, rootFactor, index, size, algorithmType, separator );	
+			revertHashByPartition( hash, dictionary, length, rootFactor, startIndex, endIndex, size, algorithmType, separator );	
 
 		}catch( Exception exception ){
 			System.err.print( exception.getMessage( ) );
 		}
 	}
 
-	public static final void revertHashByPartition( String hash, String dictionary, int length, String rootFactor, String index, String size, String algorithmType, String separator )
+	public static final void revertHashByPartition( String hash, String dictionary, int length, String rootFactor, String startIndex, String endIndex, String size, String algorithmType, String separator )
 		throws Exception
 	{
 		//: Split the dictionary using the separator to get the dictionary list which is badly needed.
@@ -185,8 +200,17 @@ public class revertHashByPartition{
 		
 		//: Try to check if there is a given starting index.
 		BigDecimal startingIndex = BigDecimal.ONE;
-		if( !index.equals( DEFAULT_STARTING_INDEX ) ){
-			startingIndex = new BigDecimal( index );
+		if( !startIndex.equals( DEFAULT_STARTING_INDEX ) ){
+			startingIndex = new BigDecimal( startIndex );
+		}
+
+		BigDecimal endingIndex = BigDecimal.ONE;
+		if( !endIndex.equals( DEFAULT_ENDING_INDEX ) ){
+			endingIndex = new BigDecimal( endIndex );
+
+			endingSequence = convertToSequence( endingIndex, dictionary, separator );
+
+			totalSequenceCount = new BigDecimal( convertToSequenceIndex( endingSequence, dictionary, separator ).toString( ) );
 		}
 
 		//: If the starting index is greater than the total sequence count stop the execution.
