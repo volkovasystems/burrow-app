@@ -66,8 +66,8 @@ Command.prototype.execute = function execute( commandPhrase, commandData, callba
 	var commandName = S( this.selectedCommand.commandName ).camelize( ).toString( );
 
 	commandExecutor = require( this.selectedCommand.path )[ commandName ];
-	
-	/*if( _.isEmpty( commandExecutor ) ){
+
+	if( _.isEmpty( commandExecutor ) ){
 		callback( null, {
 			"type": "error",
 			"error": "command executor does not exists"
@@ -75,7 +75,7 @@ Command.prototype.execute = function execute( commandPhrase, commandData, callba
 
 		return this;	
 	}
-*/
+
 	this.commandPhrase = commandPhrase;
 
 	this.extractParameterList( commandPhrase );
