@@ -105,7 +105,7 @@ public class generatePartitionRange{
 				endIndex = startIndex.add( lastPartitionSize );
 
 				if( endIndex.compareTo( totalSequenceCount ) != "0" ){
-
+					endIndex = totalSequenceCount;
 				}
 
 				partitionRangeList.push( new BigDecimal( ){ startIndex, endIndex } );
