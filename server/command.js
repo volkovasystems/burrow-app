@@ -82,7 +82,8 @@ Command.prototype.execute = function execute( commandPhrase, commandData, callba
 
 	this.extractParameterList( commandPhrase );
 
-	commtypeof commandData != "object" ){
+	commandData = commandData || { };
+	if( typeof commandData != "object" ){
 		commandData = { };
 	}
 
