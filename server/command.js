@@ -67,7 +67,7 @@ Command.prototype.execute = function execute( commandPhrase, commandData, callba
 
 	commandExecutor = require( this.selectedCommand.path )[ commandName ];
 
-	if( _.isEmpty( commandExecutor ) ){
+	if( _.isEmpty( commandExecutor.toString( ) ) ){
 		callback( null, {
 			"type": "error",
 			"error": "command executor does not exists"
