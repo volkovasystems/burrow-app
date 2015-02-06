@@ -1,7 +1,7 @@
 var output = function output( callback ){
 	callback( null, {
 		"type": "text",
-		"text": this.outputPhrase
+		"text": this.outputPhrase || this.commandPhrase
 	}, "broadcast:output" );
 };
 

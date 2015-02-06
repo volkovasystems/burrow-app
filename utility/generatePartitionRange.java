@@ -57,7 +57,17 @@ public class generatePartitionRange{
 
 			String outputString = "";
 
-			
+			while( partitionRangeList.size( ) != 0 ){
+				BigDecimal[ ] partitionRange = partitionRangeList.pop( );
+
+				outputString += String.join( "-", new String( ){ partitionRange[ 0 ].toString( ), partitionRange[ 1 ].toString( ) } );
+
+				if( partitionRangeList.size( ) > 1 ){
+					outputString += ",";	
+				}
+			}
+
+			System.out.print( outputString );
 
 		}catch( Exception exception ){
 			System.err.print( exception.getMessage( ) );

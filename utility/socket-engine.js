@@ -4,7 +4,7 @@ var socketEngine = function socketEngine( socket ){
 
 	socket.emit( "command", "output", {
 		"outputPhrase": "client engine initiated"
-	}, Date.now( ), socketData.pairID.substring( 0, 6 ) );
+	}, { "requestTime": Date.now( ) }, socketData.pairID.substring( 0, 6 ) );
 
 	socket.on( "ping",
 		function onPing( error, result, durationData, reference ){

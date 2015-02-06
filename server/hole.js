@@ -114,7 +114,7 @@ Hole.prototype.listenToCommand = function listenToCommand( ){
 
 							if( holeList instanceof Array && 
 								holeList.length > 1 )
-							{
+							{	
 								socket.broadcast.emit( command, 
 									error, 
 									result, 
@@ -149,7 +149,7 @@ Hole.prototype.listenToPing = function listenToPing( ){
 			function onPing( durationData, reference ){
 				durationData.responseTime = Date.now( );
 
-				self.getSocket( ).emit( "ping", durationData, reference );
+				self.getSocket( ).emit( "ping", null, null, durationData, reference );
 			} );
 };
 

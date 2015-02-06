@@ -93,6 +93,7 @@ Command.prototype.execute = function execute( commandPhrase, commandData, callba
 	commandData.reference = this.reference;
 
 	commandData.parameterList = this.parameterList;
+	commandData.commandPhrase = commandPhrase;
 
 	this.commandData = commandData;
 

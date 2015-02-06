@@ -23,12 +23,12 @@
 					} );
 
 				pairedSocket.on( "ping",
-					function onPing( durationData, reference ){
+					function onPing( error, result, durationData, reference ){
 						durationData = requestResponseDuration( durationData );
 
 						pubsub.publish( "output", [ 
-							null, 
-							{ "type": "text", "text": "ping" },
+							error || null, 
+							result || { "type": "text", "text": "ping" },
 							durationData,
 							reference
 						] );
