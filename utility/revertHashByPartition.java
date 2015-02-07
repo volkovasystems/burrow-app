@@ -208,7 +208,7 @@ public class revertHashByPartition{
 		if( !endIndex.equals( DEFAULT_ENDING_INDEX ) ){
 			endingIndex = new BigDecimal( endIndex );
 
-			endingSequence = convertToSequence( endingIndex, dictionary, separator );
+			endingSequence = convertToSequence( endingIndex.toString( ), dictionary, separator );
 
 			totalSequenceCount = new BigDecimal( convertToSequenceIndex( endingSequence, dictionary, separator ).toString( ) );
 		}

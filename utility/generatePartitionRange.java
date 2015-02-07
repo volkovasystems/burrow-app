@@ -38,7 +38,9 @@ public class generatePartitionRange{
 			return;
 		}
 
+		String separator = EMPTY_STRING;
 		String rootFactor = DEFAULT_ROOT_FACTOR;
+
 		if( parameterListLength >= 3 &&
 			parameterList[ 2 ].matches( "\\d+" ) )
 		{
@@ -60,7 +62,12 @@ public class generatePartitionRange{
 			while( partitionRangeList.size( ) != 0 ){
 				BigDecimal[ ] partitionRange = partitionRangeList.pop( );
 
-				outputString += String.join( "-", new String( ){ partitionRange[ 0 ].toString( ), partitionRange[ 1 ].toString( ) } );
+				String startingIndex = partitionRange[ 0 ].toString( );
+				String endingIndex = partitionRange[ 1 ].toString( );
+
+				String[ ] partition = new String[ ]{ startingIndex, endingIndex };
+
+				outputString += String.join( "-", partition );
 
 				if( partitionRangeList.size( ) > 1 ){
 					outputString += ",";	
@@ -75,7 +82,7 @@ public class generatePartitionRange{
 	}
 
 	public static final Stack<BigDecimal[ ]> generatePartitionRange( String dictionary, int length, String rootFactor, String separator ){
-		//: Split the dictionary using the separator to get the dictionary list which is badly needed.
+		/*//: Split the dictionary using the separator to get the dictionary list which is badly needed.
 		String[ ] dictionaryList = dictionary.split( separator );
 		int dictionaryListLength = dictionaryList.length;
 
@@ -91,10 +98,10 @@ public class generatePartitionRange{
 		BigDecimal partitionSize = totalSequenceCount.divide( partitionCount, 0, RoundingMode.FLOOR );
 		
 		BigDecimal lastPartitionSize = totalSequenceCount.subtract( partitionCount.subtract( BigDecimal.ONE ).multiply( partitionSize ) );
-
+*/
 		Stack<BigDecimal[ ]> partitionRangeList = new Stack<>( );
 
-		for( 
+		/*for( 
 			BigDecimal index = BigDecimal.ONE,
 			BigDecimal startIndex = index,
 			BigDecimal endIndex = index;
@@ -115,6 +122,8 @@ public class generatePartitionRange{
 				partitionRangeList.push( new BigDecimal( ){ startIndex, endIndex } );
 				startIndex = endIndex.add( BigDecimal.ONE );
 			}
-		}
+		}*/
+
+		return partitionRangeList;
 	}
 }
