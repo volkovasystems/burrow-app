@@ -32,13 +32,13 @@ Grub.prototype.save = function save( command, callback ){
 };
 
 Grub.prototype.get = function get( reference, callback ){
-	
+
 	var Grub =	mongoose.model( "Grub" );
 	var thisGrub =  { "reference": reference };
 
 	Grub.findOne( thisGrub, 'reference',
 		function onGet( error, result ){
-			callback( result.reference );
+			callback( result );
 		} );
 
 	return this;
@@ -47,20 +47,13 @@ Grub.prototype.get = function get( reference, callback ){
 Grub.prototype.getAll = function getAll( referenceList, callback ){
 
 	var Grub =	mongoose.model( "Grub" );
-	var resultList = [];
 
-	function traverse( reference ){
-		var thisGrub =  { "reference": reference };
-		Grub.findOne( thisGrub, 'reference',
-			function onGetAll( error, result ){
-				resultList.push( result );
-			} );
-	};
+	Grub.find( { "reference": { $in: referenceList } },
+		function onCallback( error, results ){
+			callback( results );
+		} );
 
-	referenceList.map( traverse );
-	callback( referenceList );
-
-	return this;
+	return this;	
 };
 
 Grub.prototype.remove = function remove( reference, callback ){
@@ -70,7 +63,11 @@ Grub.prototype.remove = function remove( reference, callback ){
 
 	Grub.findOneAndRemove( thisGrub,
 		function onRemove( error, result ){
-			callback ( result.reference );
+			if ( error ) {
+				callback ( false );
+			}else{
+				callback ( true );
+			}
 		} );
 
 	return this;
@@ -79,19 +76,16 @@ Grub.prototype.remove = function remove( reference, callback ){
 Grub.prototype.removeAll = function removeAll( referenceList, callback ){
 
 	var Grub =	mongoose.model( "Grub" );
-	var resultList = [];
 
-	function traverse( reference ){
-		var thisGrub =  { "reference": reference };
-		Grub.findOneAndRemove( thisGrub,
-			function onRemoveAll( error, result ){
-				resultList.push( result );
-			} );
-	};
-
-	referenceList.map( traverse );
-	callback( referenceList );
-
+	Grub.remove( { "reference": { $in: referenceList } },
+		function onRemove( error, result ){
+			if ( error ) {
+				callback ( false );
+			}else{
+				callback ( true );
+			}
+		} );
+	
 	return this;
 };
 
