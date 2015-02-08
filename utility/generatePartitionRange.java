@@ -69,7 +69,7 @@ public class generatePartitionRange{
 
 				outputString += String.join( "-", partition );
 
-				if( partitionRangeList.size( ) > 1 ){
+				if( partitionRangeList.size( ) > 0 ){
 					outputString += ",";	
 				}
 			}
@@ -106,7 +106,7 @@ public class generatePartitionRange{
 		BigDecimal index = BigDecimal.ONE;
 		BigDecimal startIndex = index;
 		BigDecimal endIndex = index;
-		while( index.compareTo( partitionCount ) <= 0 ){
+		while( index.compareTo( partitionCount ) != 0 ){
 			if( index.add( BigDecimal.ONE ).compareTo( partitionCount ) == 0 ){
 				endIndex = startIndex.add( lastPartitionSize );
 
