@@ -81,8 +81,10 @@ public class generatePartitionRange{
 		}
 	}
 
-	public static final Stack<BigDecimal[ ]> generatePartitionRange( String dictionary, int length, String rootFactor, String separator ){
-		/*//: Split the dictionary using the separator to get the dictionary list which is badly needed.
+	public static final Stack<BigDecimal[ ]> generatePartitionRange( String dictionary, int length, String rootFactor, String separator )
+		throws Exception
+	{
+		//: Split the dictionary using the separator to get the dictionary list which is badly needed.
 		String[ ] dictionaryList = dictionary.split( separator );
 		int dictionaryListLength = dictionaryList.length;
 
@@ -98,31 +100,30 @@ public class generatePartitionRange{
 		BigDecimal partitionSize = totalSequenceCount.divide( partitionCount, 0, RoundingMode.FLOOR );
 		
 		BigDecimal lastPartitionSize = totalSequenceCount.subtract( partitionCount.subtract( BigDecimal.ONE ).multiply( partitionSize ) );
-*/
+
 		Stack<BigDecimal[ ]> partitionRangeList = new Stack<>( );
 
-		/*for( 
-			BigDecimal index = BigDecimal.ONE,
-			BigDecimal startIndex = index,
-			BigDecimal endIndex = index;
-			index.compareTo( partitionCount ) <= 0;
-			index = index.add( BigDecimal.ONE )
-		){
+		BigDecimal index = BigDecimal.ONE;
+		BigDecimal startIndex = index;
+		BigDecimal endIndex = index;
+		while( index.compareTo( partitionCount ) <= 0 ){
 			if( index.add( BigDecimal.ONE ).compareTo( partitionCount ) == 0 ){
 				endIndex = startIndex.add( lastPartitionSize );
 
-				if( endIndex.compareTo( totalSequenceCount ) != "0" ){
+				if( endIndex.compareTo( totalSequenceCount ) != 0 ){
 					endIndex = totalSequenceCount;
 				}
 
-				partitionRangeList.push( new BigDecimal( ){ startIndex, endIndex } );
+				partitionRangeList.push( new BigDecimal[ ]{ startIndex, endIndex } );
 
 			}else{
 				endIndex = startIndex.add( partitionSize );
-				partitionRangeList.push( new BigDecimal( ){ startIndex, endIndex } );
+				partitionRangeList.push( new BigDecimal[ ]{ startIndex, endIndex } );
 				startIndex = endIndex.add( BigDecimal.ONE );
 			}
-		}*/
+
+			index = index.add( BigDecimal.ONE );
+		}
 
 		return partitionRangeList;
 	}
