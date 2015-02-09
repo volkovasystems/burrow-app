@@ -25,7 +25,7 @@ var register = function register( callback ){
 					callback( );
 
 				}else{
-					callback( "hole-exists" );
+					callback( new Error( "hole already exists" ) );
 				}
 			},
 
@@ -47,10 +47,19 @@ var register = function register( callback ){
 			}
 		],
 			function lastly( error ){
-				callback( error, {
-					"type": "text",
-					"text": "registration completed"
-				}, "broadcast:output" );
+				if( error ){
+					callback( error, {
+						"type": "error",
+						"error": error.message
+					}, "broadcast:output" );
+
+				}else{
+					callback( null, {
+						"type": "text",
+						"text": "registration completed"
+					}, "broadcast:output" );
+				}
+				
 			} );
 
 	}else{

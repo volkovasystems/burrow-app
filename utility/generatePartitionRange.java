@@ -57,8 +57,6 @@ public class generatePartitionRange{
 		try{
 			Stack<BigDecimal[ ]> partitionRangeList = generatePartitionRange( dictionary, length, rootFactor, separator );
 
-			String outputString = "";
-
 			while( partitionRangeList.size( ) != 0 ){
 				BigDecimal[ ] partitionRange = partitionRangeList.pop( );
 
@@ -67,14 +65,8 @@ public class generatePartitionRange{
 
 				String[ ] partition = new String[ ]{ startingIndex, endingIndex };
 
-				outputString += String.join( "-", partition );
-
-				if( partitionRangeList.size( ) > 0 ){
-					outputString += ",";	
-				}
+				System.out.print( String.join( "-", partition ) + "," );
 			}
-
-			System.out.print( outputString );
 
 		}catch( Exception exception ){
 			System.err.print( exception.getMessage( ) );

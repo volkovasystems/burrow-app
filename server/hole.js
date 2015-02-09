@@ -103,7 +103,7 @@ Hole.prototype.listenToCommand = function listenToCommand( ){
 
 				durationData.responseTime = Date.now( );
 
-				command( null, referenceID, socket, durationData, reference )
+				command( null, referenceID, socket, durationData, reference, self.holeSet )
 					.execute( commandPhrase, commandData,
 						function callback( error, result, command ){
 							command = command || "output";

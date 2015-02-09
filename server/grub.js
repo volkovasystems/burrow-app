@@ -21,7 +21,7 @@ Grub.prototype.save = function save( command, callback ){
 		"timestamp": Date.now( ),
 		"duration": command.durationData,
 		"command": command.commandPhrase,
-		"data": _.omit( command.commandData, "socket" ),
+		"data": _.omit( command.commandData, "socket", "holeSet" ),
 		"result": command.result,
 		"error": command.error
 	} );

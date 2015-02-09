@@ -4,7 +4,7 @@ var grub = require( "./grub.js" ).grub;
 var path = require( "path" );
 var S = require( "string" );
 
-var Command = function Command( socketReference, socket, durationData, reference ){
+var Command = function Command( socketReference, socket, durationData, reference, holeSet ){
 	
 	Command.commandList = Command.commandList || 
 		_.map( fs.readdirSync( "./server/command" ),
@@ -17,14 +17,15 @@ var Command = function Command( socketReference, socket, durationData, reference
 				return commandData;
 			} );
 
-	this.initialize( socketReference, socket, durationData, reference );
+	this.initialize( socketReference, socket, durationData, reference, holeSet );
 };
 
-Command.prototype.initialize = function initialize( socketReference, socket, durationData, reference ){
+Command.prototype.initialize = function initialize( socketReference, socket, durationData, reference, holeSet ){
 	this.socketReference = socketReference;
 	this.socket = socket;
 	this.durationData = durationData;
 	this.reference = reference;
+	this.holeSet = holeSet;
 
 	this.commandList = Command.commandList;
 };
@@ -91,6 +92,7 @@ Command.prototype.execute = function execute( commandPhrase, commandData, callba
 	commandData.socket = this.socket;
 	commandData.durationData = this.durationData;
 	commandData.reference = this.reference;
+	commandData.holeSet = holeSet;
 
 	commandData.parameterList = this.parameterList;
 	commandData.commandPhrase = commandPhrase;
