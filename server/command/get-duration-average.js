@@ -9,14 +9,17 @@ var getDurationAverage = function getDurationAverage( ){
 					{
 						_id : { socketReference: "$data.socketReference" },
 						totalRequestTime: { $sum: "$duration.requestTime" },
-						totalResponseTime: { $sum: "$duration.responseTime" }
+						totalResponseTime: { $sum: "$duration.responseTime" },
+						totalDurationTime: { $sum: "$duration.totalDuration" }
 					}
 				},
 				{ $group:
 					{
 						_id: "$_id.socketReference",
 						averageRequestTime: { $avg: "$totalRequestTime" },
-						averageResponseTime: { $avg: "$totalResponseTime"}
+						averageResponseTime: { $avg: "$totalResponseTime" },
+						averageDurationTime: { $avg: "$totalDurationTime" }
+
 					}
 				}
 			],

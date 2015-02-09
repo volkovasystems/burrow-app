@@ -6,7 +6,14 @@
 
 			socket.on( "output",
 				function onOutput( error, result, durationData, reference ){
+
+					durationData = requestResponseDuration( durationData );
+
 					pubsub.publish( "output", [ error, result, durationData, reference ] );
+
+					socket.emit( "record-duration",
+						durationData,
+						reference );
 				} );
 
 			pubsub.subscribe( "command",
@@ -110,7 +117,7 @@
 							</span>
 						</div>
 					);
-
+					
 				case "chart":
 					break;
 
@@ -219,10 +226,8 @@
 
 			pubsub.subscribe( "output",
 				function onOutput( error, result, durationData, reference ){
-					durationData = _.clone( durationData );
-
-					durationData = requestResponseDuration( durationData );
-
+					durationData = _.clone( durationData );	
+		
 					var outputList = _.clone( self.state.outputList );
 
 					if( error ){
