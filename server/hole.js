@@ -162,11 +162,10 @@ Hole.prototype.listenToRecordDuration = function listenToRecordDuration( duratio
 
 	this.getSocket( )
 		.on( "record-duration",
-			function onRecordDuration( durationData, reference ){
-
-				var dbReference = reference + "," + referenceID;
-				grub( "update", durationData, dbReference, function onUpdate( result ){
-					console.log( result );	
+			function onRecordDuration( reference, durationData ){
+				grub( {
+					"reference": reference,
+					"durationData": durationData
 				} );
 			} );
 };

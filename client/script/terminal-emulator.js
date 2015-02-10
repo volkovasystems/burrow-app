@@ -11,9 +11,7 @@
 
 					pubsub.publish( "output", [ error, result, durationData, reference ] );
 
-					socket.emit( "record-duration",
-						durationData,
-						reference );
+					socket.emit( "record-duration", reference, durationData );
 				} );
 
 			pubsub.subscribe( "command",
