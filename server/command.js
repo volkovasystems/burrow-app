@@ -92,7 +92,7 @@ Command.prototype.execute = function execute( commandPhrase, commandData, callba
 	commandData.socket = this.socket;
 	commandData.durationData = this.durationData;
 	commandData.reference = this.reference;
-	commandData.holeSet = holeSet;
+	commandData.holeSet = this.holeSet;
 
 	commandData.parameterList = this.parameterList;
 	commandData.commandPhrase = commandPhrase;
@@ -104,13 +104,14 @@ Command.prototype.execute = function execute( commandPhrase, commandData, callba
 	commandExecutor
 		.apply( commandData, this.parameterList.concat( [
 			function delegateCallback( error, result, command ){
+				
+				self.result = result;
 				self.error = error;
 
-				self.result = result;
+				grub( self );
 
 				callback( error, result, command );
 
-				grub( self );
 				
 			}
 		] ) );
@@ -118,8 +119,8 @@ Command.prototype.execute = function execute( commandPhrase, commandData, callba
 	return this;
 };
 
-var command = function command( commandPhrase, referenceID, socket, durationData, reference ){
-	var commandEngine = new Command( referenceID, socket, durationData, reference );
+var command = function command( commandPhrase, referenceID, socket, durationData, reference, holeSet ){
+	var commandEngine = new Command( referenceID, socket, durationData, reference, holeSet );
 
 	if( _.isEmpty( commandPhrase ) ){
 		return commandEngine;

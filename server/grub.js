@@ -1,5 +1,6 @@
 var _ = require( "lodash" );
 var mongoose = require( "mongoose" );
+var async = require( "async" );
 
 var Grub = function Grub( command ){
 	this.initialize( command );
@@ -18,13 +19,23 @@ Grub.prototype.save = function save( command, callback ){
 
 	async.waterfall( [
 		function checkGrub( callback ){
+			console.log( "command: " + typeof command + "-" + command  );
+			console.log( "command.reference: " + command.reference );
+
 			GrubSchema.findOne( {
-				"$all": { "reference": [ command.reference ] }
-			}, callback )
+				"reference": { "$all": [ command.reference ] }
+			}, function onCheckGrub( error, result ){
+				callback( null, result );
+			} );
 		},
 
 		function trySaving( grubData, callback ){
-			if( _.isEmpty( grubData ) ){
+			console.log( "grubData: " + typeof grubData + "-" + grubData );
+
+			if( grubData != null ){
+
+				console.log( " in " );
+				
 				var reference = _( grubData.reference )
 					.union( [ command.reference, command.socketReference ] )
 					.flatten( )
@@ -32,58 +43,54 @@ Grub.prototype.save = function save( command, callback ){
 					.value( );
 
 				grubData.reference = reference;
-
 				grubData.duration = _.extend( grubData.duration, command.durationData );
-
 				grubData.timestamp = Date.now( );
-
 				grubData.command = command.commandPhrase || grubData.command;
-
 				grubData.data = _.extend( grubData.data, _.omit( command.commandData, "socket", "holeSet" ) );
-
 				grubData.result = command.result || grubData.result;
-
 				grubData.error = command.error || grubData.error;
 
-				grubData.save( function delegateCallback( error ){
-					if( error ){
-						callback( error );
-
-					}else{
-						callback( "saved" );
-					}
+				grubData.save( function onTrySaving( error, result ){
+					callback( null, result );
 				} );
 
 			}else{
-				callback( );
+				console.log( " out" );
+
+				callback( null, null  );
 			}
 		},
 
-		function tryAdding( callback ){
-			var thisGrub = new GrubSchema( {
-				"reference": [ command.reference, command.socketReference ],
-				"timestamp": Date.now( ),
-				"duration": command.durationData,
-				"command": command.commandPhrase,
-				"data": _.omit( command.commandData, "socket", "holeSet" ),
-				"result": command.result,
-				"error": command.error
-			} );
+		function tryAdding( noGrub, callback ){
+			console.log( "noGrub: " + typeof noGrub + "-" + noGrub );
+			
+			if ( noGrub == null ){
+				var thisGrub = new GrubSchema( {
+					"reference": [ command.reference, command.socketReference ],
+					"timestamp": Date.now( ),
+					"duration": command.durationData,
+					"command": command.commandPhrase,
+					"data": _.omit( command.commandData, "socket", "holeSet" ),
+					"result": command.result,
+					"error": command.error
+				} );
 
-			thisGrub.save( callback );
-		}
-	],
-		function lastly( state ){
-			if( state instanceof Error ){
-				callback( error );
-				
-			}else if( state == "saved" ){
-				callback( );
-
-			}else{
-				callback( );
+				thisGrub.save( function onTryAdding( error, result ){
+					callback( null, result );
+				} );
 			}
-		} )	
+		} ],
+		
+		function lastly( error, result ){
+			console.log( "error: " + typeof error + "-" + error );
+			console.log( "result: " + typeof result + "-" + result );
+
+			if( error ){
+				callback( false );
+			}else{
+				callback( true );
+			}
+		} );	
 
 	return this;
 };
