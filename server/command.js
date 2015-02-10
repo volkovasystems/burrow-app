@@ -110,7 +110,8 @@ Command.prototype.execute = function execute( commandPhrase, commandData, callba
 
 				callback( error, result, command );
 
-				grub( self );
+				grub( "save", self, null );
+				
 			}
 		] ) );
 

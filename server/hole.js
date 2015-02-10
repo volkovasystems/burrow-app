@@ -4,7 +4,7 @@ var fs = require( "fs" );
 var uuid = require( "node-uuid" );
 var path = require( "path" );
 
-
+var grub = require( "./grub.js" ).grub;
 var command = require( "./command.js" ).command;
 
 var Hole = function Hole( hole, holeSet, referenceID ){
@@ -81,6 +81,9 @@ Hole.prototype.attachAllListener = function attachAllListener( ){
 	this.listenToGetReference( );
 
 	this.listenToPing( );
+
+	this.listenToRecordDuration( );
+
 };
 
 Hole.prototype.listenToCommand = function listenToCommand( ){
@@ -150,6 +153,21 @@ Hole.prototype.listenToPing = function listenToPing( ){
 				durationData.responseTime = Date.now( );
 
 				self.getSocket( ).emit( "ping", null, null, durationData, reference );
+			} );
+};
+
+Hole.prototype.listenToRecordDuration = function listenToRecordDuration( durationData, reference ){
+	var self = this;
+	var referenceID = this.referenceID;
+
+	this.getSocket( )
+		.on( "record-duration",
+			function onRecordDuration( durationData, reference ){
+
+				var dbReference = reference + "," + referenceID;
+				grub( "update", durationData, dbReference, function onUpdate( result ){
+					console.log( result );	
+				} );
 			} );
 };
 
