@@ -46,7 +46,9 @@ Hole.prototype.saveSocket = function saveSocket( ){
 
 Hole.prototype.setSocket = function setSocket( socket ){
 	if( _.isEmpty( this.socket ) ){
-		this.socket = socket;	
+		this.socket = socket;
+
+		this.socket.coreSocket = true;	
 
 	}else{
 		var holeSet = this.holeSet;

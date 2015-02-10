@@ -23,7 +23,34 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 			function onExit( ){
 				partitionRangeList = _.compact( partitionRangeList.join( "" ).split( "," ) );
 
-				console.log( this.holeSet );
+				var engineSocketList = _( this.holeSet )
+					.filter( function onEachHole( holeData ){
+						return holeData instanceof Array;
+					} )
+					.flatten( )
+					.compact( )
+					.filter( function onEachHoleSocket( socket ){
+						return !socket.coreSocket
+					} );
+
+				//Now we have a list of engine sockets start emitting.
+				while( partitionRangeList.length ){
+					_.each( engineSocketList,
+						function onEachEngineSocket( socket ){
+							var partitionRange = partitionRangeList.pop( );
+
+							partitionRange = partitionRange.split( "-" )
+								.map( function onEachRange( range ){
+									return parseInt( range );
+								} );
+
+							socket.emit( "decode-md5hash", 
+								md5Hash, 
+								dictionary, 
+								partitionRange[ 0 ], 
+								partitionRange[ 1 ] );
+						} );	
+				}
 			} );
 	}
 };
