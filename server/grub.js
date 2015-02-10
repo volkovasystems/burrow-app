@@ -95,28 +95,36 @@ Grub.prototype.save = function save( command, callback ){
 	return this;
 };
 
-Grub.prototype.get = function get( reference, callback ){
+Grub.prototype.getGrub = function getGrub( reference, callback ){
 	callback = callback || function callback( ){ };
 
 	var Grub =	mongoose.model( "Grub" );
 	var thisGrub =  { "reference": reference };
 
 	Grub.findOne( thisGrub, 'reference',
-		function onGet( error, result ){
-			callback( result );
+		function onGetGrub( error, result ){
+			if( error ){
+				callback( false );
+			}else{
+				callback( true );
+			}
 		} );
 
 	return this;
 };
 
-Grub.prototype.getAll = function getAll( referenceList, callback ){
+Grub.prototype.getGrubs = function getGrubs( referenceList, callback ){
 	callback = callback || function callback( ){ };
 
 	var Grub =	mongoose.model( "Grub" );
 
 	Grub.find( { "reference": { $in: referenceList } },
-		function onCallback( error, results ){
-			callback( results );
+		function onGetGrubs( error, results ){
+			if( error ){
+				callback( false );
+			}else{
+				callback( true );
+			}
 		} );
 
 	return this;	
