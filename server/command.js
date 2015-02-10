@@ -65,8 +65,10 @@ Command.prototype.execute = function execute( commandPhrase, commandData, callba
 	}
 
 	var commandName = S( this.selectedCommand.commandName ).camelize( ).toString( );
+	console.log( commandName );
 
 	commandExecutor = require( this.selectedCommand.path )[ commandName ];
+	console.log("commandExecutor:" + commandExecutor );
 
 	if( typeof commandExecutor != "function" ||
 		_.isEmpty( commandExecutor.toString( ) ) )

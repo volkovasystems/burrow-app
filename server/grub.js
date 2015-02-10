@@ -19,9 +19,9 @@ Grub.prototype.save = function save( command, callback ){
 
 	async.waterfall( [
 		function checkGrub( callback ){
-			console.log( "command: " + typeof command + "-" + command  );
+/*			console.log( "command: " + typeof command + "-" + command  );
 			console.log( "command.reference: " + command.reference );
-
+*/
 			GrubSchema.findOne( {
 				"reference": { "$all": [ command.reference ] }
 			}, function onCheckGrub( error, result ){
@@ -30,8 +30,8 @@ Grub.prototype.save = function save( command, callback ){
 		},
 
 		function trySaving( grubData, callback ){
-			console.log( "grubData: " + typeof grubData + "-" + grubData );
-
+/*			console.log( "grubData: " + typeof grubData + "-" + grubData );
+*/
 			if( grubData != null ){
 
 				console.log( " in " );
@@ -62,8 +62,8 @@ Grub.prototype.save = function save( command, callback ){
 		},
 
 		function tryAdding( noGrub, callback ){
-			console.log( "noGrub: " + typeof noGrub + "-" + noGrub );
-			
+/*			console.log( "noGrub: " + typeof noGrub + "-" + noGrub );
+*/			
 			if ( noGrub == null ){
 				var thisGrub = new GrubSchema( {
 					"reference": [ command.reference, command.socketReference ],
@@ -82,9 +82,9 @@ Grub.prototype.save = function save( command, callback ){
 		} ],
 		
 		function lastly( error, result ){
-			console.log( "error: " + typeof error + "-" + error );
+/*			console.log( "error: " + typeof error + "-" + error );
 			console.log( "result: " + typeof result + "-" + result );
-
+*/
 			if( error ){
 				callback( false );
 			}else{
@@ -122,14 +122,14 @@ Grub.prototype.getAll = function getAll( referenceList, callback ){
 	return this;	
 };
 
-Grub.prototype.remove = function remove( reference, callback ){
+Grub.prototype.removeGrub = function removeGrub( reference, callback ){
 	callback = callback || function callback( ){ };
 
 	var Grub =	mongoose.model( "Grub" );
 	var thisGrub =  { "reference": reference };
 
 	Grub.findOneAndRemove( thisGrub,
-		function onRemove( error, result ){
+		function onRemoveGrub( error, result ){
 			if ( error ) {
 				callback ( false );
 			}else{
@@ -140,20 +140,32 @@ Grub.prototype.remove = function remove( reference, callback ){
 	return this;
 };
 
-Grub.prototype.removeAll = function removeAll( referenceList, callback ){
+Grub.prototype.removeGrubs = function removeGrubs( referenceList, callback ){
 	callback = callback || function callback( ){ };
 
 	var Grub =	mongoose.model( "Grub" );
 
 	Grub.remove( { "reference": { $in: referenceList } },
-		function onRemoveAll( error, result ){
+		function onRemoveGrubs( error, result ){
 			if ( error ) {
 				callback ( false );
 			}else{
 				callback ( true );
 			}
 		} );
-	
+		
+	return this;
+};
+
+Grub.prototype.removeAllGrub = function removeAllGrub( callback ){
+	callback = callback || function callback( ){ };
+
+	var Grub =	mongoose.model( "Grub" );
+
+	Grub.remove( { },
+		function onRemoveAllGrubs( ){ 
+			callback ( true );
+		} );		
 	return this;
 };
 
@@ -179,7 +191,7 @@ Grub.prototype.update = function update( durationData, reference, callback ){
 };
 
 
-var grub = function grub( operation, parameter1, parameter2 ){
-	return new Grub( operation, parameter1, parameter2 );
+var grub = function grub( command ){
+	return new Grub( command );
 };
 exports.grub = grub;
