@@ -2,7 +2,7 @@ var grub = require( "../grub.js" ).grub;
 
 var getGrubs = function getGrubs( referenceList, callback ){
 
-	grub().getGrubs( reference, function onCallback( result ){
+	grub().getGrubs( referenceList, function onCallback( result ){
 		if( result ){
 			callback( null, {
 				"type": "text",
