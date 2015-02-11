@@ -19,23 +19,15 @@ Grub.prototype.save = function save( command, callback ){
 
 	async.waterfall( [
 		function checkGrub( callback ){
-/*			console.log( "command: " + typeof command + "-" + command  );
-			console.log( "command.reference: " + command.reference );
-*/
 			GrubSchema.findOne( {
 				"reference": { "$all": [ command.reference ] }
-			}, function onCheckGrub( error, result ){
+			}, function onCheckGrub( error, grubData ){
 				callback( null, result );
 			} );
 		},
 
 		function trySaving( grubData, callback ){
-/*			console.log( "grubData: " + typeof grubData + "-" + grubData );
-*/
-			if( grubData != null ){
-
-				console.log( " in " );
-				
+			if( !_.isEmpty( grubData ) ){
 				var reference = _( grubData.reference )
 					.union( [ command.reference, command.socketReference ] )
 					.flatten( )
@@ -50,20 +42,16 @@ Grub.prototype.save = function save( command, callback ){
 				grubData.result = command.result || grubData.result;
 				grubData.error = command.error || grubData.error;
 
-				grubData.save( function onTrySaving( error, result ){
-					callback( null, result );
+				grubData.save( function onSave( error, result ){
+					callback( error, result );
 				} );
 
 			}else{
-				console.log( " out" );
-
-				callback( null, null  );
+				callback(  );
 			}
 		},
 
 		function tryAdding( noGrub, callback ){
-/*			console.log( "noGrub: " + typeof noGrub + "-" + noGrub );
-*/			
 			if ( noGrub == null ){
 				var thisGrub = new GrubSchema( {
 					"reference": [ command.reference, command.socketReference ],
@@ -75,22 +63,20 @@ Grub.prototype.save = function save( command, callback ){
 					"error": command.error
 				} );
 
-				thisGrub.save( function onTryAdding( error, result ){
-					callback( null, result );
+				thisGrub.save( function onSave( error ){
+					callback( error );
 				} );
 			}
 		} ],
 		
-		function lastly( error, result ){
-/*			console.log( "error: " + typeof error + "-" + error );
-			console.log( "result: " + typeof result + "-" + result );
-*/
-			if( error ){
-				callback( false );
+		function lastly( state ){
+			if( state instanceof Error ){
+				callback( state );
+
 			}else{
-				callback( true );
+				callback( );
 			}
-		} );	
+		} );
 
 	return this;
 };
