@@ -1,17 +1,26 @@
 
 var correlateDuration = function correlateDuration( xData, yData, callback ){
 
-	var xySummation = summationOfArray( productByElement( x, y ) );
-	var xSummation = summationOfArray( x );
-	var ySummation = summationOfArray( y );
-	var xSquareSum = summationOfArray ( squareByElement ( x ) );
-	var xSumSqaure = square( summationOfArray( x ) );
-	var ySquareSum = summationOfArray ( squareByElement ( y ) );
-	var ySumSqaure = square( summationOfArray( y ) );
+	var n = 0;
 
+	if ( xData.length == yData.length ){
+		n = xData.length || yData.length;
+	}
+
+	var Exy = summationOfArray( productByElement( xData, yData ) );
+	var Ex = summationOfArray( xData );
+	var Ey = summationOfArray( yData );
+	
+	var Ex2 = summationOfArray ( squareByElement ( xData ) );
+	var squaredEx = square( summationOfArray( xData ) );
+
+	var Ey2 = summationOfArray ( squareByElement ( yData ) );
+	var squaredEy = square( summationOfArray( yData ) );
+
+	
 	var correlationAnswer =	(
-		( xySummation - ( xSummation * ySummation ) ) / 
-		( ( squareRoot( xSquareSum ) - xSumSqaure ) * ( squareRoot( ySquareSum ) - ySumSqaure ) )
+		( ( n * Exy ) - ( Ex * Ey ) ) /
+		squareRoot ( ( ( n * Ex2 ) - squaredEx ) * ( ( n * Ey2 ) - squaredEy ) )
 		);
 
 	callback( correlationAnswer );
