@@ -45,6 +45,8 @@ var socketEngine = function socketEngine( socket ){
 			} );
 		} );
 
+	socket.on( "decode-md5hash" )
+
 	console.log( "client engine initialized" );
 };
 

@@ -32,7 +32,7 @@ database.createDatabase( "Burrow", "burrowdb", host, databasePort,
 			mongoose.model( "Hole", hole );
 
 			var grub = mongoose.Schema( {
-				"reference": String,
+				"reference": [ String ],
 				"timestamp": Date,
 				"duration": Object,
 				"command": String,

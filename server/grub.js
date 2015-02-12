@@ -22,12 +22,15 @@ Grub.prototype.save = function save( command, callback ){
 			GrubSchema.findOne( {
 				"reference": { "$all": [ command.reference ] }
 			}, function onCheckGrub( error, grubData ){
-				callback( null, result );
+				callback( null, grubData );
 			} );
 		},
 
 		function trySaving( grubData, callback ){
-			if( !_.isEmpty( grubData ) ){
+			if( _.isEmpty( grubData ) ){
+				callback( );
+
+			}else{
 				var reference = _( grubData.reference )
 					.union( [ command.reference, command.socketReference ] )
 					.flatten( )
@@ -39,21 +42,18 @@ Grub.prototype.save = function save( command, callback ){
 				grubData.timestamp = Date.now( );
 				grubData.command = command.commandPhrase || grubData.command;
 				grubData.data = _.extend( grubData.data, _.omit( command.commandData, "socket", "holeSet" ) );
-				grubData.result = command.result || grubData.result;
+				grubData.result = _.extend( grubData.result, command.result );
 				grubData.error = command.error || grubData.error;
 
-				grubData.save( function onSave( error, result ){
-					callback( error, result );
+				grubData.save( function onSave( error ){
+					callback( error );
 				} );
-
-			}else{
-				callback(  );
 			}
 		},
 
 		function tryAdding( noGrub, callback ){
 			if ( noGrub == null ){
-				var thisGrub = new GrubSchema( {
+				var newGrub = new GrubSchema( {
 					"reference": [ command.reference, command.socketReference ],
 					"timestamp": Date.now( ),
 					"duration": command.durationData,

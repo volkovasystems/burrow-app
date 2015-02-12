@@ -2,7 +2,9 @@ var _ = require( "lodash" );
 var childprocess = require( "child_process" );
 
 var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLength ){
-	if( this.hasResult ){
+	if( this.hasNoResult ){
+		
+	}else if( this.hasResult ){
 
 	}else{
 		var task = childprocess.exec( [ 
@@ -23,6 +25,14 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 			function onExit( ){
 				partitionRangeList = _.compact( partitionRangeList.join( "" ).split( "," ) );
 
+				/*:
+					The holeSet contains list of references.
+
+					One of the items are array of sockets.
+
+					We want to get those and determine those sockets not owned by
+					the browser but by the client engine.
+				*/
 				var engineSocketList = _( this.holeSet )
 					.filter( function onEachHole( holeData ){
 						return holeData instanceof Array;
