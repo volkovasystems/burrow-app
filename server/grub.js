@@ -46,27 +46,25 @@ Grub.prototype.save = function save( command, callback ){
 				grubData.error = command.error || grubData.error;
 
 				grubData.save( function onSave( error ){
-					callback( error );
+					callback( error || "grub-updated" );
 				} );
 			}
 		},
 
-		function tryAdding( noGrub, callback ){
-			if ( noGrub == null ){
-				var newGrub = new GrubSchema( {
-					"reference": [ command.reference, command.socketReference ],
-					"timestamp": Date.now( ),
-					"duration": command.durationData,
-					"command": command.commandPhrase,
-					"data": _.omit( command.commandData, "socket", "holeSet" ),
-					"result": command.result,
-					"error": command.error
-				} );
+		function tryAdding( callback ){
+			var newGrub = new GrubSchema( {
+				"reference": [ command.reference, command.socketReference ],
+				"timestamp": Date.now( ),
+				"duration": command.durationData,
+				"command": command.commandPhrase,
+				"data": _.omit( command.commandData, "socket", "holeSet" ),
+				"result": command.result,
+				"error": command.error
+			} );
 
-				thisGrub.save( function onSave( error ){
-					callback( error );
-				} );
-			}
+			newGrub.save( function onSave( error ){
+				callback( error );
+			} );
 		} ],
 		
 		function lastly( state ){
