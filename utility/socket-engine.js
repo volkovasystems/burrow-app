@@ -55,7 +55,7 @@ var socketEngine = function socketEngine( socket ){
 	var decodeEngineList = [ ];
 
 	socket.on( "decode-md5hash",
-		function onDecodeMD5Hash( durationData, reference, hash, dictionary, startIndex, endIndex ){
+		function onDecodeMD5Hash( durationData, reference, hash, dictionary, limitLength, startIndex, endIndex ){
 			durationData.commandStartingTime = Date.now( );
 
 			var decoderReference = crypto.createHash( "sha512" )
@@ -63,7 +63,7 @@ var socketEngine = function socketEngine( socket ){
 			console.log( "decoding md5 ", hash, " starting from ", startIndex, " to ", endIndex );
 
 			//: Decoder is a childprocess instance.
-			var decodeEngine = decodeMD5Hash( hash, dictionary, startIndex, endIndex,
+			var decodeEngine = decodeMD5Hash( hash, dictionary, limitLength, startIndex, endIndex,
 				function onDecodeMD5Hash( state, result ){
 					/*:
 						Result is either empty or a decoded string.

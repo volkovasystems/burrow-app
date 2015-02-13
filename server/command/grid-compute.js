@@ -59,6 +59,7 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 								this.reference, 
 								md5Hash, 
 								dictionary, 
+								limitLength,
 								partitionRange[ 0 ], 
 								partitionRange[ 1 ] );
 						} );	
