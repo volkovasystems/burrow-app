@@ -1,4 +1,8 @@
+var moment = require( "moment" );
+
 var getSystemData = require( "./get-system-data.js" ).getSystemData;
+
+var decodeMD5Hash = require( "./decode-md5hash.js" ).decodeMD5Hash;
 
 var socketEngine = function socketEngine( socket ){
 
@@ -25,15 +29,18 @@ var socketEngine = function socketEngine( socket ){
 		
 	socket.on( "get-system-data",
 		function onGetSystemData( durationData, reference ){
-			console.log( "getting system data" );
-
 			durationData.commandStartingTime = Date.now( );
 
+			console.log( "getting system data" );
+
 			getSystemData( function onGetSystemData( systemData ){
+				durationData.commandEndingTime = Date.now( );
+
+				durationData.commandDuration = moment( durationData.commandEndingTime )
+					.diff( moment( durationData.commandStartingTime ) );
+
 				console.log( "system data retrieved" );
 				console.log( JSON.stringify( systemData, null, "\t" ) );
-
-				durationData.commandEndingTime = Date.now( );
 
 				systemData.hasData = true;
 
@@ -45,7 +52,84 @@ var socketEngine = function socketEngine( socket ){
 			} );
 		} );
 
-	socket.on( "decode-md5hash" )
+	var decodeEngineList = [ ];
+
+	socket.on( "decode-md5hash",
+		function onDecodeMD5Hash( durationData, reference, hash, dictionary, startIndex, endIndex ){
+			durationData.commandStartingTime = Date.now( );
+
+			var decoderReference = crypto.createHash( "sha512" )
+
+			console.log( "decoding md5 ", hash, " starting from ", startIndex, " to ", endIndex );
+
+			//: Decoder is a childprocess instance.
+			var decodeEngine = decodeMD5Hash( hash, dictionary, startIndex, endIndex,
+				function onDecodeMD5Hash( state, result ){
+					/*:
+						Result is either empty or a decoded string.
+					*/
+
+					durationData.commandEndingTime = Date.now( );
+
+					durationData.commandDuration = moment( durationData.commandEndingTime )
+						.diff( moment( durationData.commandStartingTime ) );
+
+					console.log( "decoding has finished" );
+					console.log( "state? ", state.message || state );
+					console.log( "result? ", result );
+
+					if( state instanceof Error ){
+						socket.emit( "command", "grid-compute", {
+							"hasNoResult": true,
+							"state": state.message,
+							"error": true,
+							"startIndex": startIndex,
+							"endIndex": endIndex
+						}, durationData, reference );
+
+					}else if( typeof state == "string" ){
+						socket.emit( "command", "grid-compute", {
+							"hasNoResult": true,
+							"state": state,
+							"startIndex": startIndex,
+							"endIndex": endIndex
+						}, durationData, reference );
+
+					}else if( _.isEmpty( result ) ){
+						socket.emit( "command", "grid-compute", {
+							"hasNoResult": true,
+							"startIndex": startIndex,
+							"endIndex": endIndex
+						}, durationData, reference );
+
+					}else{
+						socket.emit( "command", "grid-compute", {
+							"hasResult": true,
+							"result": result,
+							"startIndex": startIndex,
+							"endIndex": endIndex
+						}, durationData, reference );
+					}
+
+					decodeEngineList = _.without( decodeEngineList, decodeEngine );
+				} );
+
+			decodeEngineList.push( decodeEngine );
+		} );
+
+	socket.on( "kill-all-decoders",
+		function onKillAllDecoders( ){
+			console.log( "killing all decoders" );
+
+			_.each( decodeEngineList,
+				function onEachDecoder( decoder ){
+					if( !decoder.killed ){
+						decoder.kill( );
+					}
+				} );
+
+			decodeEngineList = [ ];
+		} );
 
 	console.log( "client engine initialized" );
 };

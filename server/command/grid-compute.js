@@ -22,7 +22,7 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 			} );
 
 		task.on( "exit",
-			function onExit( ){
+			( function onExit( ){
 				partitionRangeList = _.compact( partitionRangeList.join( "" ).split( "," ) );
 
 				/*:
@@ -54,14 +54,16 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 									return parseInt( range );
 								} );
 
-							socket.emit( "decode-md5hash", 
+							socket.broadcast.emit( "decode-md5hash",
+								this.durationData,
+								this.reference, 
 								md5Hash, 
 								dictionary, 
 								partitionRange[ 0 ], 
 								partitionRange[ 1 ] );
 						} );	
 				}
-			} );
+			} ).bind( this ) );
 	}
 };
 
