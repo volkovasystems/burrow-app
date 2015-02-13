@@ -155,33 +155,11 @@ Grub.prototype.removeAllGrub = function removeAllGrub( callback ){
 	var Grub =	mongoose.model( "Grub" );
 
 	Grub.remove( { },
-		function onRemoveAllGrubs( ){ 
+		function onRemoveAllGrub( ){ 
 			callback ( true );
 		} );		
 	return this;
 };
-
-Grub.prototype.update = function update( durationData, reference, callback ){
-	callback = callback || function callback( ){ };
-
-	var Grub =	mongoose.model( "Grub" );
-	var thisGrub =  { "reference": reference };
-
-
-	Grub.update( thisGrub,
-		{ duration: durationData },
-		{ multi: false },
-			function onUpdate( error, numberofAffectedDocuments ){
-				if ( error ){
-					callback( false );
-				} else {
-					callback( true );
-				}
-			} );
-	
-	return this;
-};
-
 
 var grub = function grub( command ){
 	return new Grub( command );

@@ -1,31 +1,45 @@
 var mongoose = require( "mongoose" );
 
-var getDurationAverage = function getDurationAverage( ){
+var getDurationAverage = function getDurationAverage( referenceList, callback ){
 
 	var Grub =	mongoose.model( "Grub" );
 
 	Grub.aggregate( [
-				{ $group :
-					{
-						_id : { socketReference: "$data.socketReference" },
-						totalRequestTime: { $sum: "$duration.requestTime" },
-						totalResponseTime: { $sum: "$duration.responseTime" },
-						totalDurationTime: { $sum: "$duration.totalDuration" }
-					}
-				},
-				{ $group:
-					{
-						_id: "$_id.socketReference",
-						averageRequestTime: { $avg: "$totalRequestTime" },
-						averageResponseTime: { $avg: "$totalResponseTime" },
-						averageDurationTime: { $avg: "$totalDurationTime" }
+						{ $match :
+							{ reference : { $in: referenceList } }
+						},
 
-					}
-				}
-			],
-			function ( error, result ) {
-				callback( result );
-			} );
-	
+						{ $group:
+							{
+								_id : {
+									command: "$command",
+									reference: "$reference"
+								},
+								totalRequestTime : { $sum: "$duration.requestTime" },
+								totalResponseTime : { $sum: "$duration.responseTime" },
+								totalDurationTime : { $sum: "$duration.totalDuration" }
+							}
+						},
+						
+						{ $group:
+							{
+								_id : {
+									command : "$_id.command",
+									reference : "$_id.reference"
+								},
+								averageRequestTime : { $avg: "$totalRequestTime" },
+								averageResponseTime : { $avg: "$totalResponseTime" },
+								averageDurationTime : { $avg: "$totalDurationTime" }
+							}
+						}
+					],
+
+					function ( error, result ){
+						if( error ){
+							callback( false );
+						}else{
+							callback( result );
+						}
+	} );	
 };
 exports.getDurationAverage = getDurationAverage;
