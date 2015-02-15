@@ -84,7 +84,8 @@ var socketEngine = function socketEngine( socket ){
 							"state": state.message,
 							"error": true,
 							"startIndex": startIndex,
-							"endIndex": endIndex
+							"endIndex": endIndex,
+							"client": socketData.pairID
 						}, durationData, reference );
 
 					}else if( typeof state == "string" ){
@@ -92,14 +93,17 @@ var socketEngine = function socketEngine( socket ){
 							"hasNoResult": true,
 							"state": state,
 							"startIndex": startIndex,
-							"endIndex": endIndex
+							"endIndex": endIndex,
+							"client": socketData.pairID
 						}, durationData, reference );
 
 					}else if( _.isEmpty( result ) ){
 						socket.emit( "command", "grid-compute", {
 							"hasNoResult": true,
+							"empty": true,
 							"startIndex": startIndex,
-							"endIndex": endIndex
+							"endIndex": endIndex,
+							"client": socketData.pairID
 						}, durationData, reference );
 
 					}else{
@@ -107,7 +111,8 @@ var socketEngine = function socketEngine( socket ){
 							"hasResult": true,
 							"result": result,
 							"startIndex": startIndex,
-							"endIndex": endIndex
+							"endIndex": endIndex,
+							"client": socketData.pairID
 						}, durationData, reference );
 					}
 

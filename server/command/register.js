@@ -64,6 +64,11 @@ var register = function register( callback ){
 
 	}else{
 		this.socket.broadcast.emit( "get-system-data", this.durationData, this.reference );
+
+		callback( null, {
+			"type": "text",
+			"text": "registration ongoing"
+		}, "broadcast:output" );
 	}
 	
 };

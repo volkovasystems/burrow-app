@@ -2,10 +2,128 @@ var _ = require( "lodash" );
 var childprocess = require( "child_process" );
 var grub = require( "./grub.js" ).grub;
 
-var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLength ){
+var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLength, callback ){
 	if( this.hasNoResult ){
+		var result = { };
+
+		var text = "";
+
+		var rangeReference = [ this.startIndex, this.endIndex ].join( "-" );
+
+		if( this.error ){
+			result[ rangeReference ] = {
+				"startIndex": this.startIndex,
+				"endIndex": this.endIndex,
+				"error": this.state,
+				"duration": this.durationData.commandDuration,
+				"client": this.client
+			};
+
+			text = [
+				"error in one of the grids measuring for range",
+				this.startIndex, "to", this.endIndex,
+				"error message was", this.state
+			].join( " " );
+
+			var engineSocketList = _( this.holeSet )
+				.filter( function onEachHole( holeData ){
+					return holeData instanceof Array;
+				} )
+				.flatten( )
+				.compact( )
+				.filter( function onEachHoleSocket( socket ){
+					return !socket.coreSocket
+				} )
+				.value( );
+
+			_.each( engineSocketList,
+				function onEachEngineSocket( socket ){
+					socket.broadcast.emit( "kill-all-decoders" );
+				} );
+
+		}else if( this.empty ){
+			result[ rangeReference ] = {
+				"startIndex": this.startIndex,
+				"endIndex": this.endIndex,
+				"empty": true,
+				"duration": this.durationData.commandDuration,
+				"client": this.client
+			};
+
+			text = [
+				"grid with range",
+				this.startIndex, "to", this.endIndex,
+				"returned empty result"
+			].join( " " );
+		
+		}else{
+			result[ rangeReference ] = {
+				"startIndex": this.startIndex,
+				"endIndex": this.endIndex,
+				"state": this.state,
+				"duration": this.durationData.commandDuration,
+				"client": this.client
+			};
+
+			text = [ 
+				"unknown result on range",
+				this.startIndex, "to", this.endIndex,
+				"with state message", this.state
+			].join( " " );
+		}
+
+		grub( ).save( {
+			"reference": this.reference,
+			"result": result
+		} );
+
+		callback( null, {
+			"type": "text",
+			"text": text
+		}, "broadcast:output" );
 		
 	}else if( this.hasResult ){
+		var result = { };
+
+		result[ rangeReference ] = {
+			"startIndex": this.startIndex,
+			"endIndex": this.endIndex,
+			"result": this.result,
+			"duration": this.durationData.commandDuration,
+			"client": this.client
+		};
+
+		var rangeReference = [ this.startIndex, this.endIndex ].join( "-" );
+
+		grub( ).save( {
+			"reference": this.reference,
+			"result": result
+		} );
+
+		var engineSocketList = _( this.holeSet )
+			.filter( function onEachHole( holeData ){
+				return holeData instanceof Array;
+			} )
+			.flatten( )
+			.compact( )
+			.filter( function onEachHoleSocket( socket ){
+				return !socket.coreSocket
+			} )
+			.value( );
+
+		_.each( engineSocketList,
+			function onEachEngineSocket( socket ){
+				socket.broadcast.emit( "kill-all-decoders" );
+			} );
+
+		callback( null, {
+			"type": "text",
+			"text": [
+				"result was found on range",
+				this.startIndex, "to", this.endIndex,
+				"result was", this.result
+			].join( " " )
+		}, "broadcast:output" );
 
 	}else{
 		grub( ).save( {
@@ -34,6 +152,14 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 		task.on( "exit",
 			( function onExit( ){
 				partitionRangeList = _.compact( partitionRangeList.join( "" ).split( "," ) );
+
+				this.socket.broadcast.emit( "output", null, {
+					"type": "text",
+					"text": [ 
+						partitionRangeList.length, 
+						"partitions for this grid computation" 
+					].join( " " )
+				}, this.durationData, this.reference );
 
 				/*:
 					The holeSet contains list of references.
@@ -82,8 +208,23 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 								limitLength,
 								partitionRange[ 0 ], 
 								partitionRange[ 1 ] );
+
+							this.socket.broadcast.emit( "output", null, {
+								"type": "text",
+								"text": [ 
+									"decode command for range of", 
+									partitionRange[ 0 ], "to", partitionRange[ 1 ], 
+									"has been deployed"
+								].join( " " )
+							}, this.durationData, this.reference );
 						} );	
 				}
+
+				callback( null, {
+					"type": "text",
+					"text": "grid computation ongoing"
+				}, "broadcast:output" );
+
 			} ).bind( this ) );
 	}
 };
