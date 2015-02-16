@@ -48,7 +48,7 @@ io.on( "connection",
 
 				var referenceID = pairID.substring( 0, 5 );
 
-				holeSet[ pairID ] = new Hole( hole, holeSet, referenceID );
+				holeSet[ pairID ] = [ new Hole( hole, holeSet, referenceID ) ];
 
 				holeSet[ referenceID ] = pairID;
 

@@ -61,7 +61,7 @@ Hole.prototype.setSocket = function setSocket( socket ){
 			.setSocket( socket )
 			.attachAllListener( );
 
-		holeSet[ pairID ] = _.flatten( [ holeSet[ pairID ] ] ).concat( [ hole ] );
+		holeSet[ pairID ].push( hole );
 	}
 
 	return this;

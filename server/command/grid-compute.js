@@ -125,7 +125,7 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 			].join( " " )
 		}, "broadcast:output" );
 
-	}else{
+	}else if( !_.isEmpty( this.parameterList ) ){
 		grub( ).save( {
 			"reference": this.reference,
 			"data": {
@@ -226,6 +226,12 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 				}, "broadcast:output" );
 
 			} ).bind( this ) );
+
+	}else{
+		callback( null, {
+			"type": "text",
+			"text": "grid computation ongoing"
+		}, "broadcast:output" );
 	}
 };
 
