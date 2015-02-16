@@ -38,11 +38,11 @@ Grub.prototype.save = function save( command, callback ){
 					.value( );
 
 				grubData.reference = reference;
-				grubData.duration = _.extend( { }, grubData.duration, command.durationData );
+				grubData.duration = _.extend( _.clone( grubData.duration ), command.durationData );
 				grubData.timestamp = Date.now( );
 				grubData.command = command.commandPhrase || grubData.command;
-				grubData.data = _.extend( { }, grubData.data, _.omit( command.commandData, "socket", "holeSet" ) );
-				grubData.result = _.extend( { }, grubData.result, command.result );
+				grubData.data = _.extend( _.clone( grubData.data, true ), _.omit( command.commandData, "socket", "holeSet" ), command.data );
+				grubData.result = _.extend( _.clone( grubData.result, true ), command.result );
 				grubData.error = command.error || grubData.error;
 
 				grubData.save( function onSave( error ){

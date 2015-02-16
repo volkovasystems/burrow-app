@@ -9,14 +9,14 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 	}
 
 	if( this.hasNoResult ){
-		var result = { };
+		var data = { };
 
 		var text = "";
 
-		var rangeReference = [ this.startIndex, this.endIndex ].join( "-" );
+		var rangeReference = [ "range", this.startIndex, this.endIndex ].join( "_" );
 
 		if( this.error ){
-			result[ rangeReference ] = {
+			data[ rangeReference ] = {
 				"startIndex": this.startIndex,
 				"endIndex": this.endIndex,
 				"error": this.state,
@@ -52,7 +52,7 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 				} );
 
 		}else if( this.empty ){
-			result[ rangeReference ] = {
+			data[ rangeReference ] = {
 				"startIndex": this.startIndex,
 				"endIndex": this.endIndex,
 				"empty": true,
@@ -67,7 +67,7 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 			].join( " " );
 		
 		}else{
-			result[ rangeReference ] = {
+			data[ rangeReference ] = {
 				"startIndex": this.startIndex,
 				"endIndex": this.endIndex,
 				"state": this.state,
@@ -82,20 +82,22 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 			].join( " " );
 		}
 
-		grub( ).save( {
+		/*grub( ).save( {
 			"reference": this.reference,
-			"result": result
-		} );
+			"data": data
+		} );*/
 
-		callback( null, {
+		/*callback( null, {
 			"type": "text",
 			"text": text
-		}, "broadcast:output" );
+		}, "broadcast:output" );*/
 		
 	}else if( this.hasResult ){
-		var result = { };
+		var data = { };
 
-		result[ rangeReference ] = {
+		var rangeReference = [ "range", this.startIndex, this.endIndex ].join( "_" );
+
+		data[ rangeReference ] = {
 			"startIndex": this.startIndex,
 			"endIndex": this.endIndex,
 			"result": this.result,
@@ -103,11 +105,9 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 			"client": this.client
 		};
 
-		var rangeReference = [ this.startIndex, this.endIndex ].join( "-" );
-
 		grub( ).save( {
 			"reference": this.reference,
-			"result": result
+			"data": data
 		} );
 
 		var engineSocketList = _( this.holeSet )
@@ -253,17 +253,17 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 						} ).bind( this ) );	
 				}
 
-				callback( null, {
+				/*callback( null, {
 					"type": "text",
 					"text": "grid computation ongoing"
-				}, "broadcast:output" );
+				}, "broadcast:output" );*/
 
 			} ).bind( this ) );
 
 	}else{
 		callback( null, {
 			"type": "text",
-			"text": "grid computation ongoing"
+			"text": "no grid computation"
 		}, "broadcast:output" );
 	}
 };
