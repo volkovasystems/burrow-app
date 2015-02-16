@@ -189,12 +189,20 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 					.take( gridCount )
 					.value( );
 
+				if( _.isEmpty( engineSocketList ) ){
+					callback( new Error( "client engine empty" ), {
+						"type": "error",
+						"text": "client engine empty"
+					}, "broadcast:output" );
+					return;
+				}
+
 				//Now we have a list of engine sockets start emitting.
 				while( partitionRangeList.length ){
 					_.each( engineSocketList,
 						function onEachEngineSocket( socket ){
 							var partitionRange = partitionRangeList.pop( );
-
+					
 							partitionRange = partitionRange.split( "-" )
 								.map( function onEachRange( range ){
 									return parseInt( range );
