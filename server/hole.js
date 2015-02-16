@@ -44,12 +44,14 @@ Hole.prototype.saveSocket = function saveSocket( ){
 
 };
 
-Hole.prototype.setSocket = function setSocket( socket ){
+Hole.prototype.setSocket = function setSocket( socket, childSocket ){
 	if( _.isEmpty( this.socket ) ){
 		this.socket = socket;
 
-		this.socket.coreSocket = true;	
-
+		if( !childSocket ){
+			this.parentSocket = true;	
+		}
+		
 	}else{
 		var holeSet = this.holeSet;
 
@@ -58,7 +60,7 @@ Hole.prototype.setSocket = function setSocket( socket ){
 
 		var hole = ( new Hole( ) )
 			.initialize( this.hole, holeSet, this.referenceID )
-			.setSocket( socket )
+			.setSocket( socket, true )
 			.attachAllListener( );
 
 		holeSet[ pairID ].push( hole );
@@ -86,6 +88,7 @@ Hole.prototype.attachAllListener = function attachAllListener( ){
 
 	this.listenToRecordDuration( );
 
+	return this;
 };
 
 Hole.prototype.listenToCommand = function listenToCommand( ){

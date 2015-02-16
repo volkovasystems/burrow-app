@@ -1,3 +1,4 @@
+var _ = require( "lodash" );
 var moment = require( "moment" );
 
 var getSystemData = require( "./get-system-data.js" ).getSystemData;
@@ -37,7 +38,7 @@ var socketEngine = function socketEngine( socket ){
 				durationData.commandEndingTime = Date.now( );
 
 				durationData.commandDuration = moment( durationData.commandEndingTime )
-					.diff( moment( durationData.commandStartingTime ) );
+					.diff( moment( durationData.commandStartingTime ), "DD/MM/YYYY HH:mm:ss", true );
 
 				console.log( "system data retrieved" );
 				console.log( JSON.stringify( systemData, null, "\t" ) );
@@ -58,8 +59,6 @@ var socketEngine = function socketEngine( socket ){
 		function onDecodeMD5Hash( durationData, reference, hash, dictionary, limitLength, startIndex, endIndex ){
 			durationData.commandStartingTime = Date.now( );
 
-			var decoderReference = crypto.createHash( "sha512" )
-
 			console.log( "decoding md5 ", hash, " starting from ", startIndex, " to ", endIndex );
 
 			//: Decoder is a childprocess instance.
@@ -72,11 +71,14 @@ var socketEngine = function socketEngine( socket ){
 					durationData.commandEndingTime = Date.now( );
 
 					durationData.commandDuration = moment( durationData.commandEndingTime )
-						.diff( moment( durationData.commandStartingTime ) );
+						.diff( moment( durationData.commandStartingTime ), "DD/MM/YYYY HH:mm:ss", true );
 
-					console.log( "decoding has finished" );
-					console.log( "state? ", state.message || state );
-					console.log( "result? ", result );
+					console.log( [
+						"decoding has finished for range",
+						startIndex, "to", endIndex,
+						"with result", result,
+						"and state", state
+					].join( " " ) );
 
 					if( state instanceof Error ){
 						socket.emit( "command", "grid-compute", {
@@ -97,7 +99,7 @@ var socketEngine = function socketEngine( socket ){
 							"client": socketData.pairID
 						}, durationData, reference );
 
-					}else if( _.isEmpty( result ) ){
+					}else if( !result || _.isEmpty( result ) || result === "null" ){
 						socket.emit( "command", "grid-compute", {
 							"hasNoResult": true,
 							"empty": true,
@@ -129,6 +131,7 @@ var socketEngine = function socketEngine( socket ){
 			_.each( decodeEngineList,
 				function onEachDecoder( decoder ){
 					if( !decoder.killed ){
+						decoder.killed = true;
 						decoder.kill( );
 					}
 				} );

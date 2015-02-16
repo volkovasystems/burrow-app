@@ -1,4 +1,6 @@
+var _ = require( "lodash" );
 var childprocess = require( "child_process" );
+
 
 var decodeMD5Hash = function decodeMD5Hash( hash, dictionary, limitLength, startIndex, endIndex, callback ){
 	var task = childprocess.exec( [
@@ -10,7 +12,7 @@ var decodeMD5Hash = function decodeMD5Hash( hash, dictionary, limitLength, start
 			2,
 			startIndex,
 			endIndex
-		], { "cwd": "./utility" } );
+		].join( " " ), { "cwd": "./utility" } );
 
 	var resultData = "";
 
@@ -38,6 +40,8 @@ var decodeMD5Hash = function decodeMD5Hash( hash, dictionary, limitLength, start
 				callback( );
 			}
 		} ); 
+
+	return task;
 };
 
 

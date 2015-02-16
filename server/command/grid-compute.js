@@ -1,8 +1,13 @@
 var _ = require( "lodash" );
 var childprocess = require( "child_process" );
 var grub = require( "../grub.js" ).grub;
+var util = require( "util" );
 
 var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLength, callback ){
+	if( typeof arguments[ 0 ] == "function" ){
+		callback = arguments[ 0 ];
+	}
+
 	if( this.hasNoResult ){
 		var result = { };
 
@@ -26,19 +31,24 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 			].join( " " );
 
 			var engineSocketList = _( this.holeSet )
+				.values( )
 				.filter( function onEachHole( holeData ){
 					return holeData instanceof Array;
 				} )
 				.flatten( )
 				.compact( )
-				.filter( function onEachHoleSocket( socket ){
-					return !socket.coreSocket
+				.filter( function onEachHole( hole ){
+					return !hole.parentSocket;
 				} )
+				.map( function onEachHole( hole ){
+					return hole.socket;
+				} )
+				.compact( )
 				.value( );
 
 			_.each( engineSocketList,
 				function onEachEngineSocket( socket ){
-					socket.broadcast.emit( "kill-all-decoders" );
+					socket.emit( "kill-all-decoders" );
 				} );
 
 		}else if( this.empty ){
@@ -101,19 +111,24 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 		} );
 
 		var engineSocketList = _( this.holeSet )
+			.values( )
 			.filter( function onEachHole( holeData ){
 				return holeData instanceof Array;
 			} )
 			.flatten( )
 			.compact( )
-			.filter( function onEachHoleSocket( socket ){
-				return !socket.coreSocket
+			.filter( function onEachHole( hole ){
+				return !hole.parentSocket;
 			} )
+			.map( function onEachHole( hole ){
+				return hole.socket;
+			} )
+			.compact( )
 			.value( );
 
 		_.each( engineSocketList,
 			function onEachEngineSocket( socket ){
-				socket.broadcast.emit( "kill-all-decoders" );
+				socket.emit( "kill-all-decoders" );
 			} );
 
 		callback( null, {
@@ -177,17 +192,27 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 						if we will strictly distribute to every client engine.
 				*/
 				var engineSocketList = _( this.holeSet )
+					.values( )
 					.filter( function onEachHole( holeData ){
 						return holeData instanceof Array;
 					} )
 					.flatten( )
 					.compact( )
-					.filter( function onEachHoleSocket( socket ){
-						return !socket.coreSocket
+					.filter( function onEachHole( hole ){
+						return !hole.parentSocket;
 					} )
-					.shuffle( )
-					.take( gridCount )
+					.map( function onEachHole( hole ){
+						return hole.socket;
+					} )
+					.compact( )
 					.value( );
+
+				var socketList = null;
+				if( engineSocketList.length > gridCount ){
+					socketList = _.take( engineSocketList, gridCount );
+				}
+
+				engineSocketList = socketList || engineSocketList;
 
 				if( _.isEmpty( engineSocketList ) ){
 					callback( new Error( "client engine empty" ), {
@@ -200,7 +225,7 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 				//Now we have a list of engine sockets start emitting.
 				while( partitionRangeList.length ){
 					_.each( engineSocketList,
-						function onEachEngineSocket( socket ){
+						( function onEachEngineSocket( socket ){
 							var partitionRange = partitionRangeList.pop( );
 					
 							partitionRange = partitionRange.split( "-" )
@@ -208,7 +233,7 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 									return parseInt( range );
 								} );
 
-							socket.broadcast.emit( "decode-md5hash",
+							socket.emit( "decode-md5hash",
 								this.durationData,
 								this.reference, 
 								md5Hash, 
@@ -225,7 +250,7 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 									"has been deployed"
 								].join( " " )
 							}, this.durationData, this.reference );
-						} );	
+						} ).bind( this ) );	
 				}
 
 				callback( null, {
