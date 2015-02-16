@@ -7,9 +7,9 @@
 
 		finalTime = moment( finalTime );
 
-		var requestDuration = responseTime.diff( requestTime, true );
-		var responseDuration = finalTime.diff( responseTime, true );
-		var totalDuration = finalTime.diff( requestTime, true );
+		var requestDuration = responseTime.diff( requestTime, "DD/MM/YYYY HH:mm:ss", true );
+		var responseDuration = finalTime.diff( responseTime, "DD/MM/YYYY HH:mm:ss", true );
+		var totalDuration = finalTime.diff( requestTime, "DD/MM/YYYY HH:mm:ss", true );
 
 		return {
 			"requestDuration": requestDuration,

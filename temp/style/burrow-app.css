@@ -55,7 +55,7 @@ div {
   color: rgba(255, 255, 255, 0.2);
 }
 .terminal-emulator .terminal-container .output-container .output .reference {
-  margin-right: 10px;
+  margin-left: 10px;
 }
 .terminal-emulator .terminal-container .input-container {
   width: 100% !important;
