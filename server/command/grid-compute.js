@@ -1,6 +1,6 @@
 var _ = require( "lodash" );
 var childprocess = require( "child_process" );
-var grub = require( "./grub.js" ).grub;
+var grub = require( "../grub.js" ).grub;
 
 var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLength, callback ){
 	if( this.hasNoResult ){
