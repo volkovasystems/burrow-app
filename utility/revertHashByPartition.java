@@ -193,8 +193,9 @@ public class revertHashByPartition{
 		int dictionaryListLength = dictionaryList.length;
 
 		//: Based from the length, get the ending sequence by repeatedly appending the last character in the dictionary.
-		String endingSequence = ( new String( new char[ length ] ) ).replace( "\0", dictionaryList[ dictionaryListLength - 1 ] ); 
-		
+		/*String endingSequence = ( new String( new char[ length ] ) ).replace( "\0", dictionaryList[ dictionaryListLength - 1 ] );*/
+		String endingSequence = convertToSequence( endIndex, dictionary, separator );
+
 		//: Initial get the total sequence count.
 		BigDecimal totalSequenceCount = new BigDecimal( convertToSequenceIndex( endingSequence, dictionary, separator ).toString( ) );
 		
@@ -222,11 +223,14 @@ public class revertHashByPartition{
 		}
 
 		//: Calculate the partition count, size and the last size based on the total sequence count.
-		BigDecimal partitionCount = calculatePartition( totalSequenceCount.toString( ), rootFactor );
+
+		BigDecimal actualSequenceCount = endingIndex.subtract( startingIndex );
+
+		BigDecimal partitionCount = calculatePartition( actualSequenceCount.toString( ), rootFactor );
 		
-		BigDecimal partitionSize = totalSequenceCount.divide( partitionCount, 0, RoundingMode.FLOOR );
+		BigDecimal partitionSize = actualSequenceCount.divide( partitionCount, 0, RoundingMode.FLOOR );
 		
-		BigDecimal lastPartitionSize = totalSequenceCount.subtract( partitionCount.subtract( BigDecimal.ONE ).multiply( partitionSize ) );
+		BigDecimal lastPartitionSize = actualSequenceCount.subtract( partitionCount.subtract( BigDecimal.ONE ).multiply( partitionSize ) );
 		
 		//: If there is a given size, override the calculated partition count, size and last size based on the given partition size.
 		if( !size.equals( DEFAULT_PARTITION_SIZE ) ){			
@@ -243,7 +247,7 @@ public class revertHashByPartition{
 			dictionaryList,
 			endingSequence,
 			totalSequenceCount,
-			startingIndex,
+			startingIndex,			
 			partitionCount,
 			partitionSize,
 			lastPartitionSize,
@@ -356,6 +360,9 @@ public class revertHashByPartition{
 			synchronized( this.partitionData ){
 				PartitionData partitionData = this.partitionData;
 				BigDecimal nextStartingIndex = partitionData.startingIndex;
+				BigDecimal endingIndex = BigDecimal.ZERO;
+
+				int i = 0;
 
 				final Distributor self = this;
 
@@ -364,8 +371,13 @@ public class revertHashByPartition{
 					index.compareTo( partitionData.partitionCount ) <= 0;
 					index = index.add( BigDecimal.ONE )
 				){
-					BigDecimal endingIndex = nextStartingIndex.add( partitionData.partitionSize ).subtract( BigDecimal.ONE );
+					if( index.subtract( partitionData.partitionCount ) == BigDecimal.ZERO ){
+						endingIndex = partitionData.totalSequenceCount;
 					
+					}else{						
+						endingIndex = nextStartingIndex.add( partitionData.partitionSize );					
+					} 
+
 					BigDecimal[ ] indexRange = new BigDecimal[ ]{ nextStartingIndex, endingIndex };
 
 					nextStartingIndex = endingIndex.add( BigDecimal.ONE );
