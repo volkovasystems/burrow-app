@@ -6,7 +6,7 @@
 
 				var address = [ hostName, serverData.port ].join( ":" );
 
-				return [ "http:/", hostName, pathString ].join( "/" );
+				return [ "http:/", address, pathString ].join( "/" );
 			};
 
 		}else if( window.development ){
