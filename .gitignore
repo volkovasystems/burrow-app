@@ -6,3 +6,4 @@ client/fonts/
 burrowdb/
 *.log
 *.class
+deploy/

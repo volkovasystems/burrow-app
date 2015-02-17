@@ -4,6 +4,8 @@
 			serverData.joinPath = function joinPath( pathString ){
 				var hostName = serverData.domain || serverData.remote;
 
+				var address = [ hostName, serverData.port ].join( ":" );
+
 				return [ "http:/", hostName, pathString ].join( "/" );
 			};
 
