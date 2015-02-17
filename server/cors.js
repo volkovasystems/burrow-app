@@ -8,9 +8,7 @@ exports.cors = function cors( app ){
 		https://gist.github.com/cuppster/2344435
 	*/
 	app.use( function allowCrossDomain( request, response, next ){
-		var allowedOriginURL = request.headers.origin || request.get( "Host" );
-
-		response.header( "Access-Control-Allow-Origin", allowedOriginURL );
+		response.header( "Access-Control-Allow-Origin", "*" );
 		response.header( "Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS" );
 		response.header( "Access-Control-Allow-Headers", "Content-Type, Accept" );
 		response.header( "Access-Control-Allow-Credentials", true );
