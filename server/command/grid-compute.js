@@ -99,7 +99,7 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 		//: Remove this if erroneous or it contributes to delays or hangs the browser.
 		var randomTime = 1000 + Math.ceil( Math.random( ) * 1000 );
 		var timeout = setTimeout( ( function onTimeout( gridComputeInstance ){
-			var percentageRemaining = ( gridComputeInstance.count / gridComputeInstance.partitions ) * 100;
+			var percentageRemaining = Math.ceil( gridComputeInstance.count / gridComputeInstance.partitions ) * 100;
 
 			this.socket.broadcast.emit( "output", null, {
 				"type": "text",
