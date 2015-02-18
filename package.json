@@ -64,13 +64,13 @@
   },
   "serverSet": {
     "static": {
-      "domain": "",
-      "remote": "",
+      "domain": "192.168.1.100",
+      "remote": "192.168.1.100",
       "host": "localhost",
       "port": 8000
     },
     "burrow": {
-      "remote": "",
+      "remote": "192.168.1.100",
       "host": "localhost",
       "port": 9000
     }

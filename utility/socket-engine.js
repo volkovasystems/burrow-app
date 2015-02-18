@@ -85,7 +85,7 @@ var socketEngine = function socketEngine( socket ){
 					console.log( [
 						"decoding has finished for range",
 						startIndex, "to", endIndex,
-						"with result", "[", result, "],"
+						"with result", "[", result, "]",
 						"state", "[", state, "]",
 						"and duration of", durationData.commandDuration
 					].join( " " ) );
@@ -100,8 +100,8 @@ var socketEngine = function socketEngine( socket ){
 							"client": socketData.pairID,
 							"hash": hash,
 							"gridCount": gridCount,
-							"limitLength", limitLength,
-							"dictionary", dictionary
+							"limitLength": limitLength,
+							"dictionary": dictionary
 						}, durationData, reference );
 
 					}else if( typeof state == "string" ){
@@ -113,8 +113,8 @@ var socketEngine = function socketEngine( socket ){
 							"client": socketData.pairID,
 							"hash": hash,
 							"gridCount": gridCount,
-							"limitLength", limitLength,
-							"dictionary", dictionary
+							"limitLength": limitLength,
+							"dictionary": dictionary
 						}, durationData, reference );
 
 					}else if( !result || _.isEmpty( result ) || result === "null" ){
@@ -126,8 +126,8 @@ var socketEngine = function socketEngine( socket ){
 							"client": socketData.pairID,
 							"hash": hash,
 							"gridCount": gridCount,
-							"limitLength", limitLength,
-							"dictionary", dictionary
+							"limitLength": limitLength,
+							"dictionary": dictionary
 						}, durationData, reference );
 
 					}else{
@@ -139,8 +139,8 @@ var socketEngine = function socketEngine( socket ){
 							"client": socketData.pairID,
 							"hash": hash,
 							"gridCount": gridCount,
-							"limitLength", limitLength,
-							"dictionary", dictionary
+							"limitLength": limitLength,
+							"dictionary": dictionary
 						}, durationData, reference );
 					}
 

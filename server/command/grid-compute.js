@@ -5,7 +5,7 @@ var util = require( "util" );
 
 const GRID_COMPUTE_INSTANCES = { };
 
-var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLength, callback ){
+var gridCompute = function gridCompute( gridCount, md5hash, dictionary, limitLength, callback ){
 	if( typeof arguments[ 0 ] == "function" ){
 		callback = arguments[ 0 ];
 	}
@@ -277,7 +277,7 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 							socket.emit( "decode-md5hash",
 								this.durationData,
 								this.reference, 
-								md5Hash, 
+								md5hash, 
 								dictionary, 
 								limitLength,
 								partitionRange[ 0 ], 
