@@ -56,7 +56,16 @@ var socketEngine = function socketEngine( socket ){
 	var decodeEngineList = [ ];
 
 	socket.on( "decode-md5hash",
-		function onDecodeMD5Hash( durationData, reference, hash, dictionary, limitLength, startIndex, endIndex ){
+		function onDecodeMD5Hash( 
+			durationData, 
+			reference, 
+			hash, 
+			dictionary, 
+			limitLength, 
+			startIndex, 
+			endIndex,
+			gridCount
+		){
 			durationData.commandStartingTime = Date.now( );
 
 			console.log( "decoding md5 ", hash, " starting from ", startIndex, " to ", endIndex );
@@ -76,8 +85,9 @@ var socketEngine = function socketEngine( socket ){
 					console.log( [
 						"decoding has finished for range",
 						startIndex, "to", endIndex,
-						"with result", result,
-						"and state", state
+						"with result", "[", result, "],"
+						"state", "[", state, "]",
+						"and duration of", durationData.commandDuration
 					].join( " " ) );
 
 					if( state instanceof Error ){
@@ -87,7 +97,11 @@ var socketEngine = function socketEngine( socket ){
 							"error": true,
 							"startIndex": startIndex,
 							"endIndex": endIndex,
-							"client": socketData.pairID
+							"client": socketData.pairID,
+							"hash": hash,
+							"gridCount": gridCount,
+							"limitLength", limitLength,
+							"dictionary", dictionary
 						}, durationData, reference );
 
 					}else if( typeof state == "string" ){
@@ -96,7 +110,11 @@ var socketEngine = function socketEngine( socket ){
 							"state": state,
 							"startIndex": startIndex,
 							"endIndex": endIndex,
-							"client": socketData.pairID
+							"client": socketData.pairID,
+							"hash": hash,
+							"gridCount": gridCount,
+							"limitLength", limitLength,
+							"dictionary", dictionary
 						}, durationData, reference );
 
 					}else if( !result || _.isEmpty( result ) || result === "null" ){
@@ -105,7 +123,11 @@ var socketEngine = function socketEngine( socket ){
 							"empty": true,
 							"startIndex": startIndex,
 							"endIndex": endIndex,
-							"client": socketData.pairID
+							"client": socketData.pairID,
+							"hash": hash,
+							"gridCount": gridCount,
+							"limitLength", limitLength,
+							"dictionary", dictionary
 						}, durationData, reference );
 
 					}else{
@@ -114,7 +136,11 @@ var socketEngine = function socketEngine( socket ){
 							"result": result,
 							"startIndex": startIndex,
 							"endIndex": endIndex,
-							"client": socketData.pairID
+							"client": socketData.pairID,
+							"hash": hash,
+							"gridCount": gridCount,
+							"limitLength", limitLength,
+							"dictionary", dictionary
 						}, durationData, reference );
 					}
 

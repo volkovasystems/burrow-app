@@ -3,33 +3,20 @@ var childprocess = require( "child_process" );
 var grub = require( "../grub.js" ).grub;
 var util = require( "util" );
 
+const GRID_COMPUTE_INSTANCES = { };
+
 var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLength, callback ){
 	if( typeof arguments[ 0 ] == "function" ){
 		callback = arguments[ 0 ];
 	}
 
-	if( this.hasNoResult ){
-		var data = { };
-
-		var text = "";
-
-		var rangeReference = [ "range", this.startIndex, this.endIndex ].join( "_" );
+	if( this.hasNoResult && 
+		this.hash in GRID_COMPUTE_INSTANCES )
+	{
+		var gridComputeInstance = GRID_COMPUTE_INSTANCES[ this.hash ] || { "count": 0, "hasResult": true };
+		gridComputeInstance.count++;
 
 		if( this.error ){
-			data[ rangeReference ] = {
-				"startIndex": this.startIndex,
-				"endIndex": this.endIndex,
-				"error": this.state,
-				"duration": this.durationData.commandDuration,
-				"client": this.client
-			};
-
-			text = [
-				"error in one of the grids measuring for range",
-				this.startIndex, "to", this.endIndex,
-				"error message was", this.state
-			].join( " " );
-
 			var engineSocketList = _( this.holeSet )
 				.values( )
 				.filter( function onEachHole( holeData ){
@@ -51,64 +38,86 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 					socket.emit( "kill-all-decoders" );
 				} );
 
-		}else if( this.empty ){
-			data[ rangeReference ] = {
-				"startIndex": this.startIndex,
-				"endIndex": this.endIndex,
-				"empty": true,
-				"duration": this.durationData.commandDuration,
-				"client": this.client
-			};
+			callback( new Error( this.state ), {
+				"type": "text",
+				"text": [
+					"error in one of the grids measuring for range",
+					this.startIndex, "to", this.endIndex,
+					"error message was", this.state,
+					"for md5hash", this.hash, ",",
+					"grid count", this.gridCount, ",",
+					"limit length", this.limitLength, ",",
+					"dictionary", this.dictionary 
+				].join( " " )
+			}, "broadcast:output" );
 
-			text = [
-				"grid with range",
-				this.startIndex, "to", this.endIndex,
-				"returned empty result"
-			].join( " " );
-		
-		}else{
-			data[ rangeReference ] = {
-				"startIndex": this.startIndex,
-				"endIndex": this.endIndex,
-				"state": this.state,
-				"duration": this.durationData.commandDuration,
-				"client": this.client
-			};
+			delete GRID_COMPUTE_INSTANCES[ this.hash ];
 
-			text = [ 
-				"unknown result on range",
-				this.startIndex, "to", this.endIndex,
-				"with state message", this.state
-			].join( " " );
+			return;
 		}
 
-		/*grub( ).save( {
-			"reference": this.reference,
-			"data": data
-		} );*/
+		if( gridComputeInstance.count >= gridComputeInstance.partitions &&
+			!gridComputeInstance.hasResult )
+		{
+			var engineSocketList = _( this.holeSet )
+				.values( )
+				.filter( function onEachHole( holeData ){
+					return holeData instanceof Array;
+				} )
+				.flatten( )
+				.compact( )
+				.filter( function onEachHole( hole ){
+					return !hole.parentSocket;
+				} )
+				.map( function onEachHole( hole ){
+					return hole.socket;
+				} )
+				.compact( )
+				.value( );
 
-		/*callback( null, {
-			"type": "text",
-			"text": text
-		}, "broadcast:output" );*/
+			_.each( engineSocketList,
+				function onEachEngineSocket( socket ){
+					socket.emit( "kill-all-decoders" );
+				} );
+
+			callback( new Error( this.state ), {
+				"type": "text",
+				"text": [
+					"no result in all partitions",
+					"for md5hash", this.hash, ",",
+					"grid count", this.gridCount, ",",
+					"limit length", this.limitLength, ",",
+					"dictionary", this.dictionary
+				].join( " " )
+			}, "broadcast:output" );
+
+			delete GRID_COMPUTE_INSTANCES[ this.hash ];
+
+			return;
+		}
+
+		//: Remove this if erroneous or it contributes to delays or hangs the browser.
+		var randomTime = 1000 + Math.ceil( Math.random( ) * 1000 );
+		var timeout = setTimeout( ( function onTimeout( gridComputeInstance ){
+			var percentageRemaining = ( gridComputeInstance.count / gridComputeInstance.partitions ) * 100;
+
+			this.socket.broadcast.emit( "output", null, {
+				"type": "text",
+				"text": [ 
+					"decoding md5hash", this.hash,
+					"remaining percentage", percentageRemaining + "%"
+				].join( " " )
+			}, this.durationData, this.hash );
+
+			clearTimeout( timeout );
+		} ).bind( this ), randomTime, gridComputeInstance );
 		
-	}else if( this.hasResult ){
-		var data = { };
-
-		var rangeReference = [ "range", this.startIndex, this.endIndex ].join( "_" );
-
-		data[ rangeReference ] = {
-			"startIndex": this.startIndex,
-			"endIndex": this.endIndex,
-			"result": this.result,
-			"duration": this.durationData.commandDuration,
-			"client": this.client
-		};
-
-		grub( ).save( {
-			"reference": this.reference,
-			"data": data
-		} );
+	}else if( this.hasResult && 
+		this.hash in GRID_COMPUTE_INSTANCES )
+	{
+		var gridComputeInstance = GRID_COMPUTE_INSTANCES[ this.hash ];
+		gridComputeInstance.count++;
+		gridComputeInstance.hasResult = true;
 
 		var engineSocketList = _( this.holeSet )
 			.values( )
@@ -136,26 +145,25 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 			"text": [
 				"result was found on range",
 				this.startIndex, "to", this.endIndex,
-				"result was", this.result
+				"result was", "[", this.result, "]",
+				"for md5hash", this.hash, ",",
+				"grid count", this.gridCount, ",",
+				"limit length", this.limitLength, ",",
+				"dictionary", this.dictionary
 			].join( " " )
 		}, "broadcast:output" );
 
-	}else if( !_.isEmpty( this.parameterList ) ){
-		grub( ).save( {
-			"reference": this.reference,
-			"data": {
-				"gridCount": gridCount,
-				"md5Hash": md5Hash,
-				"limitLength": limitLength
-			}
-		} );
+		delete GRID_COMPUTE_INSTANCES[ this.hash ];
 
+	}else if( !_.isEmpty( this.parameterList ) &&
+		!( md5hash in GRID_COMPUTE_INSTANCES ) )
+	{
 		var task = childprocess.exec( [ 
 			"java", 
 			"generatePartitionRange.generatePartitionRange",
 			dictionary,
 			limitLength
-		].join( " " ), { "cwd": "utility", "maxBuffer": 2048 * 2048 } )
+		].join( " " ), { "cwd": "utility", "maxBuffer": 8192 * 8192 } )
 
 		var partitionRangeList = [ ];
 
@@ -164,8 +172,27 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 				partitionRangeList.push( data.toString( ) );
 			} );
 
+		var errorData = "";
+
+		task.stderr.on( "data",
+			function onData( data ){
+				errorData += data.toString( );
+			} );
+
 		task.on( "exit",
 			( function onExit( ){
+				if( !_.isEmpty( errorData ) ){
+					callback( new Error( errorData ), {
+						"type": "text",
+						"text": [
+							"error generating partition ranges",
+							"error was", errorData
+						].join( " " )
+					}, "broadcast:output" );
+
+					return;
+				}
+
 				partitionRangeList = _.compact( partitionRangeList.join( "" ).split( "," ) );
 
 				this.socket.broadcast.emit( "output", null, {
@@ -174,7 +201,7 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 						partitionRangeList.length, 
 						"partitions for this grid computation" 
 					].join( " " )
-				}, this.durationData, this.reference );
+				}, this.durationData, md5hash );
 
 				/*:
 					The holeSet contains list of references.
@@ -222,6 +249,20 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 					return;
 				}
 
+				this.socket.broadcast.emit( "output", null, {
+					"type": "text",
+					"text": [ 
+						"decoding md5hash",
+						md5hash,
+						"has started"
+					]
+				}, this.durationData, md5hash );
+
+				GRID_COMPUTE_INSTANCES[ md5hash ] = {
+					"partitions": partitionRangeList,
+					"count": 0
+				};
+
 				//Now we have a list of engine sockets start emitting.
 				while( partitionRangeList.length ){
 					_.each( engineSocketList,
@@ -240,30 +281,38 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 								dictionary, 
 								limitLength,
 								partitionRange[ 0 ], 
-								partitionRange[ 1 ] );
+								partitionRange[ 1 ],
+								gridCount );
 
-							this.socket.broadcast.emit( "output", null, {
-								"type": "text",
-								"text": [ 
-									"decode command for range of", 
-									partitionRange[ 0 ], "to", partitionRange[ 1 ], 
-									"has been deployed"
-								].join( " " )
-							}, this.durationData, this.reference );
 						} ).bind( this ) );	
 				}
 
-				/*callback( null, {
+				this.socket.broadcast.emit( "output", null, {
 					"type": "text",
-					"text": "grid computation ongoing"
-				}, "broadcast:output" );*/
+					"text": [ 
+						"all decoders for",
+						md5hash,
+						"has been deployed"
+					]
+				}, this.durationData, md5hash );
+
+				this.socket.broadcast.emit( "output", null, {
+					"type": "text",
+					"text": [
+						"grid computation for decoding md5hash",
+						md5hash,
+						"has been ongoing"
+					]
+				}, this.durationData, md5hash );
 
 			} ).bind( this ) );
 
 	}else{
 		callback( null, {
 			"type": "text",
-			"text": "no grid computation"
+			"text": [
+				"no grid computation"
+			].join( " " )
 		}, "broadcast:output" );
 	}
 };

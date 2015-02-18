@@ -30,7 +30,15 @@ var decodeMD5Hash = function decodeMD5Hash( hash, dictionary, limitLength, start
 
 	task.on( "exit",
 		function onExit( ){
+			if( task.killed ){
+				console.log( "task was killed" );
+				
+				return;
+			}
+
 			if( !_.isEmpty( errorData ) ){
+				console.log( "error during decoding md5hash", errorData );
+
 				callback( new Error( errorData ) );
 
 			}else if( !_.isEmpty( resultData ) ){
