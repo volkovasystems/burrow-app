@@ -2,6 +2,7 @@ package generatePartitionRange;
 
 import java.math.RoundingMode;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Stack;
 
 import static calculatePartition.calculatePartition.calculatePartition;
@@ -55,17 +56,15 @@ public class generatePartitionRange{
 		}
 
 		try{
-			Stack<BigDecimal[ ]> partitionRangeList = generatePartitionRange( dictionary, length, rootFactor, separator );
+			Stack<BigInteger[ ]> partitionRangeList = generatePartitionRange( dictionary, length, rootFactor, separator );
 
-			while( partitionRangeList.size( ) != 0 ){
-				BigDecimal[ ] partitionRange = partitionRangeList.pop( );
+			while( partitionRangeList.size( ) > 0 ){
+				BigInteger[ ] partitionRange = partitionRangeList.pop( );
 
 				String startingIndex = partitionRange[ 0 ].toString( );
 				String endingIndex = partitionRange[ 1 ].toString( );
 
-				String[ ] partition = new String[ ]{ startingIndex, endingIndex };
-
-				System.out.print( String.join( "-", partition ) + "," );
+                System.out.print( startingIndex + "-" + endingIndex + "," );
 			}
 
 		}catch( Exception exception ){
@@ -73,7 +72,7 @@ public class generatePartitionRange{
 		}
 	}
 
-	public static final Stack<BigDecimal[ ]> generatePartitionRange( String dictionary, int length, String rootFactor, String separator )
+	public static final Stack<BigInteger[ ]> generatePartitionRange( String dictionary, int length, String rootFactor, String separator )
 		throws Exception
 	{
 		//: Split the dictionary using the separator to get the dictionary list which is badly needed.
@@ -84,39 +83,36 @@ public class generatePartitionRange{
 		String endingSequence = ( new String( new char[ length ] ) ).replace( "\0", dictionaryList[ dictionaryListLength - 1 ] ); 
 
 		//: Initial get the total sequence count.
-		BigDecimal totalSequenceCount = new BigDecimal( convertToSequenceIndex( endingSequence, dictionary, separator ).toString( ) );
+		BigInteger totalSequenceCount = convertToSequenceIndex( endingSequence, dictionary, separator );
 
 		//: Calculate the partition count, size and the last size based on the total sequence count.
-		BigDecimal partitionCount = calculatePartition( totalSequenceCount.toString( ), rootFactor );
+		BigInteger partitionCount = calculatePartition( totalSequenceCount.toString( ), rootFactor );
 		
-		BigDecimal partitionSize = totalSequenceCount.divide( partitionCount, 0, RoundingMode.FLOOR );
+		BigInteger partitionSize = ( new BigDecimal( totalSequenceCount ).divide( new BigDecimal( partitionCount ), 0, RoundingMode.FLOOR ) ).toBigInteger( );
 		
-		BigDecimal lastPartitionSize = totalSequenceCount.subtract( partitionCount.subtract( BigDecimal.ONE ).multiply( partitionSize ) );
+		BigInteger differencePartitionCount = partitionCount.subtract( BigInteger.ONE );		
+		BigInteger productPartitionSize = differencePartitionCount.multiply( partitionSize );		
+		BigInteger lastPartitionSize = totalSequenceCount.subtract( productPartitionSize );
 
-		Stack<BigDecimal[ ]> partitionRangeList = new Stack<>( );
+		Stack<BigInteger[ ]> partitionRangeList = new Stack<>( );
+		
+		BigInteger index = BigInteger.ONE;
+		BigInteger startIndex = index;
+		BigInteger endIndex = index;
 
-		BigDecimal index = BigDecimal.ONE;
-		BigDecimal startIndex = index;
-		BigDecimal endIndex = index;
-		while( index.compareTo( partitionCount ) != 0 ){
-			if( index.add( BigDecimal.ONE ).compareTo( partitionCount ) == 0 ){
-				endIndex = startIndex.add( lastPartitionSize );
-
-				if( endIndex.compareTo( totalSequenceCount ) != 0 ){
-					endIndex = totalSequenceCount;
-				}
-
-				partitionRangeList.push( new BigDecimal[ ]{ startIndex, endIndex } );
-
+		while( index.compareTo( partitionCount ) < 0 ){
+			if( index.add( BigInteger.ONE ).compareTo( partitionCount ) == 0 ){
+				endIndex = totalSequenceCount;
+				
 			}else{
 				endIndex = startIndex.add( partitionSize );
-				partitionRangeList.push( new BigDecimal[ ]{ startIndex, endIndex } );
-				startIndex = endIndex.add( BigDecimal.ONE );
 			}
 
-			index = index.add( BigDecimal.ONE );
-		}
+			partitionRangeList.push( new BigInteger[ ]{ startIndex, endIndex } );
+			startIndex = endIndex.add( BigInteger.ONE );
 
+			index = index.add( BigInteger.ONE );
+		}
 		return partitionRangeList;
 	}
 }

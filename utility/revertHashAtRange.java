@@ -1,7 +1,6 @@
 package revertHashAtRange;
 
 import java.security.MessageDigest;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import static convertToSequence.convertToSequence.convertToSequence;
@@ -143,27 +142,26 @@ public class revertHashAtRange{
 	public static final String revertHashAtRange( String hash, String dictionary, String startIndex, String endIndex, String algorithmType, String separator )
 		throws Exception
 	{
-		BigDecimal startingIndex = new BigDecimal( startIndex );
-		BigDecimal endingIndex = new BigDecimal( endIndex );
+		BigInteger startingIndex = new BigInteger( startIndex );
+		BigInteger endingIndex = new BigInteger( endIndex );
 
 		String sequence = NULL_STRING;
 		String testingHash = NULL_STRING;
 
 		MessageDigest messageDigest = MessageDigest.getInstance( algorithmType );
-		for(
-			BigDecimal index = startingIndex;
-			index.compareTo( endingIndex ) < 0;
-			index = index.add( BigDecimal.ONE )
-		){
-			sequence = convertToSequence( index.toString( ), dictionary, separator );
 
+		BigInteger index = startingIndex;			
+		while( index.compareTo( endingIndex ) < 1 ){
+
+			sequence = convertToSequence( index.toString( ), dictionary, separator );
 			testingHash = new BigInteger( 1, messageDigest.digest( sequence.getBytes( ) ) ).toString( 16 );
 
 			if( hash.equals( testingHash ) ){
 				return sequence;
 			}
-		}
 
+			index = index.add( BigInteger.ONE );		
+		}
 		return NULL_STRING;
 	}
 }
