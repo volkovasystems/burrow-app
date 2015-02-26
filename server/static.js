@@ -38,8 +38,8 @@ app.get( "/action/:action/:actionType/:actionValue([^]+)*",
 		if( action == "download" && 
 			actionType == "installer" )
 		{
-			var installerPath = path.resolve( __dirname, "../", actionType, actionValue );
-
+			var installerPath = path.resolve( __dirname, "installer/burrow-app.bat" );
+			
 			if( fs.existsSync( installerPath ) ){
 				response
 					.status( 200 )
