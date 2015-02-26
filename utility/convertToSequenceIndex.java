@@ -97,6 +97,9 @@ public class convertToSequenceIndex{
 		String element = EMPTY_STRING;
 		Integer dictionaryElementIndex = 0;
 		
+		BigInteger d_Power_i = BigInteger.ZERO;
+		BigInteger dPoweri_Product_wn_i = BigInteger.ZERO;
+
 		for( int index = 0; index < sequenceLength; index++, elementIndex-- ){
 			element = sequenceList[ elementIndex ];
 
@@ -113,7 +116,10 @@ public class convertToSequenceIndex{
 					The summation of the length of dictionary raise to the current index multiplied
 						by the element index from the dictionary starting at the last element.
 			*/
-			sequenceIndex = sequenceIndex.add( dictionaryLength.pow( index ).multiply( dictionaryIndex ) );
+			
+			d_Power_i = dictionaryLength.pow( index );
+			dPoweri_Product_wn_i = d_Power_i.multiply( dictionaryIndex );
+			sequenceIndex = sequenceIndex.add( dPoweri_Product_wn_i );
 		}
 		return sequenceIndex;
 	}
