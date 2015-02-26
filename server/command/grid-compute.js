@@ -150,18 +150,24 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 			}
 		} );
 
-		var task = childprocess.exec( [ 
-			"java", 
+		var task = childprocess.spawn( "java", [
+			"-Xmx512m",
 			"generatePartitionRange.generatePartitionRange",
 			dictionary,
 			limitLength
-		].join( " " ), { "cwd": "utility", "maxBuffer": 2048 * 2048 } )
+		], { "cwd": "utility" } );
 
 		var partitionRangeList = [ ];
 
 		task.stdout.on( "data",
 			function onData( data ){
+				/*console.log( data.toString( ) );*/
 				partitionRangeList.push( data.toString( ) );
+			} );
+
+		task.stderr.on( "data",
+			function onData( data ){
+				console.log( data.toString( ) );
 			} );
 
 		task.on( "exit",
@@ -176,7 +182,7 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 					].join( " " )
 				}, this.durationData, this.reference );
 
-				/*:
+				/*:x
 					The holeSet contains list of references.
 
 					One of the items are array of sockets.
@@ -222,42 +228,54 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 					return;
 				}
 
+				var partitionRangeIndex = partitionRangeList.length;
 				//Now we have a list of engine sockets start emitting.
-				while( partitionRangeList.length ){
+				while( partitionRangeIndex >= -1 ){
 					_.each( engineSocketList,
 						( function onEachEngineSocket( socket ){
-							var partitionRange = partitionRangeList.pop( );
-					
-							partitionRange = partitionRange.split( "-" )
+							if(  partitionRangeIndex > 0  ){
+								var partitionRange = partitionRangeList.pop( );
+																
+								partitionRange = partitionRange.split( "-" )
 								.map( function onEachRange( range ){
 									return parseInt( range );
 								} );
 
-							socket.emit( "decode-md5hash",
-								this.durationData,
-								this.reference, 
-								md5Hash, 
-								dictionary, 
-								limitLength,
-								partitionRange[ 0 ], 
-								partitionRange[ 1 ] );
+								socket.emit( "decode-md5hash",
+									this.durationData,
+									this.reference, 
+									md5Hash, 
+									dictionary, 
+									limitLength,
+									partitionRange[ 0 ], 
+									partitionRange[ 1 ] );
+							
+								this.socket.broadcast.emit( "output", null, {
+									"type": "text",
+									"text": [ 
+										"decode command for range of", 
+										partitionRange[ 0 ], "to", partitionRange[ 1 ], 
+										"has been deployed"
+									].join( " " )
+								}, this.durationData, this.reference );
+							
+							} else if( partitionRangeIndex == -1 ){
+								console.log( partitionRangeIndex );
 
-							this.socket.broadcast.emit( "output", null, {
-								"type": "text",
-								"text": [ 
-									"decode command for range of", 
-									partitionRange[ 0 ], "to", partitionRange[ 1 ], 
-									"has been deployed"
-								].join( " " )
-							}, this.durationData, this.reference );
-						} ).bind( this ) );	
-				}
-
-				/*callback( null, {
+								socket.emit( "start-decoder",
+									this.durationData,
+									this.reference );							
+							}
+						
+						} ).bind( this ) );
+					
+					partitionRangeIndex--;
+				}							
+			/*	callback( null, {
 					"type": "text",
 					"text": "grid computation ongoing"
-				}, "broadcast:output" );*/
-
+				}, "broadcast:output" );
+*/
 			} ).bind( this ) );
 
 	}else{
