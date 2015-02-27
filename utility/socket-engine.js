@@ -118,7 +118,7 @@ var socketEngine = function socketEngine( socket ){
 			var pendingTask = decodeThisList.length;
 
 			while( pendingTask > 0 ){
-				queue.push( decodeThisList.pop( ), function ( error ){
+				queue.push( decodeThisList.shift( ), function ( error ){
 					if( error ){
 						queue.kill( );
 						decodeThisList = [ ];

@@ -191,31 +191,30 @@ public class revertHashByPartition{
 	}
 
 	public static final void revertHashByPartition( String hash, String dictionary, int length, String rootFactor, String startIndex, String endIndex, String size, String algorithmType, String separator )
-		throws Exception{
+		throws Exception
+		{
+
+		BigInteger startingIndex = new BigInteger( startIndex );
+		BigInteger endingIndex = new BigInteger( endIndex );
+
+		if( startingIndex.compareTo( endingIndex ) > 0 ){
+			Exception exception = new Exception( "starting index is greater than the end index." );
+			System.err.print( exception.getMessage( ) );			
+
+			return;
+		}
+				
 		//: Split the dictionary using the separator to get the dictionary list which is badly needed.
 		String[ ] dictionaryList = dictionary.split( separator );
 		int dictionaryListLength = dictionaryList.length;
 
-		//: Based from the length, get the ending sequence by repeatedly appending the last character in the dictionary.
+		//: Based from the endIndex, get the ending sequence using convertToSequence.
 		String endingSequence = convertToSequence( endIndex, dictionary, separator );
 
 		//: Initial get the total sequence count.
 		BigInteger totalSequenceCount = convertToSequenceIndex( endingSequence, dictionary, separator );
 		
-		//: Try to check if there is a given starting index.
-		BigInteger startingIndex = BigInteger.ONE;
-		if( !startIndex.equals( DEFAULT_STARTING_INDEX ) ){
-			startingIndex = new BigInteger( startIndex );
-		}
-
-		BigInteger endingIndex = BigInteger.ONE;
-		if( !endIndex.equals( DEFAULT_ENDING_INDEX ) ){
-			endingIndex = new BigInteger( endIndex );
-
-			endingSequence = convertToSequence( endingIndex.toString( ), dictionary, separator );
-
-			totalSequenceCount = convertToSequenceIndex( endingSequence, dictionary, separator );
-		}
+		//: TODO: Try to check if there is a given starting index.
 
 		//: If the starting index is greater than the total sequence count stop the execution.
 		if( startingIndex.compareTo( totalSequenceCount ) > 0 ){
@@ -225,35 +224,24 @@ public class revertHashByPartition{
 			return;
 		}
 
-		//: Calculate the partition count, based on the modified sequence count from previous root.
-		BigInteger actualPartitionCount = calculatePartition( totalSequenceCount.toString( ), rootFactor );
-		BigInteger partitionCount = actualPartitionCount.subtract( BigInteger.ONE );		
+		//: Calculate the actual partition count, based on indices.
+		BigInteger actualSequenceCount = endingIndex.subtract( startingIndex );
 
-		//: Calculate the partition size and the last size based on the total sequence count.
-		BigInteger partitionSize = ( new BigDecimal( totalSequenceCount ).divide( new BigDecimal( partitionCount ), 0, RoundingMode.FLOOR ) ).toBigInteger( );
-					
-		BigInteger differencePartitionCount = partitionCount.subtract( BigInteger.ONE );		
-		BigInteger productPartitionSize = differencePartitionCount.multiply( partitionSize );		
-		BigInteger lastPartitionSize = totalSequenceCount.subtract( productPartitionSize );		
-
-		//: If there is a given size, override the calculated partition count, size and last size based on the given partition size.
-		if( !size.equals( DEFAULT_PARTITION_SIZE ) ){
+		//: Add one to include partitioin count of startingIndex.
+		BigInteger finalSequenceCount = actualSequenceCount.add( BigInteger.ONE );
 		
-			//: Based from the length, get the ending sequence by repeatedly appending the last character in the dictionary.
-			endingSequence = ( new String( new char[ length ] ) ).replace( "\0", dictionaryList[ dictionaryListLength - 1 ] ); 
+		//: Calculate the partition size and the last size based on the actual sequence count.		
+		BigInteger partitionCount = calculatePartition( finalSequenceCount.toString( ), rootFactor );
+		BigInteger partitionSize = ( new BigDecimal( finalSequenceCount ).divide( new BigDecimal( partitionCount ), 0, RoundingMode.FLOOR ) ).toBigInteger( );
+		
+		//: TODO: Get the last partition size.	
+		/*BigInteger differencePartitionCount = partitionCount.subtract( BigInteger.ONE );		
+		BigInteger productPartitionSize = differencePartitionCount.multiply( partitionSize );		
+		BigInteger lastPartitionSize = totalSequenceCount.subtract( productPartitionSize );*/
 
-			//: Initial get the total sequence count.
-			totalSequenceCount = convertToSequenceIndex( endingSequence, dictionary, separator );
+		BigInteger lastPartitionSize = null;
 
-			//: Calculate the partition count, size and the last size based on the total sequence count.
-			partitionCount = calculatePartition( totalSequenceCount.toString( ), rootFactor );
-			
-			partitionSize = ( new BigDecimal( totalSequenceCount ).divide( new BigDecimal( partitionCount ), 0, RoundingMode.FLOOR ) ).toBigInteger( );
-			
-			differencePartitionCount = partitionCount.subtract( BigInteger.ONE );		
-			productPartitionSize = differencePartitionCount.multiply( partitionSize );		
-			lastPartitionSize = totalSequenceCount.subtract( productPartitionSize );
-		}
+		//: TODO: If there is a given size, override the calculated partition count, size and last size based on the given partition size.
 
 		final PartitionData partitionData = new PartitionData( 
 			hash,
@@ -261,7 +249,8 @@ public class revertHashByPartition{
 			dictionaryList,
 			endingSequence,
 			totalSequenceCount,
-			startingIndex,			
+			startingIndex,
+			endingIndex,			
 			partitionCount,
 			partitionSize,
 			lastPartitionSize,
@@ -272,6 +261,9 @@ public class revertHashByPartition{
 		Distributor distributor = new Distributor( partitionData ){
 			public void callback( Exception exception, String revertedHash ){
 				synchronized( partitionData ){
+				//: Request GC prior to launch of each thread.
+					Runtime.getRuntime( ).gc( );					
+
 					System.out.print( revertedHash );
 					
 					//: Start killing the threads here.
@@ -370,43 +362,50 @@ public class revertHashByPartition{
 		public void run( ){
 			synchronized( this.partitionData ){				
 				PartitionData partitionData = this.partitionData;
-				
+
 				BigInteger nextStartingIndex = partitionData.startingIndex;
 				BigInteger endingIndex = BigInteger.ZERO;
+				BigInteger previousIndex = BigInteger.ZERO;
 
 				final Distributor self = this;
 
 				BigInteger index = BigInteger.ONE;
 				BigInteger [ ] indexRange = new BigInteger [ ]{ BigInteger.ZERO, BigInteger.ZERO };
 
+				//: Limit number of thread to the number of cores. This will prevent context switch triggering on large partition size.
 				int cpuCores = Runtime.getRuntime( ).availableProcessors( );
-
-				int activeThreadCount = 0;				
+				
+				//: Reserve one for the Distributor thread.
+				int activeThreadCount = 1;
 				int desiredThreadCount = cpuCores;
 				int processingThreadCount = partitionData.rangeList.size( );
 
 				Thread executorEngine = null;
 				
 				while( index.compareTo( partitionData.partitionCount ) < 1 ){
+
 					if( activeThreadCount < desiredThreadCount ){
-						if( index.subtract( partitionData.partitionCount ) == BigInteger.ZERO ){
-							endingIndex = partitionData.totalSequenceCount;
+					
+						if( index.compareTo( partitionData.partitionCount ) == 0 ){
+							endingIndex = partitionData.endingIndex;
 						
 						}else{						
-							endingIndex = endingIndex.add( partitionData.partitionSize );					
+							previousIndex = nextStartingIndex;
+							endingIndex = previousIndex.add( partitionData.partitionSize );
+
 						} 
 
 						indexRange = new BigInteger [ ]{ nextStartingIndex, endingIndex };
-						
-						nextStartingIndex = endingIndex.add( BigInteger.ONE );
-
 						partitionData.rangeList.add( indexRange );
-						
-						Runtime.getRuntime( ).gc( );					
+					
+						nextStartingIndex = endingIndex.add( BigInteger.ONE );
+								
+						//: Request GC prior to launch of each thread.
+						Runtime.getRuntime( ).gc( );
 
 						Executor executor = new Executor( partitionData ){
 							public void callback( Exception exception, String revertedHash ){
-								synchronized( self.partitionData ){
+								synchronized( self.partitionData ){									
 									PartitionData partitionData = self.partitionData;
 
 									partitionData.resultCount = partitionData.resultCount.add( BigInteger.ONE );
@@ -447,7 +446,8 @@ public class revertHashByPartition{
 						executorEngine.start( );
 
 						partitionData.executorEngineList.add( executorEngine );
-					
+						
+						//: For queue.
 						activeThreadCount++;
 						processingThreadCount++;
 
@@ -462,11 +462,11 @@ public class revertHashByPartition{
 					}
 				}
 
-					/*:
-						This will make the distributor thread alive. 
-						This will always check if the engine list has been popped out and killed.
-						This wait method will release the lock of partition data for the distributor thread which holds it for 100 milliseconds. 
-					*/
+				/*:
+					This will make the distributor thread alive. 
+					This will always check if the engine list has been popped out and killed.
+					This wait method will release the lock of partition data for the distributor thread which holds it for 100 milliseconds. 
+				*/
 
 					while( partitionData.executorEngineList.size( ) != 0 ){
 					
@@ -500,6 +500,7 @@ public class revertHashByPartition{
 		public static volatile String endingSequence = null;
 		public static volatile BigInteger totalSequenceCount = null;
 		public static volatile BigInteger startingIndex = null;
+		public static volatile BigInteger endingIndex= null;
 		public static volatile BigInteger partitionCount = null;
 		public static volatile BigInteger partitionSize = null;
 		public static volatile BigInteger lastPartitionSize = null;
@@ -521,6 +522,7 @@ public class revertHashByPartition{
 			String endingSequence, 
 			BigInteger totalSequenceCount,
 			BigInteger startingIndex,
+			BigInteger endingIndex,
 			BigInteger partitionCount,
 			BigInteger partitionSize,
 			BigInteger lastPartitionSize,
@@ -533,6 +535,7 @@ public class revertHashByPartition{
 			PartitionData.endingSequence = endingSequence;
 			PartitionData.totalSequenceCount = totalSequenceCount;
 			PartitionData.startingIndex = startingIndex;
+			PartitionData.endingIndex = endingIndex;
 			PartitionData.partitionCount = partitionCount;
 			PartitionData.partitionSize = partitionSize;
 			PartitionData.lastPartitionSize = lastPartitionSize;
