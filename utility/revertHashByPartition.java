@@ -203,7 +203,7 @@ public class revertHashByPartition{
 
 			return;
 		}
-				
+
 		//: Split the dictionary using the separator to get the dictionary list which is badly needed.
 		String[ ] dictionaryList = dictionary.split( separator );
 		int dictionaryListLength = dictionaryList.length;
@@ -257,7 +257,7 @@ public class revertHashByPartition{
 			algorithmType,
 			separator
 		);
-
+					
 		Distributor distributor = new Distributor( partitionData ){
 			public void callback( Exception exception, String revertedHash ){
 				synchronized( partitionData ){
@@ -390,7 +390,7 @@ public class revertHashByPartition{
 							endingIndex = partitionData.endingIndex;
 						
 						}else{						
-							previousIndex = nextStartingIndex;
+							previousIndex = nextStartingIndex.subtract( BigInteger.ONE );
 							endingIndex = previousIndex.add( partitionData.partitionSize );
 
 						} 
