@@ -52,9 +52,13 @@ public class nthRoot{
 		throws Exception
 	{
 		BigDecimal rootExponent = new BigDecimal( exponent );
-		BigDecimal baseValue = new BigDecimal( value );
-		BigDecimal guessRoot = baseValue.divide( new BigDecimal( guessFactor ) );
 
+		BigDecimal baseValue = new BigDecimal( value );		
+		BigDecimal baseGuessFactor = new BigDecimal( guessFactor );		
+		BigDecimal guessRoot = baseValue.divide( baseGuessFactor );
+		
+		BigInteger integerBaseValue = new BigInteger( value );
+		BigInteger integerGuessRoot = null; 		
 		/*
 			The base precision is the length of numbers after the decimal point.
 			This will be used to validate the guess root.
@@ -78,21 +82,25 @@ public class nthRoot{
 			guessRoot at the specific index is therefore equal to C * ( A + B )
 		*/
 		do{
-			BigDecimal phaseA = rootExponent.subtract( BigDecimal.ONE ).multiply( guessRoot );
-
-			BigDecimal phaseB = nthPower( guessRoot.toString( ), rootExponent.subtract( BigDecimal.ONE ).toString( ) );
-
+			BigDecimal differenceRootExponent = rootExponent.subtract( BigDecimal.ONE );
+			BigDecimal productGuessRoot = differenceRootExponent .multiply( guessRoot );
+			
+			BigDecimal phaseA = productGuessRoot;
+			BigDecimal phaseB = nthPower( guessRoot.toString( ), differenceRootExponent.toString( ) );
 			BigDecimal phaseC = baseValue.divide( phaseB, precision, RoundingMode.HALF_UP );
+			BigDecimal phaseD = ( BigDecimal.ONE ).divide( rootExponent, precision, RoundingMode.HALF_UP );
 
-			BigDecimal phaseD = BigDecimal.ONE.divide( rootExponent, precision, RoundingMode.HALF_UP );
-
-			guessRoot = phaseD.multiply( phaseA.add( phaseC ) ).setScale( precision, RoundingMode.HALF_UP );
+			BigDecimal sumPhaseAnPhaseB = phaseA.add( phaseC );
+            
+            guessRoot = phaseD.multiply( sumPhaseAnPhaseB ).setScale( precision, RoundingMode.HALF_UP );
 
 			//We increase the precision to match the evaluation.
 			//NOTE: Increasing the precision means increasing the number of digits after the dot.
 			precision++;
 
-		}while( guessRoot.pow( rootExponent.intValue( ) ).setScale( basePrecision, RoundingMode.HALF_UP ).compareTo( baseValue ) != 0 );
+			integerGuessRoot = guessRoot.pow( rootExponent.intValueExact( ) ).setScale( basePrecision, RoundingMode.HALF_UP ).toBigInteger( );
+	
+		}while(	integerGuessRoot.compareTo( integerBaseValue ) != 0 );
 
 		return guessRoot;
 	}

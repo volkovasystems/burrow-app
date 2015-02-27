@@ -37,7 +37,8 @@
     "socket.io-client": "^1.3.2",
     "string": "^3.0.0",
     "unirest": "^0.4.0",
-    "yargs": "^1.3.3"
+    "yargs": "^1.3.3",
+    "colors": "^1.0.1"
   },
   "devDependencies": {
     "bower": "^1.3.12",
@@ -64,14 +65,14 @@
   },
   "serverSet": {
     "static": {
-      "domain": "",
-      "remote": "",
-      "host": "localhost",
+      "domain": "192.168.1.100",
+      "remote": "192.168.1.100",
+      "host": "192.168.1.100",
       "port": 8000
     },
     "burrow": {
-      "remote": "",
-      "host": "localhost",
+      "remote": "192.168.1.100",
+      "host": "192.168.1.100",
       "port": 9000
     }
   }
