@@ -4,13 +4,13 @@ var childprocess = require( "child_process" );
 var decodeMD5Hash = function decodeMD5Hash( hash, dictionary, limitLength, startIndex, endIndex, callback ){
 	
 	//limit stackSize per thread
-	var cpuCores = process.env.NUMBER_OF_PROCESSORS;
+	//var cpuCores = process.env.NUMBER_OF_PROCESSORS;
 	//:var assumedBaseThread = 2; //main and distributor
-	var ThreadBufferSize = 512 / parseInt( cpuCores );
+	//var ThreadBufferSize = 512 / parseInt( cpuCores );
 
 	var task = childprocess.spawn( "java", [		
-		"-Xss" + Math.round( ThreadBufferSize ) + "m",
-		"-Xmx512m",
+	/*	"-Xss" + Math.round( ThreadBufferSize ) + "m",
+	*/	"-Xmx512m",
 		"revertHashByPartition.revertHashByPartition",
 		hash,
 		dictionary,

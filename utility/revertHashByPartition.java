@@ -261,6 +261,9 @@ public class revertHashByPartition{
 		Distributor distributor = new Distributor( partitionData ){
 			public void callback( Exception exception, String revertedHash ){
 				synchronized( partitionData ){
+				//: Request GC prior to launch of each thread.
+					Runtime.getRuntime( ).gc( );					
+
 					System.out.print( revertedHash );
 					
 					//: Start killing the threads here.
@@ -396,13 +399,13 @@ public class revertHashByPartition{
 						partitionData.rangeList.add( indexRange );
 					
 						nextStartingIndex = endingIndex.add( BigInteger.ONE );
-						
+								
 						//: Request GC prior to launch of each thread.
-						Runtime.getRuntime( ).gc( );					
+						Runtime.getRuntime( ).gc( );
 
 						Executor executor = new Executor( partitionData ){
 							public void callback( Exception exception, String revertedHash ){
-								synchronized( self.partitionData ){
+								synchronized( self.partitionData ){									
 									PartitionData partitionData = self.partitionData;
 
 									partitionData.resultCount = partitionData.resultCount.add( BigInteger.ONE );
