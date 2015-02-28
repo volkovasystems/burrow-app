@@ -6,6 +6,10 @@ import java.math.BigInteger;
 import java.util.LinkedList;
 import java.util.Queue;
 
+/*import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+*/ 
 import static calculatePartition.calculatePartition.calculatePartition;
 import static revertHashAtRange.revertHashAtRange.revertHashAtRange;
 import static convertToSequenceIndex.convertToSequenceIndex.convertToSequenceIndex;
@@ -92,7 +96,7 @@ public class revertHashByPartition{
 	private static final String DEFAULT_PARTITION_SIZE = "0";
 	private static final String DEFAULT_ALGORITHM_TYPE = "md5";
 	
-	public static void main( String... parameterList ){
+	public static void main( String... parameterList ) throws ParseException{
 
 		int parameterListLength = parameterList.length;
 		if( parameterListLength == 0 ||
@@ -180,14 +184,26 @@ public class revertHashByPartition{
 			}
 		}
 
+		/*System.out.println( System.getProperty( "java.vm.name" ) );
+				
+		SimpleDateFormat format = new SimpleDateFormat( "EEE MMM d HH:mm:ss zzz yyyy" );
+		
+		Date startDate = new Date( );
+		Date startTime  = format.parse( startDate.toString( ) );
+		*/			
 		try{
+
 			revertHashByPartition( hash, dictionary, length, rootFactor, startIndex, endIndex, size, algorithmType, separator );	
 
 		}catch( Exception exception ){
 			System.err.print( exception.getMessage( ) );
 		}
 
-		Runtime.getRuntime( ).gc( );					
+		/*Date endDate = new Date( );
+		Date endTime  = format.parse( endDate.toString( ) );
+
+		long runTime = endTime.getTime( ) - startTime.getTime( );
+		System.out.println( "Total Runtime in milliseconds: " + runTime );*/
 	}
 
 	public static final void revertHashByPartition( String hash, String dictionary, int length, String rootFactor, String startIndex, String endIndex, String size, String algorithmType, String separator )
@@ -261,9 +277,6 @@ public class revertHashByPartition{
 		Distributor distributor = new Distributor( partitionData ){
 			public void callback( Exception exception, String revertedHash ){
 				synchronized( partitionData ){
-				//: Request GC prior to launch of each thread.
-					Runtime.getRuntime( ).gc( );					
-
 					System.out.print( revertedHash );
 					
 					//: Start killing the threads here.
@@ -372,175 +385,149 @@ public class revertHashByPartition{
 				BigInteger index = BigInteger.ONE;
 				BigInteger [ ] indexRange = new BigInteger [ ]{ BigInteger.ZERO, BigInteger.ZERO };
 
-				//: Limit number of thread to the number of cores. This will prevent context switch triggering on large partition size.
-				int cpuCores = Runtime.getRuntime( ).availableProcessors( );
-				
-				//: Reserve one for the Distributor thread.
-				int activeThreadCount = 1;
-				int desiredThreadCount = cpuCores;
-				int processingThreadCount = partitionData.rangeList.size( );
-
 				Thread executorEngine = null;
 				
 				while( index.compareTo( partitionData.partitionCount ) < 1 ){
 
-					if( activeThreadCount < desiredThreadCount ){
-					
-						if( index.compareTo( partitionData.partitionCount ) == 0 ){
-							endingIndex = partitionData.endingIndex;
-						
-						}else{						
-							previousIndex = nextStartingIndex.subtract( BigInteger.ONE );
-							endingIndex = previousIndex.add( partitionData.partitionSize );
+					if( index.compareTo( partitionData.partitionCount ) == 0 ){
+						endingIndex = partitionData.endingIndex;
 
-						} 
+					}else{
+						previousIndex = nextStartingIndex.subtract( BigInteger.ONE );
+						endingIndex = previousIndex.add( partitionData.partitionSize );
+					} 
 
-						indexRange = new BigInteger [ ]{ nextStartingIndex, endingIndex };
-						partitionData.rangeList.add( indexRange );
-					
-						nextStartingIndex = endingIndex.add( BigInteger.ONE );
-								
-						//: Request GC prior to launch of each thread.
-						Runtime.getRuntime( ).gc( );
+					indexRange = new BigInteger [ ]{ nextStartingIndex, endingIndex };
+					partitionData.rangeList.add( indexRange );
 
-						Executor executor = new Executor( partitionData ){
-							public void callback( Exception exception, String revertedHash ){
-								synchronized( self.partitionData ){									
-									PartitionData partitionData = self.partitionData;
+					nextStartingIndex = endingIndex.add( BigInteger.ONE );
 
-									partitionData.resultCount = partitionData.resultCount.add( BigInteger.ONE );
+					Executor executor = new Executor( partitionData ){
+						public void callback( Exception exception, String revertedHash ){
+							synchronized( self.partitionData ){									
+								PartitionData partitionData = self.partitionData;
 
-									//: Do not execute this anymore for other threads when they are finished.
-									if( partitionData.hasFinished ){
-										//: Release lock for partition data object.
-										partitionData.notifyAll( );
+								partitionData.resultCount = partitionData.resultCount.add( BigInteger.ONE );
 
-										return;
-									}
+								//: Do not execute this anymore for other threads when they are finished.
+								if( partitionData.hasFinished ){
+									//: Release lock for partition data object.
+									partitionData.notifyAll( );
 
-									//: Return only if a thread already returns a reverted hash.
-									if( revertedHash != NULL_STRING ){
-										partitionData.hasFinished = true;
+									return;
+								}
 
-										self.callback( NULL_EXCEPTION, revertedHash );
+								//: Return only if a thread already returns a reverted hash.
+								if( revertedHash != NULL_STRING ){
+									partitionData.hasFinished = true;
 
-										//: Release lock for partition data object.
-										partitionData.notifyAll( );
-
-										return;
-									}
-
-									//: All threads are exhausted and nothing was returned.
-									if( partitionData.resultCount.compareTo( partitionData.partitionCount ) >= 0 ){										
-										partitionData.hasFinished = true;
-
-										self.callback( NULL_EXCEPTION, NULL_STRING );
-									}
+									self.callback( NULL_EXCEPTION, revertedHash );
 
 									//: Release lock for partition data object.
 									partitionData.notifyAll( );
+
+									return;
 								}
+
+								//: All threads are exhausted and nothing was returned.
+								if( partitionData.resultCount.compareTo( partitionData.partitionCount ) >= 0 ){										
+									partitionData.hasFinished = true;
+
+									self.callback( NULL_EXCEPTION, NULL_STRING );
+								}
+
+								//: Release lock for partition data object.
+								partitionData.notifyAll( );
 							}
-						};
-						executorEngine = new Thread( executor );
-						executorEngine.start( );
-
-						partitionData.executorEngineList.add( executorEngine );
-						
-						//: For queue.
-						activeThreadCount++;
-						processingThreadCount++;
-
-						index = index.add( BigInteger.ONE );
-
-					} else {
-						int  processedThreadCount = partitionData.rangeList.size( );
-
-						if( processingThreadCount == processedThreadCount ){
-							activeThreadCount--;
 						}
-					}
-				}
+					};
+					executorEngine = new Thread( executor );
+					executorEngine.start( );
 
+					partitionData.executorEngineList.add( executorEngine );
+
+					index = index.add( BigInteger.ONE );
+				}
+				
 				/*:
-					This will make the distributor thread alive. 
-					This will always check if the engine list has been popped out and killed.
-					This wait method will release the lock of partition data for the distributor thread which holds it for 100 milliseconds. 
+				This will make the distributor thread alive. 
+				This will always check if the engine list has been popped out and killed.
+				This wait method will release the lock of partition data for the distributor thread which holds it for 100 milliseconds. 
 				*/
 
-					while( partitionData.executorEngineList.size( ) != 0 ){
-					
-					try{
-						partitionData.wait( 100 );
+				while( partitionData.executorEngineList.size( ) != 0 ){
+				
+				try{
+					partitionData.wait( 100 );
 
-					}catch( Exception exception ){
-						if( exception instanceof InterruptedException ){
-							//: Release lock for partition data object.
-							partitionData.notifyAll( );
-							break;
-						}
+				}catch( Exception exception ){
+					if( exception instanceof InterruptedException ){
+						//: Release lock for partition data object.
+						partitionData.notifyAll( );
+						break;
 					}
 				}
 			}
 		}
-
-		public void callback( Exception exception, String result ){ }
-		public void callback( Exception exception, Object result ){ }
 	}
 
-	private static interface Callback{
-		public void callback( Exception exception, String result );
-		public void callback( Exception exception, Object result );
-	}
+	public void callback( Exception exception, String result ){ }
+	public void callback( Exception exception, Object result ){ }
+}
 
-	private static final class PartitionData{
-		public static volatile String hash = null;
-		public static volatile String dictionary = null;
-		public static volatile String[ ] dictionaryList = null;
-		public static volatile String endingSequence = null;
-		public static volatile BigInteger totalSequenceCount = null;
-		public static volatile BigInteger startingIndex = null;
-		public static volatile BigInteger endingIndex= null;
-		public static volatile BigInteger partitionCount = null;
-		public static volatile BigInteger partitionSize = null;
-		public static volatile BigInteger lastPartitionSize = null;
-		public static volatile String algorithmType = null;
-		public static volatile String separator = null;
+private static interface Callback{
+	public void callback( Exception exception, String result );
+	public void callback( Exception exception, Object result );
+}
 
-		public static volatile Queue<BigInteger[ ]> rangeList = new LinkedList<>( );
-		public static volatile Queue<String> resultList = new LinkedList<>( );
-		public static volatile Queue<Thread> executorEngineList = new LinkedList<>( );
-		public static volatile BigInteger resultCount = BigInteger.ZERO;
-		public static volatile boolean hasFinished = false;
+private static final class PartitionData{
+	public static volatile String hash = null;
+	public static volatile String dictionary = null;
+	public static volatile String[ ] dictionaryList = null;
+	public static volatile String endingSequence = null;
+	public static volatile BigInteger totalSequenceCount = null;
+	public static volatile BigInteger startingIndex = null;
+	public static volatile BigInteger endingIndex= null;
+	public static volatile BigInteger partitionCount = null;
+	public static volatile BigInteger partitionSize = null;
+	public static volatile BigInteger lastPartitionSize = null;
+	public static volatile String algorithmType = null;
+	public static volatile String separator = null;
 
-		public PartitionData( ){ }
+	public static volatile Queue<BigInteger[ ]> rangeList = new LinkedList<>( );
+	public static volatile Queue<String> resultList = new LinkedList<>( );
+	public static volatile Queue<Thread> executorEngineList = new LinkedList<>( );
+	public static volatile BigInteger resultCount = BigInteger.ZERO;
+	public static volatile boolean hasFinished = false;
 
-		public PartitionData( 
-			String hash,
-			String dictionary,
-			String[ ] dictionaryList, 
-			String endingSequence, 
-			BigInteger totalSequenceCount,
-			BigInteger startingIndex,
-			BigInteger endingIndex,
-			BigInteger partitionCount,
-			BigInteger partitionSize,
-			BigInteger lastPartitionSize,
-			String algorithmType,
-			String separator
+	public PartitionData( ){ }
+
+	public PartitionData( 
+		String hash,
+		String dictionary,
+		String[ ] dictionaryList, 
+		String endingSequence, 
+		BigInteger totalSequenceCount,
+		BigInteger startingIndex,
+		BigInteger endingIndex,
+		BigInteger partitionCount,
+		BigInteger partitionSize,
+		BigInteger lastPartitionSize,
+		String algorithmType,
+		String separator
 		){
-			PartitionData.hash = hash;
-			PartitionData.dictionary = dictionary;
-			PartitionData.dictionaryList = dictionaryList;
-			PartitionData.endingSequence = endingSequence;
-			PartitionData.totalSequenceCount = totalSequenceCount;
-			PartitionData.startingIndex = startingIndex;
-			PartitionData.endingIndex = endingIndex;
-			PartitionData.partitionCount = partitionCount;
-			PartitionData.partitionSize = partitionSize;
-			PartitionData.lastPartitionSize = lastPartitionSize;
-			PartitionData.algorithmType = algorithmType;
-			PartitionData.separator = separator;
-		}
+		PartitionData.hash = hash;
+		PartitionData.dictionary = dictionary;
+		PartitionData.dictionaryList = dictionaryList;
+		PartitionData.endingSequence = endingSequence;
+		PartitionData.totalSequenceCount = totalSequenceCount;
+		PartitionData.startingIndex = startingIndex;
+		PartitionData.endingIndex = endingIndex;
+		PartitionData.partitionCount = partitionCount;
+		PartitionData.partitionSize = partitionSize;
+		PartitionData.lastPartitionSize = lastPartitionSize;
+		PartitionData.algorithmType = algorithmType;
+		PartitionData.separator = separator;
 	}
+}
 }
