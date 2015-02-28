@@ -10,7 +10,7 @@ var decodeMD5Hash = function decodeMD5Hash( hash, dictionary, limitLength, start
 
 	var task = childprocess.spawn( "java", [		
 	/*	"-Xss" + Math.round( ThreadBufferSize ) + "m",
-	*/	"-Xmx512m",
+	*/	"-Xmx1G",
 		"revertHashByPartition.revertHashByPartition",
 		hash,
 		dictionary,
