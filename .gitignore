@@ -7,3 +7,5 @@ burrowdb/
 *.log
 *.class
 deploy/
+temp/style/burrow-app.css
+*.css
