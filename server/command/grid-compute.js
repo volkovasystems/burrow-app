@@ -151,6 +151,7 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 		} );
 
 		var task = childprocess.spawn( "java", [
+			"-client",
 			"-Xmx512m",
 			"generatePartitionRange.generatePartitionRange",
 			dictionary,
