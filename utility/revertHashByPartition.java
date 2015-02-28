@@ -6,10 +6,6 @@ import java.math.BigInteger;
 import java.util.LinkedList;
 import java.util.Queue;
 
-/*import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-*/ 
 import static calculatePartition.calculatePartition.calculatePartition;
 import static revertHashAtRange.revertHashAtRange.revertHashAtRange;
 import static convertToSequenceIndex.convertToSequenceIndex.convertToSequenceIndex;
@@ -96,7 +92,7 @@ public class revertHashByPartition{
 	private static final String DEFAULT_PARTITION_SIZE = "0";
 	private static final String DEFAULT_ALGORITHM_TYPE = "md5";
 	
-	public static void main( String... parameterList ) throws ParseException{
+	public static void main( String... parameterList ){
 
 		int parameterListLength = parameterList.length;
 		if( parameterListLength == 0 ||
@@ -184,26 +180,12 @@ public class revertHashByPartition{
 			}
 		}
 
-		/*System.out.println( System.getProperty( "java.vm.name" ) );
-				
-		SimpleDateFormat format = new SimpleDateFormat( "EEE MMM d HH:mm:ss zzz yyyy" );
-		
-		Date startDate = new Date( );
-		Date startTime  = format.parse( startDate.toString( ) );
-		*/			
 		try{
-
 			revertHashByPartition( hash, dictionary, length, rootFactor, startIndex, endIndex, size, algorithmType, separator );	
 
 		}catch( Exception exception ){
 			System.err.print( exception.getMessage( ) );
 		}
-
-		/*Date endDate = new Date( );
-		Date endTime  = format.parse( endDate.toString( ) );
-
-		long runTime = endTime.getTime( ) - startTime.getTime( );
-		System.out.println( "Total Runtime in milliseconds: " + runTime );*/
 	}
 
 	public static final void revertHashByPartition( String hash, String dictionary, int length, String rootFactor, String startIndex, String endIndex, String size, String algorithmType, String separator )
