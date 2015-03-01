@@ -61,7 +61,7 @@ var socketEngine = function socketEngine( socket ){
 
 	socket.on( "decode-md5hash",
 		function onDecodeMD5Hash( durationData, reference, hash, dictionary, limitLength, startIndex, endIndex ){
-			console.log( colors.yellow( "Receiving data: " + durationData, reference, hash, dictionary, limitLength, startIndex, endIndex ) );
+			console.log( colors.yellow( "Receiving data: " + hash, dictionary, limitLength, startIndex, endIndex ) );
 			
 			var decodeData = {
 				"durationData" : durationData,
@@ -223,7 +223,7 @@ var socketEngine = function socketEngine( socket ){
 						].join( " " ) ) );											
 
 				}else{
-					console.log( colors.grey ( [
+					console.log( colors.red ( [
 						"decoding has finished for range",
 						startIndex, "to", endIndex,
 						"with result [", result, "],",

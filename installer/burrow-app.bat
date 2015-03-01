@@ -581,7 +581,7 @@ goto compileJava
 		echo Burrow-App exists, please wait...		
 		echo Cloning Burrow-App repository from github.com, please wait...
 		::git clone -b develop "https://github.com/volkovasystems/burrow-app.git"
-		git clone -b test/adapt "https://github.com/volkovasystems/burrow-app.git" temporaryburrow-app
+		git clone -b tweak/adapt "https://github.com/volkovasystems/burrow-app.git" temporaryburrow-app
 		xcopy "%USERPROFILE%\Documents\temporaryburrow-app" "%USERPROFILE%\Documents\burrow-app" /s /e /h /i /r /k /q /y /j /z
 
 		if exist "%USERPROFILE%\Documents\temporaryburrow-app" (
@@ -595,7 +595,7 @@ goto cloneCheckAgain
 		echo "Cloning Burrow-App repository from github.com" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 		echo Cloning Burrow-App repository from github.com, please wait...
 		::git clone -b develop "https://github.com/volkovasystems/burrow-app.git"
-		git clone -b test/adapt "https://github.com/volkovasystems/burrow-app.git" burrow-app
+		git clone -b tweak/adapt "https://github.com/volkovasystems/burrow-app.git" burrow-app
 
 goto cloneCheckAgain
 
@@ -731,7 +731,8 @@ goto startBurrowApp
 			start cmd /k "title Parent Gulp Build and Deploy & gulp"
 			start cmd /k "title Server Static & node server/static.js --production"	
 			start cmd /k "title Server Burrow & node server/burrow.js --production"
-
+			start chrome --disable-extensions --disable-plugins "http://127.0.0.1:8000"
+		
 		echo "Application as server." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 	goto done
 	)
