@@ -152,10 +152,13 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 
 		var task = childprocess.spawn( "java", [
 			"-client",
+			"-XX:-UseConcMarkSweepGC",
 			"-Xmx512m",
-			"generatePartitionRange.generatePartitionRange",
+			"-XX:MaxGCPauseMillis=500",
+			"generateDistributionRange.generateDistributionRange",
 			dictionary,
-			limitLength
+			limitLength,
+			gridCount
 		], { "cwd": "utility" } );
 
 		var partitionRangeList = [ ];
@@ -229,10 +232,11 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 					return;
 				}
 
+				var shuffleSockets = _.shuffle( engineSocketList ); 
 				var partitionRangeIndex = partitionRangeList.length;
 				//Now we have a list of engine sockets start emitting.
 				while( partitionRangeIndex >= -1 ){
-					_.each( engineSocketList,
+					_.each( shuffleSockets,
 						( function onEachEngineSocket( socket ){
 							if(  partitionRangeIndex > 0  ){
 								var partitionRange = partitionRangeList.pop( );

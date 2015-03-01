@@ -84,36 +84,33 @@ var socketEngine = function socketEngine( socket ){
 			pendingTask = decodeThisList.length;
 			
 			queue = async.queue( function onQueue( thisRange, callback ){
+				decoderChildProcess(
+					durationData,
+					reference,
+					thisRange.hash,
+					thisRange.dictionary,
+					thisRange.limitLength,
+					thisRange.startIndex,
+					thisRange.endIndex,
+					function onDecodeMD5Hash( result ){
+						if( typeof result == "string" ){
+							queue.kill( );
+							decodeThisList = [ ];
 
-				console.log( "processing HASH: " + thisRange.hash + " RANGE: " + thisRange.startIndex + " - " + thisRange.endIndex );
+							_.each( decodeEngineList,
+								function onEachDecoder( decoder ){
+									if( !decoder.killed ){
+										decoder.killed = true;
+										decoder.kill( );
+									}
+									decodeEngineList = [ ];
+								} );
 
-				var decoders = decoderChildProcess(
-											durationData,
-											reference,
-											thisRange.hash,
-											thisRange.dictionary,
-											thisRange.limitLength,
-											thisRange.startIndex,
-											thisRange.endIndex,
-											function onDecodeMD5Hash( result ){
-												if( typeof result == "string" ){
-													queue.kill( );
-													decodeThisList = [ ];
-
-													_.each( decodeEngineList,
-														function onEachDecoder( decoder ){
-															if( !decoder.killed ){
-																decoder.killed = true;
-																decoder.kill( );
-															}
-															decodeEngineList = [ ];
-														} );
-
-												}else if( typeof result == "undefined" ){
-													callback( );
-												}
-											} );
-									}, 1 );
+						}else if( typeof result == "undefined" ){
+							callback( );
+						}
+					} );
+			}, 1 );
 
 			var pendingTask = decodeThisList.length;
 
