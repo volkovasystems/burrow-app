@@ -86,10 +86,10 @@ public class generateDistributionRange{
 		BigInteger totalSequenceCount = convertToSequenceIndex( endingSequence, dictionary, separator );
 
 		//: Get the ideal largest partition possible per grid
-		BigInteger partitionCount = new BigInteger( gridCount );
+		BigInteger gridFactor = new BigInteger( gridCount );
 
 		//: check that partition distribution is still proportional to the grid count.  
-		BigInteger allowableRoot = ( nthRoot( totalSequenceCount.toString( ), partitionCount.toString( ), "4", 2 ) ).toBigInteger( ); 
+		BigInteger allowableRoot = ( nthRoot( totalSequenceCount.toString( ), gridFactor.toString( ), "4", 2 ) ).toBigInteger( ); 
 		
 		if ( allowableRoot.compareTo( BigInteger.ONE ) == 0 ){
 			Exception exception = new Exception( "Grid is too big for the generated paritition." );
@@ -97,16 +97,21 @@ public class generateDistributionRange{
 		}
 
 		//:check partition size, maximum of 6 legnth lexicographic permutated size. Override if bigger than allowable index.
-		BigInteger partitionSize = ( new BigDecimal( totalSequenceCount ).divide( new BigDecimal( partitionCount ), 0, RoundingMode.FLOOR ) ).toBigInteger( );
+		BigInteger partitionSize = ( new BigDecimal( totalSequenceCount ).divide( new BigDecimal( gridFactor ), 0, RoundingMode.FLOOR ) ).toBigInteger( );
 		BigInteger allowableIndex =  convertToSequenceIndex( "zzzzzz", dictionary, separator );
-		
-		if( partitionSize.compareTo( allowableIndex ) > 0 ){
-			BigInteger newGridFactor = partitionCount.add( BigInteger.ONE );
 
+		BigInteger newGridFactor = gridFactor;
+		BigInteger newPartitionSize = partitionSize;
+
+		if( partitionSize.compareTo( allowableIndex ) > 0 ){			
 			while( partitionSize.compareTo( allowableIndex ) > 0 ){
-				newGridFactor = partitionCount.add( newGridFactor );
-				partitionSize = ( new BigDecimal( totalSequenceCount ).divide( new BigDecimal( newGridFactor ), 0, RoundingMode.FLOOR ) ).toBigInteger( );
-			}	
+
+				newGridFactor = newGridFactor.add( gridFactor );
+				newPartitionSize = ( new BigDecimal( totalSequenceCount ).divide( new BigDecimal( newGridFactor ), 0, RoundingMode.FLOOR ) ).toBigInteger( );
+				
+				gridFactor = newGridFactor;
+				partitionSize = newPartitionSize;
+			}
 		}
 		
 		//: create indexes
@@ -116,8 +121,8 @@ public class generateDistributionRange{
 		BigInteger startIndex = BigInteger.ONE;
 		BigInteger endIndex = BigInteger.ZERO;
 
-		while( 	index.compareTo( partitionCount ) <= 0 ){
-			if( index.compareTo( partitionCount ) == 0 ){
+		while( 	index.compareTo( gridFactor ) <= 0 ){
+			if( index.compareTo( gridFactor ) == 0 ){
 				endIndex = totalSequenceCount;
 				
 			}else{
