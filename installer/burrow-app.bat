@@ -60,9 +60,19 @@ goto detectArchitecture
 			goto checkWget32
 		)
 	
+		
+:wgetDownload32
+	if exist "%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe" goto checkWget32
+
+		echo "Downloading GNU WGET" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
+		echo Downloading wget, please wait...
+
+		bitsadmin /reset
+		bitsadmin /transfer "Download wget" /download /priority HIGH "https://dl.dropboxusercontent.com/s/f7yc4vao7ceg731/wget-1.11.4-1-setup.exe" "%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe"
+
 			:checkWget32
 				set file="%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe"
-				set fileSize=3012464
+				set "fileSize=3012464"
 
 				for /f "usebackq" %%A IN ('%file%') DO set size=%%~zA
 
@@ -75,17 +85,6 @@ goto detectArchitecture
 					) else (
 				goto wgetInstall32
 					)
-
-:wgetDownload32
-	if exist "%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe" goto checkWget32
-
-		echo "Downloading GNU WGET" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
-		echo Downloading wget, please wait...
-
-		bitsadmin /reset
-		bitsadmin /transfer "Download wget" /download /priority HIGH "https://dl.dropboxusercontent.com/s/f7yc4vao7ceg731/wget-1.11.4-1-setup.exe" "%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe"
-
-goto checkWget32
 
 :wgetInstall32
 	if not exist "%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe" goto wgetDownload32
@@ -100,10 +99,16 @@ goto checkWget32
 		if exist "%USERPROFILE%\Documents\GridInstallers\jdk-8u25-windows-i586_2.exe" (
 			goto checkJava32
 		)
-	
+
+:javaDownload32
+	if exist "%USERPROFILE%\Documents\GridInstallers\jdk-8u31-windows-i586.exe" goto checkJava32
+
+		echo "Downloading java JDK" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
+			wget --no-check-certificate "https://dl.dropboxusercontent.com/s/9hqis4gnr2j8wyt/jdk-8u31-windows-i586.exe"
+
 		:checkJava32
 			set file="%USERPROFILE%\Documents\GridInstallers\jdk-8u31-windows-i586.exe"
-			set fileSize=165630880
+			set "fileSize=165630880"
 
 			for /f "usebackq" %%A IN ('%file%') DO set size=%%~zA
 
@@ -116,14 +121,6 @@ goto checkWget32
 				) else (
 			goto javaInstall32
 				)
-
-:javaDownload32
-	if exist "%USERPROFILE%\Documents\GridInstallers\jdk-8u31-windows-i586.exe" goto checkJava32
-
-		echo "Downloading java JDK" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
-			wget --no-check-certificate "https://dl.dropboxusercontent.com/s/9hqis4gnr2j8wyt/jdk-8u31-windows-i586.exe"
-
-goto checkJava32
 
 :javaInstall32
 	if not exist "%USERPROFILE%\Documents\GridInstallers\jdk-8u31-windows-i586.exe" goto javaDownload32
@@ -140,9 +137,15 @@ goto checkJava32
 			goto checkGit32
 			)
 		
+:gitDownload32
+	if exist "%USERPROFILE%\Documents\GridInstallers\Git-1.9.5-preview20141217.exe" goto checkGit32
+	
+		echo "Downloading git bash" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
+			wget --no-check-certificate "https://dl.dropboxusercontent.com/s/t69wd8oyid7ogti/Git-1.9.5-preview20141217.exe"
+
 		:checkGit32
 			set file="%USERPROFILE%\Documents\GridInstallers\Git-1.9.5-preview20141217.exe"
-			set fileSize=17811112
+			set "fileSize=17811112"
 
 			for /f "usebackq" %%A IN ('%file%') DO set size=%%~zA
 
@@ -155,14 +158,6 @@ goto checkJava32
 				) else (
 			goto gitInstall32
 				)
-
-:gitDownload32
-	if exist "%USERPROFILE%\Documents\GridInstallers\Git-1.9.5-preview20141217.exe" goto checkGit32
-	
-		echo "Downloading git bash" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
-			wget --no-check-certificate "https://dl.dropboxusercontent.com/s/t69wd8oyid7ogti/Git-1.9.5-preview20141217.exe"
-
-goto checkGit32
 
 :gitInstall32
 	if not exist "%USERPROFILE%\Documents\GridInstallers\Git-1.9.5-preview20141217.exe" goto gitDownload32
@@ -180,9 +175,15 @@ goto checkGit32
 			goto checkNode32
 		)
 
+:nodejsDownload32
+	if exist "%USERPROFILE%\Documents\GridInstallers\node-v0.10.35-x86.msi" goto checkNode32
+		
+		echo "Downloading nodejs" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
+			wget --no-check-certificate "https://dl.dropboxusercontent.com/s/lisgylftb89i81y/node-v0.10.35-x86.msi"
+
 		:checkNode32
 			set file="%USERPROFILE%\Documents\GridInstallers\node-v0.10.35-x86.msi"
-			set fileSize=5808128
+			set "fileSize=5808128"
 
 			for /f "usebackq" %%A IN ('%file%') DO set size=%%~zA
 
@@ -195,14 +196,6 @@ goto checkGit32
 				) else (
 			goto nodejsInstall32
 				)
-
-:nodejsDownload32
-	if exist "%USERPROFILE%\Documents\GridInstallers\node-v0.10.35-x86.msi" goto checkNode32
-		
-		echo "Downloading nodejs" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
-			wget --no-check-certificate "https://dl.dropboxusercontent.com/s/lisgylftb89i81y/node-v0.10.35-x86.msi"
-
-goto checkNode32
 
 :nodejsInstall32
 	if not exist "%USERPROFILE%\Documents\GridInstallers\node-v0.10.35-x86.msi" goto nodejsDownload32
@@ -219,9 +212,14 @@ goto checkNode32
 			goto setPath32
 		)
 
+:mongodbDownload32
+	if exist "%USERPROFILE%\Documents\GridInstallers\mongodb-win32-i386-2.6.7-signed.msi" goto checkMongo32
+		echo "Downloading mongdb" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
+			wget --no-check-certificate "https://dl.dropboxusercontent.com/s/krpwgxfvatv4506/mongodb-win32-i386-2.6.7-signed.msi"
+
 		:checkMongo32
 			set file="%USERPROFILE%\Documents\GridInstallers\mongodb-win32-i386-2.6.7-signed.msi"
-			set fileSize=121598464
+			set "fileSize=121598464"
 
 			for /f "usebackq" %%A IN ('%file%') DO set size=%%~zA
 
@@ -234,13 +232,6 @@ goto checkNode32
 				) else (
 			goto mongodbInstall32
 				)
-
-:mongodbDownload32
-	if exist "%USERPROFILE%\Documents\GridInstallers\mongodb-win32-i386-2.6.7-signed.msi" goto checkMongo32
-		echo "Downloading mongdb" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
-			wget --no-check-certificate "https://dl.dropboxusercontent.com/s/krpwgxfvatv4506/mongodb-win32-i386-2.6.7-signed.msi"
-
-goto checkMongo32
 
 :mongodbInstall32
 	if not exist "%USERPROFILE%\Documents\GridInstallers\mongodb-win32-i386-2.6.7-signed.msi" goto mongodbDownload32
@@ -282,23 +273,7 @@ goto appCheck
 	if exist "%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe" (
 		goto checkWget64
 	)
-	
-	:checkWget64
-		set file="%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe"
-		set fileSize=3012464
-
-		for /f "usebackq" %%A IN ('%file%') DO set size=%%~zA
-
-			if %size% LSS %fileSize% (
-				del "%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe"
-		goto wgetDownload64
-			) else if %size% GTR %fileSize% (
-				del "%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe"
-		goto wgetDownload64
-			) else (
-		goto wgetInstall64
-			)
-
+		
 :wgetDownload64
 	if exist "%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe" goto checkWget64
 
@@ -308,7 +283,21 @@ goto appCheck
 		bitsadmin /reset
 		bitsadmin /transfer "Download wget" /download /priority HIGH "https://dl.dropboxusercontent.com/s/f7yc4vao7ceg731/wget-1.11.4-1-setup.exe" "%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe"
 
-goto checkWget64
+			:checkWget64
+				set file="%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe"
+				set "fileSize=3012464"
+
+				for /f "usebackq" %%A IN ('%file%') DO set size=%%~zA
+
+					if %size% LSS %fileSize% (
+						del "%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe"
+				goto wgetDownload64
+					) else if %size% GTR %fileSize% (
+						del "%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe"
+				goto wgetDownload64
+					) else (
+				goto wgetInstall64
+					)
 
 :wgetInstall64
 	if not exist "%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe" goto wgetDownload64
@@ -324,9 +313,15 @@ goto checkWget64
 			goto checkJava64
 		)
  		
+:javaDownload64
+	if exist "%USERPROFILE%\Documents\GridInstallers\jdk-8u31-windows-x64.exe" goto checkJava64
+
+		echo "Downloading java JDK" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
+			wget --no-check-certificate "https://dl.dropboxusercontent.com/s/8uam9e2fyh15cxl/jdk-8u31-windows-x64.exe"
+
 		:checkJava64
 			set file="%USERPROFILE%\Documents\GridInstallers\jdk-8u31-windows-x64.exe"
-			set fileSize=178639264
+			set "fileSize=178639264"
 
 			for /f "usebackq" %%A IN ('%file%') DO set size=%%~zA
 
@@ -339,14 +334,6 @@ goto checkWget64
 				) else (
 			goto javaInstall64
 				)
-
-:javaDownload64
-	if exist "%USERPROFILE%\Documents\GridInstallers\jdk-8u31-windows-x64.exe" goto checkJava64
-
-		echo "Downloading java JDK" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
-			wget --no-check-certificate "https://dl.dropboxusercontent.com/s/8uam9e2fyh15cxl/jdk-8u31-windows-x64.exe"
-
-goto checkJava64
 
 :javaInstall64
 	if not exist "%USERPROFILE%\Documents\GridInstallers\jdk-8u31-windows-x64.exe" goto javaDownload64
@@ -363,9 +350,15 @@ goto checkJava64
 			goto checkGit64
 			)
 
+:gitDownload64
+	if exist "%USERPROFILE%\Documents\GridInstallers\Git-1.9.5-preview20141217.exe" goto checkGit64
+	
+		echo "Downloading git bash" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
+			wget --no-check-certificate "https://dl.dropboxusercontent.com/s/t69wd8oyid7ogti/Git-1.9.5-preview20141217.exe"
+
 		:checkGit64
 			set file="%USERPROFILE%\Documents\GridInstallers\Git-1.9.5-preview20141217.exe"
-			set fileSize=17811112
+			set "fileSize=17811112"
 
 			for /f "usebackq" %%A IN ('%file%') DO set size=%%~zA
 
@@ -378,14 +371,6 @@ goto checkJava64
 				) else (
 			goto gitInstall64
 				)
-
-:gitDownload64
-	if exist "%USERPROFILE%\Documents\GridInstallers\Git-1.9.5-preview20141217.exe" goto checkGit64
-	
-		echo "Downloading git bash" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
-			wget --no-check-certificate "https://dl.dropboxusercontent.com/s/t69wd8oyid7ogti/Git-1.9.5-preview20141217.exe"
-
-goto checkGit64
 
 :gitInstall64
 	if not exist "%USERPROFILE%\Documents\GridInstallers\Git-1.9.5-preview20141217.exe" goto gitDownload64
@@ -403,9 +388,15 @@ goto checkGit64
 			goto checkNode64
 		)
 
+:nodejsDownload64
+	if exist "%USERPROFILE%\Documents\GridInstallers\node-v0.10.35-x64.msi" goto checkNode64
+	
+		echo "Downloading nodejs" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
+			wget --no-check-certificate "https://dl.dropboxusercontent.com/s/e1nxd7719ybgsxu/node-v0.10.35-x64.msi"
+
 			:checkNode64
 				set file="%USERPROFILE%\Documents\GridInstallers\node-v0.10.35-x64.msi"
-				set fileSize=6209536
+				set "fileSize=6209536"
 
 				for /f "usebackq" %%A IN ('%file%') DO set size=%%~zA
 
@@ -418,14 +409,6 @@ goto checkGit64
 					) else (
 				goto nodejsInstall64
 					)
-
-:nodejsDownload64
-	if exist "%USERPROFILE%\Documents\GridInstallers\node-v0.10.35-x64.msi" goto checkNode64
-	
-		echo "Downloading nodejs" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
-			wget --no-check-certificate "https://dl.dropboxusercontent.com/s/e1nxd7719ybgsxu/node-v0.10.35-x64.msi"
-
-goto checkNode64
 
 :nodejsInstall64
 	if not exist "%USERPROFILE%\Documents\GridInstallers\node-v0.10.35-x64.msi" goto nodejsDownload64
@@ -442,9 +425,14 @@ goto checkNode64
 			goto setPath64
 		)
 
+:mongodbDownload64
+	if exist "%USERPROFILE%\Documents\GridInstallers\mongodb-win32-x86_64-2008plus-2.6.7-signed.msi" goto checkMongo64
+		echo "Downloading mongdb" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
+			wget --no-check-certificate "https://dl.dropboxusercontent.com/s/jr6y30r9pxsckz2/mongodb-win32-x86_64-2008plus-2.6.7-signed.msi"
+
 		:checkMongo64
 			set file="%USERPROFILE%\Documents\GridInstallers\mongodb-win32-x86_64-2008plus-2.6.7-signed.msi"
-			set fileSize=138940416
+			set "fileSize=138940416"
 
 			for /f "usebackq" %%A IN ('%file%') DO set size=%%~zA
 
@@ -457,12 +445,6 @@ goto checkNode64
 				) else (
 			goto mongodbInstall64
 				)
-
-:mongodbDownload64
-	if exist "%USERPROFILE%\Documents\GridInstallers\mongodb-win32-x86_64-2008plus-2.6.7-signed.msi" goto checkMongo64
-		echo "Downloading mongdb" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
-			wget --no-check-certificate "https://dl.dropboxusercontent.com/s/jr6y30r9pxsckz2/mongodb-win32-x86_64-2008plus-2.6.7-signed.msi"
-goto checkMongo64
 
 :mongodbInstall64
 	if not exist "%USERPROFILE%\Documents\GridInstallers\mongodb-win32-x86_64-2008plus-2.6.7-signed.msi" goto mongodbDownload64
