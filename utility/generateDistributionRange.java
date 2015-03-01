@@ -121,18 +121,29 @@ public class generateDistributionRange{
 		BigInteger startIndex = BigInteger.ONE;
 		BigInteger endIndex = BigInteger.ZERO;
 
-		while( 	index.compareTo( gridFactor ) <= 0 ){
-			if( index.compareTo( gridFactor ) == 0 ){
-				endIndex = totalSequenceCount;
-				
-			}else{
-				endIndex = endIndex.add( partitionSize );
-			}
+		if ( index.compareTo( gridFactor ) == 0 ){
+
+			startIndex = BigInteger.ONE;
+			endIndex = totalSequenceCount;
 
 			partitionRangeList.push( new BigInteger[ ]{ startIndex, endIndex } );
-			startIndex = endIndex.add( BigInteger.ONE );
 
-			index = index.add( BigInteger.ONE );
+		}else{
+
+			while( index.compareTo( gridFactor ) < 1  ){
+
+				if( index.compareTo( gridFactor ) == 0 ){
+					endIndex = totalSequenceCount;
+					
+				}else{
+					endIndex = endIndex.add( partitionSize );
+				}
+
+				partitionRangeList.push( new BigInteger[ ]{ startIndex, endIndex } );				
+				startIndex = endIndex.add( BigInteger.ONE );
+
+				index = index.add( BigInteger.ONE );
+			}
 		}
 		return partitionRangeList;
 	}
