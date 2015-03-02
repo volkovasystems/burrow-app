@@ -1,7 +1,7 @@
 @ECHO OFF
 TITLE SETUP -- Burrow-App Installer
 
-set ipAddressParent=192.168.1.100
+set ipAddressParent=192.168.2.105
 
 if /i {%1}=={syntax} ( goto syntax )
 if /i {%ipAddressParent%}=={} ( goto error )
@@ -55,12 +55,7 @@ goto detectArchitecture
 	cd \
 	cd "%USERPROFILE%\Documents\GridInstallers"
 	echo currently in "%USERPROFILE%\Documents\GridInstallers"
-
-		if exist "%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe" (
-			goto checkWget32
-		)
-	
-		
+			
 :wgetDownload32
 	if exist "%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe" goto checkWget32
 
@@ -82,9 +77,19 @@ goto detectArchitecture
 					) else if %size% GTR %fileSize% (
 						del "%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe"
 				goto wgetDownload32
-					) else (
-				goto wgetInstall32
 					)
+
+			:askWgetInstall32
+				set /p w32Install=Do you want to install wget (case-sensitive) [ yes/no ]? 
+
+				if /i {%w32Install%}=={y} (
+					goto wgetInstall32
+				) 
+
+				if /i {%w32Install%}=={yes} (
+					goto wgetInstall32
+				)
+				goto javaDownload32
 
 :wgetInstall32
 	if not exist "%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe" goto wgetDownload32
@@ -95,10 +100,6 @@ goto detectArchitecture
 			SET PATH=%PATH%;%PROGRAMFILES%\GnuWin32\bin
 
 		echo "Installed GNU WGET" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
-
-		if exist "%USERPROFILE%\Documents\GridInstallers\jdk-8u25-windows-i586_2.exe" (
-			goto checkJava32
-		)
 
 :javaDownload32
 	if exist "%USERPROFILE%\Documents\GridInstallers\jdk-8u31-windows-i586.exe" goto checkJava32
@@ -118,9 +119,19 @@ goto detectArchitecture
 				) else if %size% GTR %fileSize% (
 					del "%USERPROFILE%\Documents\GridInstallers\jdk-8u31-windows-i586.exe"
 			goto javaDownload32
-				) else (
-			goto javaInstall32
 				)
+
+			:askJavaInstall32
+				set /p j32Install=Do you want to install java (case-sensitive) [ yes/no ]? 
+
+				if /i {%j32Install%}=={y} (
+				goto javaInstall32
+				) 
+
+				if /i {%j32Install%}=={yes} (
+				goto javaInstall32
+				)
+				goto gitDownload32	
 
 :javaInstall32
 	if not exist "%USERPROFILE%\Documents\GridInstallers\jdk-8u31-windows-i586.exe" goto javaDownload32
@@ -132,10 +143,6 @@ goto detectArchitecture
 			SET PATH=%PATH%;%PROGRAMFILES%\Java\jdk1.8.0_31\bin
 		
 		echo "Installed java JDK" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
-
-		if exist "%USERPROFILE%\Documents\GridInstallers\Git-1.9.5-preview20141217.exe" (
-			goto checkGit32
-			)
 		
 :gitDownload32
 	if exist "%USERPROFILE%\Documents\GridInstallers\Git-1.9.5-preview20141217.exe" goto checkGit32
@@ -155,9 +162,19 @@ goto detectArchitecture
 				) else if %size% GTR %fileSize% (
 					del "%USERPROFILE%\Documents\GridInstallers\Git-1.9.5-preview20141217.exe"
 			goto gitDownload32
-				) else (
-			goto gitInstall32
 				)
+
+		:askGitInstall32
+			set /p g32Install=Do you want to install git (case-sensitive) [ yes/no ]? 
+
+			if /i {%g32Install%}=={y} (
+			goto gitInstall32
+			) 
+
+			if /i {%g32Install%}=={yes} (
+			goto gitInstall32
+			)
+			goto nodejsDownload32
 
 :gitInstall32
 	if not exist "%USERPROFILE%\Documents\GridInstallers\Git-1.9.5-preview20141217.exe" goto gitDownload32
@@ -170,10 +187,6 @@ goto detectArchitecture
 			SET PATH=%PATH%;%PROGRAMFILES%\Git\bin
 
 		echo "Installed gitbash" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
-
-		if exist "%USERPROFILE%\Documents\GridInstallers\node-v0.10.35-x86.msi" (
-			goto checkNode32
-		)
 
 :nodejsDownload32
 	if exist "%USERPROFILE%\Documents\GridInstallers\node-v0.10.35-x86.msi" goto checkNode32
@@ -193,9 +206,19 @@ goto detectArchitecture
 				) else if %size% GTR %fileSize% (
 					del "%USERPROFILE%\Documents\GridInstallers\node-v0.10.35-x86.msi"
 			goto nodejsDownload32
-				) else (
-			goto nodejsInstall32
 				)
+
+			:askNodejsInstall32
+				set /p n32Install=Do you want to install node (case-sensitive) [ yes/no ]? 
+
+				if /i {%n32Install%}=={y} (
+				goto nodejsInstall32
+				) 
+
+				if /i {%n32Install%}=={yes} (
+				goto nodejsInstall32
+				)
+				goto mongodbDownload32
 
 :nodejsInstall32
 	if not exist "%USERPROFILE%\Documents\GridInstallers\node-v0.10.35-x86.msi" goto nodejsDownload32
@@ -229,9 +252,19 @@ goto detectArchitecture
 				) else if %size% GTR %fileSize% (
 					del "%USERPROFILE%\Documents\GridInstallers\mongodb-win32-i386-2.6.7-signed.msi"
 			goto mongodbDownload32
-				) else (
-			goto mongodbInstall32
 				)
+
+			:askMongoInstall32
+				set /p m32Install=Do you want to install wget (case-sensitive) [ yes/no ]? 
+
+				if /i {%m32Install%}=={y} (
+				goto mongodbInstall32
+				) 
+
+				if /i {%m32Install%}=={yes} (
+				goto mongodbInstall32
+				)
+				goto setPath32 
 
 :mongodbInstall32
 	if not exist "%USERPROFILE%\Documents\GridInstallers\mongodb-win32-i386-2.6.7-signed.msi" goto mongodbDownload32
@@ -269,10 +302,6 @@ goto appCheck
 	cd \
 	cd "%USERPROFILE%\Documents\GridInstallers"
 	echo currently in "%USERPROFILE%\Documents\GridInstallers"
-
-	if exist "%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe" (
-		goto checkWget64
-	)
 		
 :wgetDownload64
 	if exist "%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe" goto checkWget64
@@ -295,9 +324,19 @@ goto appCheck
 					) else if %size% GTR %fileSize% (
 						del "%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe"
 				goto wgetDownload64
-					) else (
-				goto wgetInstall64
 					)
+
+				:askWgetInstall64
+					set /p w64Install=Do you want to install wget (case-sensitive) [ yes/no ]? 
+
+					if /i {%w64Install%}=={y} (
+						goto wgetInstall64
+					) 
+
+					if /i {%w64Install%}=={yes} (
+						goto wgetInstall64
+					)
+					goto javaDownload64
 
 :wgetInstall64
 	if not exist "%USERPROFILE%\Documents\GridInstallers\wget-1.11.4-1-setup.exe" goto wgetDownload64
@@ -308,10 +347,6 @@ goto appCheck
 			SET PATH=%PATH%;%PROGRAMFILES(x86)%\GnuWin32\bin
 
 		echo "Installed GNU WGET" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
-
-		if exist "%USERPROFILE%\Documents\GridInstallers\jdk-8u25-windows-x64.exe" (
-			goto checkJava64
-		)
  		
 :javaDownload64
 	if exist "%USERPROFILE%\Documents\GridInstallers\jdk-8u31-windows-x64.exe" goto checkJava64
@@ -331,9 +366,19 @@ goto appCheck
 				) else if %size% GTR %fileSize% (
 					del "%USERPROFILE%\Documents\GridInstallers\jdk-8u31-windows-x64.exe"
 			goto javaDownload64
-				) else (
-			goto javaInstall64
 				)
+
+		:askJavaInstall64
+			set /p j64Install=Do you want to install java (case-sensitive) [ yes/no ]? 
+
+			if /i {%j64Install%}=={y} (
+			goto javaInstall64
+			) 
+
+			if /i {%j64Install%}=={yes} (
+			goto javaInstall64
+			)
+			goto gitDownload64	
 
 :javaInstall64
 	if not exist "%USERPROFILE%\Documents\GridInstallers\jdk-8u31-windows-x64.exe" goto javaDownload64
@@ -345,10 +390,6 @@ goto appCheck
 			SET PATH=%PATH%;%PROGRAMFILES%\Java\jdk1.8.0_31\bin
 		
 		echo "Installed java JDK" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
-
-		if exist "%USERPROFILE%\Documents\GridInstallers\Git-1.9.5-preview20141217.exe" (
-			goto checkGit64
-			)
 
 :gitDownload64
 	if exist "%USERPROFILE%\Documents\GridInstallers\Git-1.9.5-preview20141217.exe" goto checkGit64
@@ -368,9 +409,19 @@ goto appCheck
 				) else if %size% GTR %fileSize% (
 					del "%USERPROFILE%\Documents\GridInstallers\Git-1.9.5-preview20141217.exe"
 			goto gitDownload64
-				) else (
-			goto gitInstall64
 				)
+
+			:askGitInstall64
+				set /p g64Install=Do you want to install java (case-sensitive) [ yes/no ]? 
+
+				if /i {%g64Install%}=={y} (
+				goto gitInstall64
+				) 
+
+				if /i {%g64Install%}=={yes} (
+				goto gitInstall64
+				)
+				goto nodejsDownload64
 
 :gitInstall64
 	if not exist "%USERPROFILE%\Documents\GridInstallers\Git-1.9.5-preview20141217.exe" goto gitDownload64
@@ -384,10 +435,6 @@ goto appCheck
 
 		echo "Installed gitbash" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 		
-		if exist "%USERPROFILE%\Documents\GridInstallers\node-v0.10.35-x64.msi" (
-			goto checkNode64
-		)
-
 :nodejsDownload64
 	if exist "%USERPROFILE%\Documents\GridInstallers\node-v0.10.35-x64.msi" goto checkNode64
 	
@@ -406,9 +453,19 @@ goto appCheck
 					) else if %size% GTR %fileSize% (
 						del "%USERPROFILE%\Documents\GridInstallers\node-v0.10.35-x64.msi"
 				goto nodejsDownload64
-					) else (
-				goto nodejsInstall64
 					)
+
+			:askNodejsInstall64
+				set /p n64Install=Do you want to install node (case-sensitive) [ yes/no ]? 
+
+				if /i {%n64Install%}=={y} (
+				goto nodejsInstall32
+				) 
+
+				if /i {%n64Install%}=={yes} (
+				goto nodejsInstall32
+				)
+				goto mongodbDownload32
 
 :nodejsInstall64
 	if not exist "%USERPROFILE%\Documents\GridInstallers\node-v0.10.35-x64.msi" goto nodejsDownload64
@@ -442,9 +499,20 @@ goto appCheck
 				) else if %size% GTR %fileSize% (
 					del "%USERPROFILE%\Documents\GridInstallers\mongodb-win32-x86_64-2008plus-2.6.7-signed.msi"
 			goto mongodbDownload64
-				) else (
-			goto mongodbInstall64
+				) 
+
+			:askMongoInstall64
+				set /p m64Install=Do you want to install wget (case-sensitive) [ yes/no ]? 
+
+				if /i {%m64Install%}=={y} (
+				goto mongodbInstall64
+				) 
+
+				if /i {%m64Install%}=={yes} (
+				goto mongodbInstall64
 				)
+				goto setPath64
+
 
 :mongodbInstall64
 	if not exist "%USERPROFILE%\Documents\GridInstallers\mongodb-win32-x86_64-2008plus-2.6.7-signed.msi" goto mongodbDownload64
@@ -698,7 +766,7 @@ goto startBurrowApp
 			cd \
 			cd %USERPROFILE%\Documents\burrow-app
 			start cmd /c npm run-script client --reference=%2 --host=%ipAddressParent%
-
+						
 		echo "Application as client." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 	goto done		
 	)
