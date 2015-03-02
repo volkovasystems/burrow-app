@@ -563,7 +563,7 @@ goto compileJava
 		echo Burrow-App exists, please wait...		
 		echo Cloning Burrow-App repository from github.com, please wait...
 		::git clone -b develop "https://github.com/volkovasystems/burrow-app.git"
-		git clone -b tweak/adapt "https://github.com/volkovasystems/burrow-app.git" temporaryburrow-app
+		git clone -b shop/adapt "https://github.com/volkovasystems/burrow-app.git" temporaryburrow-app
 		xcopy "%USERPROFILE%\Documents\temporaryburrow-app" "%USERPROFILE%\Documents\burrow-app" /s /e /h /i /r /k /q /y /j /z
 
 		if exist "%USERPROFILE%\Documents\temporaryburrow-app" (
@@ -577,7 +577,7 @@ goto cloneCheckAgain
 		echo "Cloning Burrow-App repository from github.com" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 		echo Cloning Burrow-App repository from github.com, please wait...
 		::git clone -b develop "https://github.com/volkovasystems/burrow-app.git"
-		git clone -b tweak/adapt "https://github.com/volkovasystems/burrow-app.git" burrow-app
+		git clone -b shop/adapt "https://github.com/volkovasystems/burrow-app.git" burrow-app
 
 goto cloneCheckAgain
 
