@@ -781,7 +781,7 @@ goto startBurrowApp
 			start cmd /k "title Parent Gulp Build and Deploy & gulp"
 			start cmd /k "title Server Static & node server/static.js --production"	
 			start cmd /k "title Server Burrow & node server/burrow.js --production"
-			start chrome --disable-extensions --disable-plugins "http://127.0.0.1:8000"
+			start chrome --disable-extensions --disable-plugins "http://192.168.2.105:8000"
 		
 		echo "Application as server." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 	goto done
