@@ -150,23 +150,25 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 			}
 		} );
 
+		var gridFactor = gridCount;
+
 		var task = childprocess.spawn( "java", [
-			"-client",
+			"-server",
 			"-XX:-UseConcMarkSweepGC",
-			"-Xmx512m",
+			"-Xmx4g",
 			"-XX:MaxGCPauseMillis=500",
 			"generateDistributionRange.generateDistributionRange",
 			dictionary,
 			limitLength,
-			gridCount
+			gridFactor
 		], { "cwd": "utility" } );
 
 		var partitionRangeList = [ ];
 
 		task.stdout.on( "data",
 			function onData( data ){
-				/*console.log( data.toString( ) );*/
 				partitionRangeList.push( data.toString( ) );
+	
 			} );
 
 		task.stderr.on( "data",
@@ -177,7 +179,7 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 		task.on( "exit",
 			( function onExit( ){
 				partitionRangeList = _.compact( partitionRangeList.join( "" ).split( "," ) );
-
+				
 				this.socket.broadcast.emit( "output", null, {
 					"type": "text",
 					"text": [ 
@@ -186,7 +188,7 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 					].join( " " )
 				}, this.durationData, this.reference );
 
-				/*:x
+				/*:
 					The holeSet contains list of references.
 
 					One of the items are array of sockets.
@@ -232,57 +234,52 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 					return;
 				}
 
-				var shuffleSockets = _.shuffle( engineSocketList ); 
-				var partitionRangeIndex = partitionRangeList.length;
+				var shuffledSockets = _.shuffle( engineSocketList ); 
+				var partitionIndex = partitionRangeList.length;
 				//Now we have a list of engine sockets start emitting.
-				while( partitionRangeIndex >= -1 ){
-					_.each( shuffleSockets,
+				while(  partitionIndex >=0 ){
+					_.each( shuffledSockets,
 						( function onEachEngineSocket( socket ){
-							if(  partitionRangeIndex > 0  ){
-								var partitionRange = partitionRangeList.pop( );
-																
-								partitionRange = partitionRange.split( "-" )
-								.map( function onEachRange( range ){
-									return parseInt( range );
-								} );
-
-								socket.emit( "decode-md5hash",
-									this.durationData,
-									this.reference, 
-									md5Hash, 
-									dictionary, 
-									limitLength,
-									partitionRange[ 0 ], 
-									partitionRange[ 1 ] );
-							
-								this.socket.broadcast.emit( "output", null, {
-									"type": "text",
-									"text": [ 
-										"decode command for range of", 
-										partitionRange[ 0 ], "to", partitionRange[ 1 ], 
-										"has been deployed"
-									].join( " " )
-								}, this.durationData, this.reference );
-							
-							} else if( partitionRangeIndex == -1 ){
-								console.log( partitionRangeIndex );
-
-								socket.emit( "start-decoder",
-									this.durationData,
-									this.reference );							
-							}
-						
-						} ).bind( this ) );
+							if( partitionIndex > 0 ){											
 					
-					partitionRangeIndex--;
-				}							
-			/*	callback( null, {
-					"type": "text",
-					"text": "grid computation ongoing"
-				}, "broadcast:output" );
-*/
-			} ).bind( this ) );
+							var partitionRange = partitionRangeList.pop( );
 
+							partitionRange = partitionRange.split( "-" )
+							.map( function onEachRange( range ){
+								return parseInt( range );
+							} );
+						
+							socket.emit( "decode-md5hash",
+								this.durationData,
+								this.reference, 
+								md5Hash, 
+								dictionary, 
+								limitLength,
+								partitionRange[ 0 ], 
+								partitionRange[ 1 ] );
+
+							this.socket.broadcast.emit( "output", null, {
+								"type": "text",
+								"text": [
+								"decode command for range of",
+								partitionRange[ 0 ], "to", partitionRange[ 1 ],
+								"has been deployed"
+								].join( " " )
+							}, this.durationData, this.reference );
+
+						}else if( partitionIndex == 0 ){
+							socket.emit( "start-decoder",
+								this.durationData,
+								this.reference );
+							/*	callback( null, {
+								"type": "text",
+								"text": "grid computation ongoing"
+							}, "broadcast:output" );*/
+						}
+						partitionIndex--;											
+					} ).bind( this ) );
+				}
+			} ).bind( this ) );
 	}else{
 		callback( null, {
 			"type": "text",
@@ -290,5 +287,4 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 		}, "broadcast:output" );
 	}
 };
-
 exports.gridCompute = gridCompute;
