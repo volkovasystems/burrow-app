@@ -248,7 +248,9 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 							.map( function onEachRange( range ){
 								return parseInt( range );
 							} );
-						
+							
+							console.log( "Distributing ranges " + partitionRange[ 0 ] + " to " partitionRange[ 1 ] );
+
 							socket.emit( "decode-md5hash",
 								this.durationData,
 								this.reference, 

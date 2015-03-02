@@ -100,7 +100,7 @@ public class generateDistributionRange{
 
 		//:check partition size, maximum of 6 legnth lexicographic permutated size. Override if bigger than allowable index.
 		BigInteger partitionSize = ( new BigDecimal( totalSequenceCount ).divide( new BigDecimal( gridFactor ), 0, RoundingMode.FLOOR ) ).toBigInteger( );
-		BigInteger allowableIndex =  convertToSequenceIndex( "zzzzzz", dictionary, separator );
+		BigInteger allowableIndex =  convertToSequenceIndex( "zzzzz", dictionary, separator );
 
 		BigInteger newGridFactor = gridFactor;
 		BigInteger newPartitionSize = partitionSize;
