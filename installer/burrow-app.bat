@@ -255,7 +255,7 @@ goto detectArchitecture
 				)
 
 			:askMongoInstall32
-				set /p m32Install=Do you want to install wget (case-sensitive) [ yes/no ]? 
+				set /p m32Install=Do you want to install mongodb (case-sensitive) [ yes/no ]? 
 
 				if /i {%m32Install%}=={y} (
 				goto mongodbInstall32
@@ -503,7 +503,7 @@ goto appCheck
 				) 
 
 			:askMongoInstall64
-				set /p m64Install=Do you want to install wget (case-sensitive) [ yes/no ]? 
+				set /p m64Install=Do you want to install mongodb (case-sensitive) [ yes/no ]? 
 
 				if /i {%m64Install%}=={y} (
 				goto mongodbInstall64
