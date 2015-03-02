@@ -240,7 +240,7 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 				while(  partitionIndex >=0 ){
 					_.each( shuffledSockets,
 						( function onEachEngineSocket( socket ){
-							if( partitionIndex > 0 ){											
+							if( partitionIndex >= 1 ){											
 					
 							var partitionRange = partitionRangeList.pop( );
 
