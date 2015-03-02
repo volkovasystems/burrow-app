@@ -59,12 +59,14 @@ public class generateDistributionRange{
 			Stack<BigInteger[ ]> partitionRangeList = generateDistributionRange( dictionary, length, gridCount, separator );
 
 			while( partitionRangeList.size( ) > 0 ){
+				
 				BigInteger[ ] partitionRange = partitionRangeList.pop( );
 
 				String startingIndex = partitionRange[ 0 ].toString( );
 				String endingIndex = partitionRange[ 1 ].toString( );
 
-                System.out.print( startingIndex + "-" + endingIndex + "," );
+				System.out.print( startingIndex + "-" + endingIndex + "," );
+
 			}
 
 		}catch( Exception exception ){
@@ -98,7 +100,7 @@ public class generateDistributionRange{
 
 		//:check partition size, maximum of 6 legnth lexicographic permutated size. Override if bigger than allowable index.
 		BigInteger partitionSize = ( new BigDecimal( totalSequenceCount ).divide( new BigDecimal( gridFactor ), 0, RoundingMode.FLOOR ) ).toBigInteger( );
-		BigInteger allowableIndex =  convertToSequenceIndex( "zzzz", dictionary, separator );
+		BigInteger allowableIndex =  convertToSequenceIndex( "zzzzzz", dictionary, separator );
 
 		BigInteger newGridFactor = gridFactor;
 		BigInteger newPartitionSize = partitionSize;
@@ -108,7 +110,7 @@ public class generateDistributionRange{
 
 				newGridFactor = newGridFactor.add( gridFactor );
 				newPartitionSize = ( new BigDecimal( totalSequenceCount ).divide( new BigDecimal( newGridFactor ), 0, RoundingMode.FLOOR ) ).toBigInteger( );
-				
+			
 				gridFactor = newGridFactor;
 				partitionSize = newPartitionSize;
 			}
@@ -139,7 +141,7 @@ public class generateDistributionRange{
 					endIndex = endIndex.add( partitionSize );
 				}
 
-				partitionRangeList.push( new BigInteger[ ]{ startIndex, endIndex } );				
+				partitionRangeList.push( new BigInteger[ ]{ startIndex, endIndex } );
 				startIndex = endIndex.add( BigInteger.ONE );
 
 				index = index.add( BigInteger.ONE );
