@@ -109,7 +109,8 @@ if "%PROCESSOR_ARCHITECTURE%"=="AMD64" goto 64bit
 		SET PATH=%PATH%;%PROGRAMFILES%\Java\jdk1.8.0_31\bin
 		SET PATH=%PATH%;%PROGRAMFILES%\Git\bin
 		SET PATH=%PATH%;%PROGRAMFILES%\nodejs
-		set PATH=%PATH%;%PROGRAMFILES%\MongoDB 2.6 Standard\bin
+		SET PATH=%PATH%;%PROGRAMFILES%\MongoDB 2.6 Standard\bin
+		SET PATH=%PATH%;%AppData%\Roaming\npm
 	goto launch
 
 	:64bit
@@ -117,7 +118,8 @@ if "%PROCESSOR_ARCHITECTURE%"=="AMD64" goto 64bit
 		SET PATH=%PATH%;%PROGRAMFILES%\Java\jdk1.8.0_31\bin
 		SET PATH=%PATH%;%PROGRAMFILES(x86)%\Git\bin
 		SET PATH=%PATH%;%PROGRAMFILES%\nodejs
-		set PATH=%PATH%;%PROGRAMFILES%\MongoDB 2.6 Standard\bin
+		SET PATH=%PATH%;%PROGRAMFILES%\MongoDB 2.6 Standard\bin
+		SET PATH=%PATH%;%AppData%\Roaming\npm
 	goto launch
 
 :launch

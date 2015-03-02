@@ -289,7 +289,8 @@ goto detectArchitecture
 		SET PATH=%PATH%;%PROGRAMFILES%\Java\jdk1.8.0_31\bin
 		SET PATH=%PATH%;%PROGRAMFILES%\Git\bin
 		SET PATH=%PATH%;%PROGRAMFILES%\nodejs
-		set PATH=%PATH%;%PROGRAMFILES%\MongoDB 2.6 Standard\bin
+		SET PATH=%PATH%;%PROGRAMFILES%\MongoDB 2.6 Standard\bin
+		SET PATH=%PATH%;%AppData%\Roaming\npm
 
 	echo "Done..." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 	echo Done...
@@ -537,7 +538,9 @@ goto appCheck
 		SET PATH=%PATH%;%PROGRAMFILES%\Java\jdk1.8.0_31\bin
 		SET PATH=%PATH%;%PROGRAMFILES(x86)%\Git\bin
 		SET PATH=%PATH%;%PROGRAMFILES%\nodejs
-		set PATH=%PATH%;%PROGRAMFILES%\MongoDB 2.6 Standard\bin
+		SET PATH=%PATH%;%PROGRAMFILES%\MongoDB 2.6 Standard\bin
+		SET PATH=%PATH%;%AppData%\Roaming\npm
+
 
 	echo "Done..." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 	echo Done...
