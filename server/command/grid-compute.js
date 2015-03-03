@@ -68,7 +68,10 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 				"returned empty result"
 			].join( " " );
 
-		console.log( colors.red ( "Is empty." ) );
+			console.log( colors.red ( "grid with range",
+			this.startIndex, "to", this.endIndex,
+			"returned empty result"
+			) );	
 		
 		}else{
 			data[ rangeReference ] = {
@@ -244,7 +247,7 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 				var decoders = shuffledSockets.length; 
 				var partitionIndex = partitionRangeList.length;
 				//Now we have a list of engine sockets start emitting.
-				while(  partitionRangeList.length ){
+				while(  partitionIndex > -1 ){
 					if( partitionRangeList.length >= 1 ){
 						_.each( shuffledSockets,
 							( function onEachEngineSocket( socket ){
@@ -277,7 +280,7 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 							} ).bind( this ) );
 					}
 
-					else if( partitionRangeList.length == 0 ){
+					if( partitionIndex == 0 ){
 						console.log( colors.grey ( "Decoders initialized." ) );
 						_.each( engineSocketList,
 							( function onEachEngineSocket( socket ){
@@ -291,6 +294,8 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 									}, "broadcast:output" );*/
 							} ).bind( this ) );					
 					}
+					
+					partitionIndex--;
 				}
 		} ).bind( this ) );
 	}else{
