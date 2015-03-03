@@ -47,10 +47,9 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 				.compact( )
 				.value( );
 
-				console.log( colors.red ( "Has no result. Kill-all-decoders." ) );
-
 			_.each( engineSocketList,
 				function onEachEngineSocket( socket ){
+					console.log( colors.red ( "Has no result. Kill-all-decoders." ) );
 					socket.emit( "kill-all-decoders" );
 				} );
 
@@ -68,6 +67,8 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 				this.startIndex, "to", this.endIndex,
 				"returned empty result"
 			].join( " " );
+
+		console.log( colors.red ( "Is empty." ) );
 		
 		}else{
 			data[ rangeReference ] = {
@@ -95,7 +96,6 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 			"text": text
 		}, "broadcast:output" );*/
 
-		console.log( colors.red ( "Is empty." ) );
 
 		
 	}else if( this.hasResult ){
@@ -132,10 +132,9 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 			.compact( )
 			.value( );
 
-			console.log( colors.grey ( "Has result. Kill-all-decoders." ) );
-
 		_.each( engineSocketList,
 			function onEachEngineSocket( socket ){
+				console.log( colors.grey ( "Has result. Kill-all-decoders." ) );
 				socket.emit( "kill-all-decoders" );
 			} );
 
@@ -241,56 +240,59 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 					return;
 				}
 
-				var shuffledSockets = _.shuffle( engineSocketList ); 
+				var shuffledSockets = _.shuffle( engineSocketList );
+				var decoders = shuffledSockets.length; 
 				var partitionIndex = partitionRangeList.length;
 				//Now we have a list of engine sockets start emitting.
-				while(  partitionIndex > -1 ){
-					_.each( shuffledSockets,
-						( function onEachEngineSocket( socket ){
-							if( partitionIndex >= 1 ){											
-					
-							var partitionRange = partitionRangeList.pop( );
+				while(  partitionRangeList.length ){
+					if( partitionRangeList.length >= 1 ){
+						_.each( shuffledSockets,
+							( function onEachEngineSocket( socket ){
+								var partitionRange = partitionRangeList.pop( );
 
-							partitionRange = partitionRange.split( "-" )
-							.map( function onEachRange( range ){
-								return parseInt( range );
-							} );
-							
-							console.log( colors.yellow ( "Distributing ranges " + partitionRange[ 0 ] + " to " + partitionRange[ 1 ] ) );
+								partitionRange = partitionRange.split( "-" )
+								.map( function onEachRange( range ){
+									return parseInt( range );
+								} );
+								
+								console.log( colors.yellow ( "Distributing ranges " + partitionRange[ 0 ] + " to " + partitionRange[ 1 ] ) );
 
-							socket.emit( "decode-md5hash",
-								this.durationData,
-								this.reference, 
-								md5Hash, 
-								dictionary, 
-								limitLength,
-								partitionRange[ 0 ], 
-								partitionRange[ 1 ] );
+								socket.emit( "decode-md5hash",
+									this.durationData,
+									this.reference, 
+									md5Hash, 
+									dictionary, 
+									limitLength,
+									partitionRange[ 0 ], 
+									partitionRange[ 1 ] );
 
-							this.socket.broadcast.emit( "output", null, {
-								"type": "text",
-								"text": [
-								"decode command for range of",
-								partitionRange[ 0 ], "to", partitionRange[ 1 ],
-								"has been deployed"
-								].join( " " )
-							}, this.durationData, this.reference );
+								this.socket.broadcast.emit( "output", null, {
+									"type": "text",
+									"text": [
+									"decode command for range of",
+									partitionRange[ 0 ], "to", partitionRange[ 1 ],
+									"has been deployed"
+									].join( " " )
+								}, this.durationData, this.reference );
+							} ).bind( this ) );
+					}
 
-						}else if( partitionIndex == 0 ){
-							console.log( colors.grey ( "Decoders initialized." ) );
+					else if( partitionRangeList.length == 0 ){
+						console.log( colors.grey ( "Decoders initialized." ) );
+						_.each( engineSocketList,
+							( function onEachEngineSocket( socket ){
 
-							socket.emit( "start-decoder",
-								this.durationData,
-								this.reference );
-							/*	callback( null, {
-								"type": "text",
-								"text": "grid computation ongoing"
-							}, "broadcast:output" );*/
-						}
-						partitionIndex--;											
-					} ).bind( this ) );
+								socket.emit( "start-decoder",
+									this.durationData,
+									this.reference );
+									/*	callback( null, {
+										"type": "text",
+										"text": "grid computation ongoing"
+									}, "broadcast:output" );*/
+							} ).bind( this ) );					
+					}
 				}
-			} ).bind( this ) );
+		} ).bind( this ) );
 	}else{
 		callback( null, {
 			"type": "text",

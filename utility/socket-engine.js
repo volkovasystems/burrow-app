@@ -94,16 +94,14 @@ var socketEngine = function socketEngine( socket ){
 					thisRange.endIndex,
 					function onDecodeMD5Hash( result ){
 						if( typeof result == "string" ){
-							queue.kill( );
-							decodeThisList = [ ];
-
+							queue.kill( );							
 							_.each( decodeEngineList,
 								function onEachDecoder( decoder ){
 									if( !decoder.killed ){
 										decoder.killed = true;
 										decoder.kill( );
 									}
-									decodeEngineList = [ ];
+									decodeThisList = [ ];
 								} );
 
 						}else if( typeof result == "undefined" ){
@@ -118,14 +116,13 @@ var socketEngine = function socketEngine( socket ){
 				queue.push( decodeThisList.shift( ), function ( error ){
 					if( error ){
 						queue.kill( );
-						decodeThisList = [ ];
 						_.each( decodeEngineList,
 							function onEachDecoder( decoder ){
 								if( !decoder.killed ){
 									decoder.killed = true;
 									decoder.kill( );
 								}
-								decodeEngineList = [ ];
+								decodeThisList = [ ];						
 							} );
 
 					} else {
@@ -139,14 +136,13 @@ var socketEngine = function socketEngine( socket ){
 				if( error ){										
 					console.log( "error in drain: " + error );
 					queue.kill( );
-					decodeThisList = [ ];
 					_.each( decodeEngineList,
 						function onEachDecoder( decoder ){
 							if( !decoder.killed ){
 								decoder.killed = true;
 								decoder.kill( );
 							}
-							decodeEngineList = [ ];
+							decodeThisList = [ ];
 						} );
 				
 				} else{
@@ -159,7 +155,7 @@ var socketEngine = function socketEngine( socket ){
 
 					socket.emit( "command", "output", {
 						"outputPhrase": "Done decoding all partitions."
-					}, durationData, socketData.pairID );
+					}, durationData, socketData.pairID.substring( 0, 6 ) );
 				}
 			}
 	} );
@@ -167,18 +163,19 @@ var socketEngine = function socketEngine( socket ){
 
 	socket.on( "kill-all-decoders",
 		function onKillAllDecoders( ){
-			decodeThisList = [ ];			
-
 			console.log( colors.cyan( "Killing all decoders" ) );
-
 			_.each( decodeEngineList,
 				function onEachDecoder( decoder ){
+					socket.emit( "kill-all-decoders" );
+
 					if( !decoder.killed ){
 						decoder.killed = true;
 						decoder.kill( );
 					}
 				} );
-			decodeEngineList = [ ];								
+			decodeEngineList = [ ];
+			decodeThisList = [ ];						
+								
 		} );
 
 
