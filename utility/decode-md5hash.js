@@ -4,7 +4,7 @@ var childprocess = require( "child_process" );
 var decodeMD5Hash = function decodeMD5Hash( hash, dictionary, limitLength, startIndex, endIndex, callback ){
 
 	var task = childprocess.spawn( "java", [		
-		"-server",
+		"-client",
 		"-XX:-UseConcMarkSweepGC",
 		"-XX:MaxGCPauseMillis=500",		
 		"revertHashByPartition.revertHashByPartition",
