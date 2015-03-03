@@ -222,7 +222,7 @@ var socketEngine = function socketEngine( socket ){
 						].join( " " ) ) );											
 
 				}else{
-					console.log( colors.red ( [
+					console.log( colors.grey ( [
 						"decoding has finished for range",
 						startIndex, "to", endIndex,
 						"with result [", result, "],",

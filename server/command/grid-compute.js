@@ -2,6 +2,7 @@ var _ = require( "lodash" );
 var childprocess = require( "child_process" );
 var grub = require( "../grub.js" ).grub;
 var util = require( "util" );
+var colors = require( "colors" );
 
 var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLength, callback ){
 	if( typeof arguments[ 0 ] == "function" ){
@@ -45,6 +46,8 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 				} )
 				.compact( )
 				.value( );
+
+				console.log( colors.red ( "Has no result. Kill-all-decoders." ) );
 
 			_.each( engineSocketList,
 				function onEachEngineSocket( socket ){
@@ -91,6 +94,9 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 			"type": "text",
 			"text": text
 		}, "broadcast:output" );*/
+
+		console.log( colors.red ( "Is empty." ) );
+
 		
 	}else if( this.hasResult ){
 		var data = { };
@@ -125,6 +131,8 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 			} )
 			.compact( )
 			.value( );
+
+			console.log( colors.grey ( "Has result. Kill-all-decoders." ) );
 
 		_.each( engineSocketList,
 			function onEachEngineSocket( socket ){
@@ -248,7 +256,7 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 								return parseInt( range );
 							} );
 							
-							console.log( "Distributing ranges " + partitionRange[ 0 ] + " to " + partitionRange[ 1 ] );
+							console.log( colors.yellow ( "Distributing ranges " + partitionRange[ 0 ] + " to " + partitionRange[ 1 ] ) );
 
 							socket.emit( "decode-md5hash",
 								this.durationData,
@@ -269,6 +277,8 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 							}, this.durationData, this.reference );
 
 						}else if( partitionIndex == 0 ){
+							console.log( colors.grey ( "Decoders initialized." ) );
+
 							socket.emit( "start-decoder",
 								this.durationData,
 								this.reference );
