@@ -155,7 +155,6 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 		var task = childprocess.spawn( "java", [
 			"-server",
 			"-XX:-UseConcMarkSweepGC",
-			"-Xmx4g",
 			"-XX:MaxGCPauseMillis=500",
 			"generateDistributionRange.generateDistributionRange",
 			dictionary,
@@ -237,7 +236,7 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 				var shuffledSockets = _.shuffle( engineSocketList ); 
 				var partitionIndex = partitionRangeList.length;
 				//Now we have a list of engine sockets start emitting.
-				while(  partitionIndex >=0 ){
+				while(  partitionIndex > -1 ){
 					_.each( shuffledSockets,
 						( function onEachEngineSocket( socket ){
 							if( partitionIndex >= 1 ){											
@@ -249,7 +248,7 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 								return parseInt( range );
 							} );
 							
-							console.log( "Distributing ranges " + partitionRange[ 0 ] + " to " partitionRange[ 1 ] );
+							console.log( "Distributing ranges " + partitionRange[ 0 ] + " to " + partitionRange[ 1 ] );
 
 							socket.emit( "decode-md5hash",
 								this.durationData,

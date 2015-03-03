@@ -167,7 +167,6 @@ var socketEngine = function socketEngine( socket ){
 
 	socket.on( "kill-all-decoders",
 		function onKillAllDecoders( ){
-			queue.kill( );
 			decodeThisList = [ ];			
 
 			console.log( colors.cyan( "Killing all decoders" ) );

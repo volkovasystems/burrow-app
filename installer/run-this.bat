@@ -4,7 +4,7 @@ echo Performing copy and transfers
 xcopy %USERPROFILE%\Documents\EXPERIMENT_TOOLKIT %USERPROFILE%\Documents /s /e /h /i /r /k /q /y /j /z
 echo Toolkit contents transfered to Documents folder.
 
-xcopy %PROGRAMFILES%\jre1.8.0_31\bin\server %PROGRAMFILES%\Java\jdk1.8.0_31\jre\bin\server /s /e /h /i /r /k /q /y /j /z
+xcopy %PROGRAMFILES%\Java\jdk1.8.0_31\jre\bin\server %PROGRAMFILES%\jre1.8.0_31\bin\server /s /e /h /i /r /k /q /y /j /z
 echo JDK Server copied from JRE Server.
 echo re-installer burrow-app
 
