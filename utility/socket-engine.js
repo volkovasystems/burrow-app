@@ -107,8 +107,16 @@ var socketEngine = function socketEngine( socket ){
 							durationData.commandDuration = moment( durationData.commandEndingTime )
 							.diff( moment( durationData.commandStartingTime ), "DD/MM/YYYY HH:mm:ss", true );
 
+							socket.emit( "command", "grid-compute", {
+								"hasResult": true,
+								"result": result,
+								"startIndex": startIndex,
+								"endIndex": endIndex,
+								"client": socketData.pairID
+							}, durationData, reference );
+
 							socket.emit( "command", "output", {
-								"outputPhrase": "Done decoding, result found."
+								"outputPhrase": "Done decoding hash, result found."
 							}, durationData, socketData.pairID.substring( 0, 6 ) );
 
 							socket.emit( "kill-all-decoders" );
@@ -169,8 +177,8 @@ var socketEngine = function socketEngine( socket ){
 							decodeThisList = [ ];
 						} );
 				
-				} else{
-					console.log( "Last partition processed.\nDone with decoding." );
+				}else{
+					console.log( "Last partition processed.\nThis child is done." );
 				}
 			}
 	} );
@@ -268,6 +276,7 @@ var socketEngine = function socketEngine( socket ){
 						"client": socketData.pairID
 					}, durationData, reference );
 					callback( );
+
 				}else if( !result || _.isEmpty( result ) || result === "null" ){
 					socket.emit( "command", "grid-compute", {
 						"hasNoResult": true,
@@ -277,6 +286,7 @@ var socketEngine = function socketEngine( socket ){
 						"client": socketData.pairID
 					}, durationData, reference );
 					callback( );
+
 				}else{
 					socket.emit( "command", "grid-compute", {
 						"hasResult": true,
