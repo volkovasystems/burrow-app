@@ -184,9 +184,8 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 		var gridFactor = gridCount;
 
 		var task = childprocess.spawn( "java", [
-			"-client",
+			"-server",
 			"-XX:-UseConcMarkSweepGC",
-			"-Xmx1g",
 			"-XX:MaxGCPauseMillis=500",
 			"generateDistributionRange.generateDistributionRange",
 			dictionary,
@@ -215,13 +214,13 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 					"type": "text",
 					"text": [ 
 						partitionRangeList.length, 
-						"partitions for this grid computation" 
+						"partition(s) for this grid computation" 
 					].join( " " )
 				}, this.durationData, this.reference );
 
 				console.log( colors.grey (
 					partitionRangeList.length,
-					"partitions for this grid computation"
+					"partition(s) for this grid computation"
 				) );
 
 				/*:

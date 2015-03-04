@@ -2,7 +2,6 @@ var _ = require( "lodash" );
 var moment = require( "moment" );
 var colors = require( "colors" );
 var async = require( "async" );
-var requestResponseDuration = require( "./requestResponseDuration.js" ).requestResponseDuration;
 
 var getSystemData = require( "./get-system-data.js" ).getSystemData;
 
@@ -82,8 +81,6 @@ var socketEngine = function socketEngine( socket ){
 
 			console.log( colors.grey( "Decoder Initiated." ) );
 
-			durationData.commandStartingTime = Date.now( );
-
 			pendingTask = decodeThisList.length;
 			
 			queue = async.queue( function onQueue( thisRange, callback ){
@@ -97,15 +94,9 @@ var socketEngine = function socketEngine( socket ){
 					thisRange.startIndex,
 					thisRange.endIndex,
 					
-					function onDecodeMD5Hash( result, value ){
-						durationData.commandEndingTime = Date.now( );
-
-						durationData.commandDuration = moment( durationData.commandEndingTime )
-							.diff( moment( durationData.commandStartingTime ), "DD/MM/YYYY HH:mm:ss", true );
-						
+					function onDecodeMD5Hash( result, value, durationData, reference ){				
 						if( typeof result == "string" ){
 							if ( result == "found." ){
-
 								socket.emit( "command", "grid-compute", {
 									"hasResult": true,
 									"result": value,
@@ -114,8 +105,7 @@ var socketEngine = function socketEngine( socket ){
 									"client": socketData.pairID
 								}, durationData, reference );
 							
-							}else if ( result == "error." ){
-			
+							}else if ( result == "error." ){			
 								socket.emit( "command", "grid-compute", {
 									"hasNoResult": true,
 									"state": value,
@@ -270,7 +260,7 @@ var socketEngine = function socketEngine( socket ){
 						"endIndex": endIndex,
 						"client": socketData.pairID
 					}, durationData, reference );
-					callback( "error.", state.message );
+					callback( "error.", state.message, durationData, reference + "-check" );
 
 				}else if( typeof state == "string" ){
 					socket.emit( "command", "grid-compute", {
@@ -300,7 +290,7 @@ var socketEngine = function socketEngine( socket ){
 						"endIndex": endIndex,
 						"client": socketData.pairID
 					}, durationData, reference );
-					callback( "found.", result );
+					callback( "found.", result, durationData, reference + "-check" );
 				}
 				decodeEngineList = _.without( this.decodeEngineList, decodeEngine );
 			} );			
