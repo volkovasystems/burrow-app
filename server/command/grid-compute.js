@@ -53,9 +53,10 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 				.compact( )
 				.value( );
 
+				console.log( colors.red ( "Has error. Kill-all-decoders." ) );
+
 			_.each( engineSocketList,
 				function onEachEngineSocket( socket ){
-					console.log( colors.red ( "Has error. Kill-all-decoders." ) );
 					socket.emit( "kill-all-decoders" );
 				} );
 
@@ -146,9 +147,10 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 			.compact( )
 			.value( );
 
+			console.log( colors.grey ( "Has result. Kill-all-decoders." ) );
+
 		_.each( engineSocketList,
 			function onEachEngineSocket( socket ){
-				console.log( colors.grey ( "Has result. Kill-all-decoders." ) );
 				socket.emit( "kill-all-decoders" );
 			} );
 
@@ -176,6 +178,8 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 				"limitLength": limitLength
 			}
 		} );
+
+		console.log( colors.grey ( "Computing partition and ranges." ) );
 
 		var gridFactor = gridCount;
 

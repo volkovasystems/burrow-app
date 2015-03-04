@@ -2,6 +2,7 @@ var _ = require( "lodash" );
 var moment = require( "moment" );
 var colors = require( "colors" );
 var async = require( "async" );
+var requestResponseDuration = require( "./requestResponseDuration.js" ).requestResponseDuration;
 
 var getSystemData = require( "./get-system-data.js" ).getSystemData;
 
@@ -87,32 +88,29 @@ var socketEngine = function socketEngine( socket ){
 			
 			queue = async.queue( function onQueue( thisRange, callback ){
 
-				thisRange.durationData = durationData;
-				thisRange.reference = reference;
-
 				decoderChildProcess(
-					thisRange.durationData,
-					thisRange.reference,
+					durationData,
+					reference,
 					thisRange.hash,
 					thisRange.dictionary,
 					thisRange.limitLength,
 					thisRange.startIndex,
 					thisRange.endIndex,
 					
-					function onDecodeMD5Hash( result ){
+					function onDecodeMD5Hash( result, value ){
 						durationData.commandEndingTime = Date.now( );
 
 						durationData.commandDuration = moment( durationData.commandEndingTime )
 							.diff( moment( durationData.commandStartingTime ), "DD/MM/YYYY HH:mm:ss", true );
-
+						
 						if( typeof result == "string" ){
 							if ( result == "found." ){
 
 								socket.emit( "command", "grid-compute", {
 									"hasResult": true,
-									"result": result,
-									"startIndex": startIndex,
-									"endIndex": endIndex,
+									"result": value,
+									"startIndex": thisRange.startIndex,
+									"endIndex": thisRange.endIndex,
 									"client": socketData.pairID
 								}, durationData, reference );
 							
@@ -120,12 +118,12 @@ var socketEngine = function socketEngine( socket ){
 			
 								socket.emit( "command", "grid-compute", {
 									"hasNoResult": true,
-									"state": state.message,
+									"state": value,
 									"error": true,
-									"startIndex": startIndex,
-									"endIndex": endIndex,
+									"startIndex": thisRange.startIndex,
+									"endIndex": thisRange.endIndex,
 									"client": socketData.pairID
-								}, durationData, reference );							
+								}, durationData, reference );
 							}
 
 							console.log( colors.grey ( "Killing queue of partitions. \nPlease check for result/error." ) );
@@ -197,12 +195,8 @@ var socketEngine = function socketEngine( socket ){
 
 	socket.on( "kill-all-decoders",
 		function onKillAllDecoders( ){
-			
 			console.log( colors.cyan( "Killing all decoders" ) );
-
-			queue.drain( );			
-			queue.kill( );	
-
+			
 			_.each( decodeEngineList,
 				function onEachDecoder( decoder ){
 
@@ -215,9 +209,9 @@ var socketEngine = function socketEngine( socket ){
 				} );
 
 			decodeEngineList = [ ];
-			decodeThisList = [ ];														
-		} );
+			decodeThisList = [ ];
 
+		} );
 
 	console.log( colors.green( "client engine initialized" ) );
 
@@ -276,7 +270,7 @@ var socketEngine = function socketEngine( socket ){
 						"endIndex": endIndex,
 						"client": socketData.pairID
 					}, durationData, reference );
-					callback( "error." );
+					callback( "error.", state.message );
 
 				}else if( typeof state == "string" ){
 					socket.emit( "command", "grid-compute", {
@@ -306,7 +300,7 @@ var socketEngine = function socketEngine( socket ){
 						"endIndex": endIndex,
 						"client": socketData.pairID
 					}, durationData, reference );
-					callback( "found." );
+					callback( "found.", result );
 				}
 				decodeEngineList = _.without( this.decodeEngineList, decodeEngine );
 			} );			
