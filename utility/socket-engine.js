@@ -100,25 +100,36 @@ var socketEngine = function socketEngine( socket ){
 					thisRange.endIndex,
 					
 					function onDecodeMD5Hash( result ){
-						if( typeof result == "string" ){
+						durationData.commandEndingTime = Date.now( );
 
-							durationData.commandEndingTime = Date.now( );
-
-							durationData.commandDuration = moment( durationData.commandEndingTime )
+						durationData.commandDuration = moment( durationData.commandEndingTime )
 							.diff( moment( durationData.commandStartingTime ), "DD/MM/YYYY HH:mm:ss", true );
 
-							socket.emit( "command", "grid-compute", {
-								"hasResult": true,
-								"result": result,
-								"startIndex": startIndex,
-								"endIndex": endIndex,
-								"client": socketData.pairID
-							}, durationData, reference );
+						if( typeof result == "string" ){
+							if ( result == "found." ){
 
-							socket.emit( "command", "output", {
-								"outputPhrase": "Done decoding hash, result found."
-							}, durationData, socketData.pairID.substring( 0, 6 ) );
+								socket.emit( "command", "grid-compute", {
+									"hasResult": true,
+									"result": result,
+									"startIndex": startIndex,
+									"endIndex": endIndex,
+									"client": socketData.pairID
+								}, durationData, reference );
+							
+							}else if ( result == "error." ){
+			
+								socket.emit( "command", "grid-compute", {
+									"hasNoResult": true,
+									"state": state.message,
+									"error": true,
+									"startIndex": startIndex,
+									"endIndex": endIndex,
+									"client": socketData.pairID
+								}, durationData, reference );							
+							}
 
+							console.log( colors.grey ( "Killing queue of partitions. \nPlease check for result/error." ) );
+							
 							socket.emit( "kill-all-decoders" );
 							queue.drain( );						
 							queue.kill( );						
@@ -265,7 +276,7 @@ var socketEngine = function socketEngine( socket ){
 						"endIndex": endIndex,
 						"client": socketData.pairID
 					}, durationData, reference );
-					callback( "error" );
+					callback( "error." );
 
 				}else if( typeof state == "string" ){
 					socket.emit( "command", "grid-compute", {

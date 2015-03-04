@@ -31,6 +31,12 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 				"error message was", this.state
 			].join( " " );
 
+			console.log( colors.red (
+				"error in one of the grids measuring for range",
+				this.startIndex, "to", this.endIndex,
+				"error message was", this.state
+			) );
+
 			var engineSocketList = _( this.holeSet )
 				.values( )
 				.filter( function onEachHole( holeData ){
@@ -49,7 +55,7 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 
 			_.each( engineSocketList,
 				function onEachEngineSocket( socket ){
-					console.log( colors.red ( "Has no result. Kill-all-decoders." ) );
+					console.log( colors.red ( "Has error. Kill-all-decoders." ) );
 					socket.emit( "kill-all-decoders" );
 				} );
 
@@ -68,11 +74,12 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 				"returned empty result"
 			].join( " " );
 
-			console.log( colors.red ( "grid with range",
-			this.startIndex, "to", this.endIndex,
-			"returned empty result"
-			) );	
-		
+			console.log( colors.red (
+				"grid with range",
+				this.startIndex, "to", this.endIndex,
+				"returned empty result"
+			) );
+
 		}else{
 			data[ rangeReference ] = {
 				"startIndex": this.startIndex,
@@ -89,6 +96,12 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 			].join( " " );
 		}
 
+		console.log( colors.red (
+				"unknown result on range",
+				this.startIndex, "to", this.endIndex,
+				"with state message", this.state
+		) );
+
 		/*grub( ).save( {
 			"reference": this.reference,
 			"data": data
@@ -98,8 +111,6 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 			"type": "text",
 			"text": text
 		}, "broadcast:output" );*/
-
-
 		
 	}else if( this.hasResult ){
 		var data = { };
@@ -141,6 +152,12 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 				socket.emit( "kill-all-decoders" );
 			} );
 
+		console.log( colors.green (
+				"result was found on range",
+				this.startIndex, "to", this.endIndex,
+				"result was", this.result
+		) );
+
 		callback( null, {
 			"type": "text",
 			"text": [
@@ -163,8 +180,9 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 		var gridFactor = gridCount;
 
 		var task = childprocess.spawn( "java", [
-			"-server",
+			"-client",
 			"-XX:-UseConcMarkSweepGC",
+			"-Xmx1g",
 			"-XX:MaxGCPauseMillis=500",
 			"generateDistributionRange.generateDistributionRange",
 			dictionary,
@@ -196,6 +214,11 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 						"partitions for this grid computation" 
 					].join( " " )
 				}, this.durationData, this.reference );
+
+				console.log( colors.grey (
+					partitionRangeList.length,
+					"partitions for this grid computation"
+				) );
 
 				/*:
 					The holeSet contains list of references.
@@ -240,6 +263,10 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 						"type": "error",
 						"text": "client engine empty"
 					}, "broadcast:output" );
+					
+					console.log( colors.red (
+						"client engine empty"
+						) );
 					return;
 				}
 
@@ -258,7 +285,7 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 									return parseInt( range );
 								} );
 								
-								console.log( colors.yellow ( "Distributing ranges " + partitionRange[ 0 ] + " to " + partitionRange[ 1 ] ) );
+								console.log( colors.yellow ( "Deploying ranges " + partitionRange[ 0 ] + " to " + partitionRange[ 1 ] ) );
 
 								socket.emit( "decode-md5hash",
 									this.durationData,
@@ -282,6 +309,7 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 
 					if( partitionIndex == 0 ){
 						console.log( colors.grey ( "Decoders initialized." ) );
+
 						_.each( engineSocketList,
 							( function onEachEngineSocket( socket ){
 
@@ -303,6 +331,8 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 			"type": "text",
 			"text": "no grid computation"
 		}, "broadcast:output" );
+
+		console.log( colors.grey ( "no grid computation." ) );						
 	}
 };
 exports.gridCompute = gridCompute;
