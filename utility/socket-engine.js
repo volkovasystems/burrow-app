@@ -78,30 +78,49 @@ var socketEngine = function socketEngine( socket ){
 	
 	socket.on( "start-decoder",
 		function onStartDecoder( durationData, reference ){
+
 			console.log( colors.grey( "Decoder Initiated." ) );
+
 			durationData.commandStartingTime = Date.now( );
 
 			pendingTask = decodeThisList.length;
 			
 			queue = async.queue( function onQueue( thisRange, callback ){
+
+				thisRange.durationData = durationData;
+				thisRange.reference = reference;
+
 				decoderChildProcess(
-					durationData,
-					reference,
+					thisRange.durationData,
+					thisRange.reference,
 					thisRange.hash,
 					thisRange.dictionary,
 					thisRange.limitLength,
 					thisRange.startIndex,
 					thisRange.endIndex,
+					
 					function onDecodeMD5Hash( result ){
 						if( typeof result == "string" ){
-							queue.kill( );							
+
+							durationData.commandEndingTime = Date.now( );
+
+							durationData.commandDuration = moment( durationData.commandEndingTime )
+							.diff( moment( durationData.commandStartingTime ), "DD/MM/YYYY HH:mm:ss", true );
+
+							socket.emit( "command", "output", {
+								"outputPhrase": "Done decoding, result found."
+							}, durationData, socketData.pairID.substring( 0, 6 ) );
+
+							socket.emit( "kill-all-decoders" );
+							queue.drain( );						
+							queue.kill( );						
+							
 							_.each( decodeEngineList,
 								function onEachDecoder( decoder ){
 									if( !decoder.killed ){
 										decoder.killed = true;
 										decoder.kill( );
-									}
-									decodeThisList = [ ];
+									}								
 								} );
 
 						}else if( typeof result == "undefined" ){
@@ -115,18 +134,19 @@ var socketEngine = function socketEngine( socket ){
 			while( pendingTask > 0 ){
 				queue.push( decodeThisList.shift( ), function ( error ){
 					if( error ){
+				
+						socket.emit( "kill-all-decoders" );
+						queue.drain( );			
 						queue.kill( );
+
 						_.each( decodeEngineList,
 							function onEachDecoder( decoder ){
 								if( !decoder.killed ){
 									decoder.killed = true;
 									decoder.kill( );
 								}
-								decodeThisList = [ ];						
+													
 							} );
-
-					} else {
-						console.log( "Next partition....." );					
 					}
 				} );
 				pendingTask--;
@@ -135,7 +155,11 @@ var socketEngine = function socketEngine( socket ){
 			queue.drain = function onDrain( error ){
 				if( error ){										
 					console.log( "error in drain: " + error );
+					
+					socket.emit( "kill-all-decoders" );
+					queue.drain( );													
 					queue.kill( );
+
 					_.each( decodeEngineList,
 						function onEachDecoder( decoder ){
 							if( !decoder.killed ){
@@ -147,15 +171,6 @@ var socketEngine = function socketEngine( socket ){
 				
 				} else{
 					console.log( "Last partition processed.\nDone with decoding." );
-
-					durationData.commandEndingTime = Date.now( );
-					
-					durationData.commandDuration = moment( durationData.commandEndingTime )
-					.diff( moment( durationData.commandStartingTime ), "DD/MM/YYYY HH:mm:ss", true );
-
-					socket.emit( "command", "output", {
-						"outputPhrase": "Done decoding all partitions."
-					}, durationData, socketData.pairID.substring( 0, 6 ) );
 				}
 			}
 	} );
@@ -163,9 +178,15 @@ var socketEngine = function socketEngine( socket ){
 
 	socket.on( "kill-all-decoders",
 		function onKillAllDecoders( ){
+			
 			console.log( colors.cyan( "Killing all decoders" ) );
+
+			queue.drain( );			
+			queue.kill( );	
+
 			_.each( decodeEngineList,
 				function onEachDecoder( decoder ){
+
 					socket.emit( "kill-all-decoders" );
 
 					if( !decoder.killed ){
@@ -173,9 +194,9 @@ var socketEngine = function socketEngine( socket ){
 						decoder.kill( );
 					}
 				} );
+
 			decodeEngineList = [ ];
-			decodeThisList = [ ];						
-								
+			decodeThisList = [ ];														
 		} );
 
 
@@ -190,7 +211,6 @@ var socketEngine = function socketEngine( socket ){
 
 		var decodeEngine = decodeMD5Hash( hash, dictionary, limitLength, startIndex, endIndex,
 			function onDecodeMD5Hash( state, result ){
-
 				/*:
 				Result is either empty or a decoded string.
 				*/
