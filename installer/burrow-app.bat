@@ -1,7 +1,7 @@
 @ECHO OFF
 TITLE SETUP -- Burrow-App Installer
 
-set ipAddressParent=192.168.2.105
+set ipAddressParent=192.168.2.110
 
 if /i {%1}=={syntax} ( goto syntax )
 if /i {%ipAddressParent%}=={} ( goto error )

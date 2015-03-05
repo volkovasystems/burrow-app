@@ -93,46 +93,47 @@ var socketEngine = function socketEngine( socket ){
 					thisRange.limitLength,
 					thisRange.startIndex,
 					thisRange.endIndex,
-					
-					function onDecodeMD5Hash( result, value, durationData, reference ){				
-						if( typeof result == "string" ){
-							if ( result == "found." ){
+
+					function onDecodeMD5Hash( decoder, value, result, durationData, reference ){
+						if( typeof value == "string" ){						
+							if ( value == "found." ){
 								socket.emit( "command", "grid-compute", {
 									"hasResult": true,
-									"result": value,
+									"result": result,
 									"startIndex": thisRange.startIndex,
 									"endIndex": thisRange.endIndex,
 									"client": socketData.pairID
 								}, durationData, reference );
-							
-							}else if ( result == "error." ){			
+
+								socket.emit( "kill-all-decoders" );
+									queue.drain( );						
+									queue.kill( );
+									queue.tasks = [ ];
+
+							}else if ( value == "error." ){			
 								socket.emit( "command", "grid-compute", {
 									"hasNoResult": true,
-									"state": value,
+									"state": result,
 									"error": true,
 									"startIndex": thisRange.startIndex,
 									"endIndex": thisRange.endIndex,
 									"client": socketData.pairID
 								}, durationData, reference );
+
+								socket.emit( "kill-all-decoders" );
+									queue.drain( );						
+									queue.kill( );
+									queue.tasks = [ ];						
 							}
-
-							console.log( colors.grey ( "Killing queue of partitions. \nPlease check for result/error." ) );
 							
-							socket.emit( "kill-all-decoders" );
-							queue.drain( );						
-							queue.kill( );						
-							
-							_.each( decodeEngineList,
-								function onEachDecoder( decoder ){
-									if( !decoder.killed ){
-										decoder.killed = true;
-										decoder.kill( );
-									}								
-								} );
-
-						}else if( typeof result == "undefined" ){
+						}else if( typeof value == "undefined" || typeof value == "null" ){							
+							callback( );						
+						
+						}else{
 							callback( );
+						
 						}
+						decodeEngineList.push( decoder );
 					} );
 			}, 1 );
 
@@ -141,19 +142,10 @@ var socketEngine = function socketEngine( socket ){
 			while( pendingTask > 0 ){
 				queue.push( decodeThisList.shift( ), function ( error ){
 					if( error ){
-				
 						socket.emit( "kill-all-decoders" );
 						queue.drain( );			
 						queue.kill( );
-
-						_.each( decodeEngineList,
-							function onEachDecoder( decoder ){
-								if( !decoder.killed ){
-									decoder.killed = true;
-									decoder.kill( );
-								}
-													
-							} );
+						queue.tasks = [ ];
 					}
 				} );
 				pendingTask--;
@@ -166,18 +158,10 @@ var socketEngine = function socketEngine( socket ){
 					socket.emit( "kill-all-decoders" );
 					queue.drain( );													
 					queue.kill( );
+					queue.task = [ ];
 
-					_.each( decodeEngineList,
-						function onEachDecoder( decoder ){
-							if( !decoder.killed ){
-								decoder.killed = true;
-								decoder.kill( );
-							}
-							decodeThisList = [ ];
-						} );
-				
 				}else{
-					console.log( "Last partition processed.\nThis child is done." );
+					console.log( "Processed all tasks.\nDone." );
 				}
 			}
 	} );
@@ -186,24 +170,30 @@ var socketEngine = function socketEngine( socket ){
 	socket.on( "kill-all-decoders",
 		function onKillAllDecoders( ){
 			console.log( colors.cyan( "Killing all decoders" ) );
-			
+
 			_.each( decodeEngineList,
 				function onEachDecoder( decoder ){
-
 					socket.emit( "kill-all-decoders" );
 
 					if( !decoder.killed ){
-						decoder.killed = true;
 						decoder.kill( );
+					
+						var decoderProcess = require( "child_process" );
+						decoderProcess.exec( "taskkill /PID " + decoder.pid + " /T /F",
+							function ( error, stdout, stderr ){
+								if( error !== null ){
+/*									console.log( "Decoder process already killed." );
+*/								}
+							} );
+					
+					}else{
+						console.log( colors.yellow( decoder.pid + " " + "decoder already dead." ) );						
+						decodeEngineList.pop( );					
 					}
 				} );
-
-			decodeEngineList = [ ];
-			decodeThisList = [ ];
-
 		} );
 
-	console.log( colors.green( "client engine initialized" ) );
+	console.log( colors.green( "Client engine initialized." ) );
 
 	//:Decoder is a childprocess instance.
 	var decoderChildProcess = function decoderChildProcess( durationData, reference, hash, dictionary, limitLength, startIndex, endIndex, callback ){
@@ -260,7 +250,8 @@ var socketEngine = function socketEngine( socket ){
 						"endIndex": endIndex,
 						"client": socketData.pairID
 					}, durationData, reference );
-					callback( "error.", state.message, durationData, reference + "-check" );
+
+					callback( decodeEngine, "error.", state.message, durationData, reference + "-check" );
 
 				}else if( typeof state == "string" ){
 					socket.emit( "command", "grid-compute", {
@@ -270,7 +261,8 @@ var socketEngine = function socketEngine( socket ){
 						"endIndex": endIndex,
 						"client": socketData.pairID
 					}, durationData, reference );
-					callback( );
+
+					callback( decodeEngine );
 
 				}else if( !result || _.isEmpty( result ) || result === "null" ){
 					socket.emit( "command", "grid-compute", {
@@ -280,7 +272,8 @@ var socketEngine = function socketEngine( socket ){
 						"endIndex": endIndex,
 						"client": socketData.pairID
 					}, durationData, reference );
-					callback( );
+
+					callback( decodeEngine );
 
 				}else{
 					socket.emit( "command", "grid-compute", {
@@ -290,10 +283,11 @@ var socketEngine = function socketEngine( socket ){
 						"endIndex": endIndex,
 						"client": socketData.pairID
 					}, durationData, reference );
-					callback( "found.", result, durationData, reference + "-check" );
+
+					callback( decodeEngine, "found.", result, durationData, reference + "-check" );
 				}
-				decodeEngineList = _.without( this.decodeEngineList, decodeEngine );
-			} );			
+				/*decodeEngineList = _.without( this.decodeEngineList, decodeEngine );*/
+			} );
 			decodeEngineList.push( decodeEngine );
 		};
 };

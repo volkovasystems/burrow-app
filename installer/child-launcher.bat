@@ -1,7 +1,7 @@
 @ECHO OFF
 TITLE Launcher Child Console Window
 
-set ipAddressParent=192.168.2.105
+set ipAddressParent=192.168.2.110
 
 if /i {%1}=={syntax} ( goto syntax )
 if /i {%1}=={} ( goto syntax )

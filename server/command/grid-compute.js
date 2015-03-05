@@ -184,7 +184,7 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 		var gridFactor = gridCount;
 
 		var task = childprocess.spawn( "java", [
-			"-server",
+			"-client",
 			"-XX:-UseConcMarkSweepGC",
 			"-XX:MaxGCPauseMillis=500",
 			"generateDistributionRange.generateDistributionRange",
@@ -198,7 +198,6 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 		task.stdout.on( "data",
 			function onData( data ){
 				partitionRangeList.push( data.toString( ) );
-	
 			} );
 
 		task.stderr.on( "data",
