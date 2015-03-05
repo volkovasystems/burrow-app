@@ -290,10 +290,6 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 									return parseInt( range );
 								} );
 
-								}catch( error ){
-									console.log( colors.yellow ( "Error: undefined" ) );
-
-								}finally{
 									console.log( colors.yellow ( "Deploying ranges " + partitionRange[ 0 ] + " to " + partitionRange[ 1 ] ) );
 
 									socket.emit( "decode-md5hash",
@@ -313,28 +309,32 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 										"has been deployed"
 										].join( " " )
 									}, this.durationData, this.reference );
+								
+								}catch( error ){
+									console.log( colors.yellow ( "Error: undefined" ) );
 								}
+							
 							} ).bind( this ) );
-							}
+						}
+	
+						if( partitionIndex == 0 ){
+							console.log( colors.grey ( "Decoders initialized." ) );
 
-							if( partitionIndex == 0 ){
-								console.log( colors.grey ( "Decoders initialized." ) );
+							_.each( engineSocketList,
+								( function onEachEngineSocket( socket ){
 
-								_.each( engineSocketList,
-									( function onEachEngineSocket( socket ){
-
-										socket.emit( "start-decoder",
-											this.durationData,
-											this.reference );
-									/*	callback( null, {
-										"type": "text",
-										"text": "grid computation ongoing"
-									}, "broadcast:output" );*/
-								} ).bind( this ) );
-							}					
-					partitionIndex--;
-				}
-		} ).bind( this ) );
+									socket.emit( "start-decoder",
+										this.durationData,
+										this.reference );
+										/*	callback( null, {
+											"type": "text",
+											"text": "grid computation ongoing"
+										}, "broadcast:output" );*/
+							} ).bind( this ) );
+						}
+						partitionIndex--;
+					}
+				} ).bind( this ) );
 	}else{
 		callback( null, {
 			"type": "text",
