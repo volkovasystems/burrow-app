@@ -185,7 +185,7 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 
 		var task = childprocess.spawn( "java", [
 			"-client",
-			"-XX:-UseConcMarkSweepGC",
+			"-XX:-UseConcMarkSweepGC",			
 			"-XX:MaxGCPauseMillis=500",
 			"generateDistributionRange.generateDistributionRange",
 			dictionary,
@@ -197,7 +197,9 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 
 		task.stdout.on( "data",
 			function onData( data ){
+				console.log( data.toString( ) );
 				partitionRangeList.push( data.toString( ) );
+	
 			} );
 
 		task.stderr.on( "data",
@@ -280,51 +282,56 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 					if( partitionRangeList.length >= 1 ){
 						_.each( shuffledSockets,
 							( function onEachEngineSocket( socket ){
-								var partitionRange = partitionRangeList.pop( );
-
-								partitionRange = partitionRange.split( "-" )
-								.map( function onEachRange( range ){
+								try{
+									var partitionRange = partitionRangeList.pop( );
+									
+									partitionRange = partitionRange.split( "-" )
+									.map( function onEachRange( range ){
 									return parseInt( range );
 								} );
-								
-								console.log( colors.yellow ( "Deploying ranges " + partitionRange[ 0 ] + " to " + partitionRange[ 1 ] ) );
 
-								socket.emit( "decode-md5hash",
-									this.durationData,
-									this.reference, 
-									md5Hash, 
-									dictionary, 
-									limitLength,
-									partitionRange[ 0 ], 
-									partitionRange[ 1 ] );
+								}catch( error ){
+									console.log( colors.yellow ( "Error: undefined" ) );
 
-								this.socket.broadcast.emit( "output", null, {
-									"type": "text",
-									"text": [
-									"decode command for range of",
-									partitionRange[ 0 ], "to", partitionRange[ 1 ],
-									"has been deployed"
-									].join( " " )
-								}, this.durationData, this.reference );
+								}finally{
+									console.log( colors.yellow ( "Deploying ranges " + partitionRange[ 0 ] + " to " + partitionRange[ 1 ] ) );
+
+									socket.emit( "decode-md5hash",
+										this.durationData,
+										this.reference, 
+										md5Hash, 
+										dictionary, 
+										limitLength,
+										partitionRange[ 0 ], 
+										partitionRange[ 1 ] );
+
+									this.socket.broadcast.emit( "output", null, {
+										"type": "text",
+										"text": [
+										"decode command for range of",
+										partitionRange[ 0 ], "to", partitionRange[ 1 ],
+										"has been deployed"
+										].join( " " )
+									}, this.durationData, this.reference );
+								}
 							} ).bind( this ) );
-					}
+							}
 
-					if( partitionIndex == 0 ){
-						console.log( colors.grey ( "Decoders initialized." ) );
+							if( partitionIndex == 0 ){
+								console.log( colors.grey ( "Decoders initialized." ) );
 
-						_.each( engineSocketList,
-							( function onEachEngineSocket( socket ){
+								_.each( engineSocketList,
+									( function onEachEngineSocket( socket ){
 
-								socket.emit( "start-decoder",
-									this.durationData,
-									this.reference );
+										socket.emit( "start-decoder",
+											this.durationData,
+											this.reference );
 									/*	callback( null, {
 										"type": "text",
 										"text": "grid computation ongoing"
 									}, "broadcast:output" );*/
-							} ).bind( this ) );					
-					}
-					
+								} ).bind( this ) );
+							}					
 					partitionIndex--;
 				}
 		} ).bind( this ) );
@@ -333,7 +340,7 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 			"type": "text",
 			"text": "no grid computation"
 		}, "broadcast:output" );
-
+		
 		console.log( colors.grey ( "no grid computation." ) );						
 	}
 };
