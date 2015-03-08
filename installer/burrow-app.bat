@@ -1,7 +1,7 @@
 @ECHO OFF
 TITLE SETUP -- Burrow-App Installer
 
-set ipAddressParent=192.168.2.110
+set ipAddressParent=192.168.254.100
 
 if /i {%1}=={syntax} ( goto syntax )
 if /i {%ipAddressParent%}=={} ( goto error )
@@ -413,7 +413,7 @@ goto appCheck
 				)
 
 			:askGitInstall64
-				set /p g64Install=Do you want to install java (case-sensitive) [ yes/no ]? 
+				set /p g64Install=Do you want to install git (case-sensitive) [ yes/no ]? 
 
 				if /i {%g64Install%}=={y} (
 				goto gitInstall64
@@ -634,7 +634,8 @@ goto compileJava
 		echo Burrow-App exists, please wait...		
 		echo Cloning Burrow-App repository from github.com, please wait...
 		::git clone -b develop "https://github.com/volkovasystems/burrow-app.git"
-		git clone -b shop/adapt "https://github.com/volkovasystems/burrow-app.git" temporaryburrow-app
+		SET PATH=%PATH%;%PROGRAMFILES(x86)%\Git\bin
+		git clone -b shop/adapt https://github.com/volkovasystems/burrow-app.git temporaryburrow-app
 		xcopy "%USERPROFILE%\Documents\temporaryburrow-app" "%USERPROFILE%\Documents\burrow-app" /s /e /h /i /r /k /q /y /j /z
 
 		if exist "%USERPROFILE%\Documents\temporaryburrow-app" (
@@ -648,7 +649,8 @@ goto cloneCheckAgain
 		echo "Cloning Burrow-App repository from github.com" >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 		echo Cloning Burrow-App repository from github.com, please wait...
 		::git clone -b develop "https://github.com/volkovasystems/burrow-app.git"
-		git clone -b shop/adapt "https://github.com/volkovasystems/burrow-app.git" burrow-app
+		SET PATH=%PATH%;%PROGRAMFILES(x86)%\Git\bin
+		git clone -b shop/adapt https://github.com/volkovasystems/burrow-app.git
 
 goto cloneCheckAgain
 
@@ -784,7 +786,7 @@ goto startBurrowApp
 			start cmd /k "title Parent Gulp Build and Deploy & gulp"
 			start cmd /k "title Server Static & node server/static.js --production"	
 			start cmd /k "title Server Burrow & node server/burrow.js --production"
-			start chrome --disable-extensions --disable-plugins "http://192.168.2.105:8000"
+			start chrome --disable-extensions --disable-plugins "http://192.168.254.100:8000"
 		
 		echo "Application as server." >> "%USERPROFILE%\Documents\GridInstallers\install_log.txt"
 	goto done

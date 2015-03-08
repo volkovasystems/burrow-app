@@ -96,6 +96,7 @@ var socketEngine = function socketEngine( socket ){
 
 					function onDecodeMD5Hash( decoder, value, result, durationData, reference ){
 						if( typeof value == "string" ){						
+							
 							if ( value == "found." ){
 								socket.emit( "command", "grid-compute", {
 									"hasResult": true,
@@ -108,7 +109,9 @@ var socketEngine = function socketEngine( socket ){
 								socket.emit( "kill-all-decoders" );
 									queue.kill( );
 									queue.tasks = [ ];
-								
+
+									decoder.kill( "SIGINT" );
+
 									callback( true );
 
 							}else if ( value == "error." ){			
@@ -124,6 +127,8 @@ var socketEngine = function socketEngine( socket ){
 								socket.emit( "kill-all-decoders" );
 									queue.kill( );
 									queue.tasks = [ ];
+
+									decoder.kill( "SIGINT" );
 										
 									callback( true );						
 							}
@@ -135,7 +140,6 @@ var socketEngine = function socketEngine( socket ){
 							callback( );						
 						
 						}
-						decodeEngineList.push( decoder );
 					} );
 			}, 1 );
 
@@ -146,8 +150,8 @@ var socketEngine = function socketEngine( socket ){
 						socket.emit( "kill-all-decoders" );
 						queue.kill( );
 						queue.tasks = [ ];
-						decodeThisList = [ ];						
-
+						decodeThisList = [ ];
+						
 					}else{
 						console.log( "Next." );					
 					}
@@ -166,9 +170,11 @@ var socketEngine = function socketEngine( socket ){
 					queue.kill( );
 					queue.task = [ ];
 
+					decoder.kill( "SIGINT" );
 				}else{
 					console.log( "Processed all tasks.\nDone." );
 				}
+				
 				decodeThisList = [ ];
 			}
 	} );
@@ -179,20 +185,31 @@ var socketEngine = function socketEngine( socket ){
 		
 		queue.kill( );
 		queue.task = [ ];
+			
 			console.log( colors.cyan( "Killing all decoders" ) );
 
 			_.each( decodeEngineList,
 				function onEachDecoder( decoder ){
 					socket.emit( "kill-all-decoders" );
-						var decoderProcess = require( "child_process" );
-						decoderProcess.exec( "taskkill /PID " + decoder.pid + " /T /F",
+						var decoderProcessID = require( "child_process" );
+						decoderProcessID.exec( "taskkill /PID " + decoder.pid + " /T /F",
 							function ( error, stdout, stderr ){
 								if( error !== null ){
 									console.log( "Decoder process already killed." );
 								}
 							} );
+
+						var decoderProcess = require( "child_process" );
+						decoderProcess.exec( "taskkill /IM java.exe /T /F",
+							function ( error, stdout, stderr ){
+								if( error !== null ){
+									console.log( "Decoder process already killed." );
+								}
+							} );
+
 						decoder.kill( "SIGINT" );
 				} );
+			
 			decodeEngineList = [ ];
 			decodeThisList = [ ];
 		} );
@@ -292,6 +309,7 @@ var socketEngine = function socketEngine( socket ){
 				}
 			} );
 		};
+		decodeEngineList.push( decodeEngine );
 };
 exports.socketEngine = socketEngine;
 

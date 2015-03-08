@@ -127,7 +127,7 @@ if "%PROCESSOR_ARCHITECTURE%"=="AMD64" goto 64bit
 	start cmd /c "title Parent Gulp Build and Deploy & gulp"
 	start cmd /k "title Server Static & node server/static.js --production"	
 	start cmd /k "title Server Burrow & node server/burrow.js --production"
-	start chrome --disable-extensions --disable-plugins "http://192.168.2.110:8000"
+	start chrome --disable-extensions --disable-plugins "http://192.168.254.100:8000"
 goto end	
 
 :done

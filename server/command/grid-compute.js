@@ -311,7 +311,7 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 									}, this.durationData, this.reference );
 								
 								}catch( error ){
-									console.log( colors.yellow ( "Error: undefined" ) );
+									/*console.log( colors.yellow ( "Error: undefined" ) );*/
 								}
 							
 							} ).bind( this ) );
