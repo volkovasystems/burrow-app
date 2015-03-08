@@ -140,6 +140,7 @@ var socketEngine = function socketEngine( socket ){
 							callback( );						
 						
 						}
+						decodeEngineList.push( decoder );
 					} );
 			}, 1 );
 
@@ -309,7 +310,6 @@ var socketEngine = function socketEngine( socket ){
 				}
 			} );
 		};
-		decodeEngineList.push( decodeEngine );
 };
 exports.socketEngine = socketEngine;
 
