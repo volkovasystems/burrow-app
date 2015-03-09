@@ -197,7 +197,7 @@ var gridCompute = function gridCompute( gridCount, md5Hash, dictionary, limitLen
 
 		task.stdout.on( "data",
 			function onData( data ){
-				console.log( data.toString( ) );
+				/*console.log( data.toString( ) );*/
 				partitionRangeList.push( data.toString( ) );
 	
 			} );
