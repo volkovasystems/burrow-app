@@ -235,8 +235,8 @@ var socketEngine = function socketEngine( socket ){
 
 				durationData.commandEndingTime = Date.now( );
 
-				durationData.commandDuration = moment( durationData.commandEndingTime, "DD/MM/YYYY HH:mm:ss", false )
-				.diff( moment( durationData.commandStartingTime, "DD/MM/YYYY HH:mm:ss", false ) );
+				durationData.commandDuration = moment( durationData.commandEndingTime )
+				.diff( moment( durationData.commandStartingTime ), "DD/MM/YYYY HH:mm:ss", false  );
 
 				if( !result || _.isEmpty( result ) || result === "null" ){
 					console.log( colors.yellow ( [
