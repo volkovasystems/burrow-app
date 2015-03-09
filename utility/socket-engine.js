@@ -147,6 +147,8 @@ var socketEngine = function socketEngine( socket ){
 			while( decodeThisList.length > 0 ){
 
 				queue.push( decodeThisList.shift( ), function ( error ){
+					queue.pause( );
+
 					if( error ){
 						socket.emit( "kill-all-decoders" );
 						queue.kill( );
@@ -154,6 +156,7 @@ var socketEngine = function socketEngine( socket ){
 						decodeThisList = [ ];
 						
 					}else{
+						queue.resume( );
 						console.log( "Next." );					
 					}
 				
