@@ -1,18 +1,21 @@
 var _ = require( "lodash" );
 var childprocess = require( "child_process" );
 
-
 var decodeMD5Hash = function decodeMD5Hash( hash, dictionary, limitLength, startIndex, endIndex, callback ){
-	var task = childprocess.exec( [
-			"java",
-			"revertHashByPartition.revertHashByPartition",
-			hash,
-			dictionary,
-			limitLength,
-			2,
-			startIndex,
-			endIndex
-		].join( " " ), { "cwd": "./utility" } );
+
+	var task = childprocess.spawn( "java", [		
+		"-client",
+		"-XX:-UseConcMarkSweepGC",
+		"-Xmx512m",
+		"-XX:MaxGCPauseMillis=500",		
+		"revertHashByPartition.revertHashByPartition",
+		hash,
+		dictionary,
+		limitLength,
+		2,
+		startIndex,
+		endIndex
+		], { "cwd": "./utility" } );
 
 	var resultData = "";
 
@@ -40,9 +43,6 @@ var decodeMD5Hash = function decodeMD5Hash( hash, dictionary, limitLength, start
 				callback( );
 			}
 		} ); 
-
 	return task;
 };
-
-
 exports.decodeMD5Hash = decodeMD5Hash;

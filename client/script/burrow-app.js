@@ -1,7 +1,5 @@
-angular
+var Burrow = angular.module( "Burrow", [ ] )
 	
-	.module( "Burrow", [ ] )
-
 	.run( [
 		"$http",
 		function onRun( $http ){
@@ -35,4 +33,9 @@ angular
 				}
 			};
 		}
+	] );
+
+	Burrow.config( [
+		"$sceProvider", function( $sceProvider ){
+			$sceProvider.enabled(false);	}
 	] );

@@ -150,7 +150,7 @@ var cleanData = function cleanData( callback ){
 							nodeSpecs[ 8],
 							Math.round( parseInt(nodeSpecs[ 9 ] ) / 1070000000 ) + ".00 GB"];
 				callback ( data );
-			} , 3000);
+			} , 10000);
 		}
 		] );	
 

@@ -31,8 +31,11 @@ public class nthPower{
 	{
 		BigDecimal baseValue = new BigDecimal( value );
 		BigDecimal baseExponent = new BigDecimal( exponent );
+		
+		BigDecimal newBaseValue = BigDecimal.ONE;
 
 		String[ ] baseExponentPartList = baseExponent.toString( ).split( "\\." );
+
 		if( baseExponentPartList.length > 1 ){
 
 			String exponentDecimal = baseExponentPartList[ 1 ];
@@ -43,44 +46,31 @@ public class nthPower{
 			String exponentFraction = "1" + zeroSequence;
 
 			BigDecimal phaseA = nthPower( value, partialBaseExponent );
-
 			BigDecimal phaseB = nthPower( value, exponentDecimal );
-
 			BigDecimal phaseC = nthRoot( phaseB.toString( ), exponentFraction, "2", 2 );
+			
+			newBaseValue = phaseA.multiply( phaseC );
 
-			return phaseA.multiply( phaseC );
+			return newBaseValue;
 
 		}else{
 
-			if( baseExponent.compareTo( BigDecimal.ONE ) == 0 ){
-				return baseValue;
-			}
-
-			if( baseExponent.compareTo( BigDecimal.ZERO ) == 0 ){
-				return BigDecimal.ONE;
-			}
-
 			if( baseExponent.compareTo( BigDecimal.ZERO ) < 0 ){
 				throw new Exception( "cannot raise to negative number exponents" );
-			}
 
-			if( baseExponent.remainder( BIG_TWO ).compareTo( BigDecimal.ZERO ) != 0 ){
-				return nthPower( value, baseExponent.subtract( BigDecimal.ONE ).toString( ) ).multiply( baseValue );
-
+			}else if( baseExponent.compareTo( BigDecimal.ZERO ) == 0 ){
+				return BigDecimal.ONE;
+			
+			}else if( baseExponent.compareTo( BigDecimal.ONE ) == 0 ){
+				return baseValue;
+			
 			}else{
-				BigDecimal result = baseValue;
 
-				BigDecimal procedureCount = baseExponent.divide( BIG_TWO );
-				BigDecimal count = BigDecimal.ONE;
-
-				do{
-					result = result.pow( BIG_TWO.intValue( ) );
-
-					count = count.add( BigDecimal.ONE );
-
-				}while( count.compareTo( procedureCount ) < 0 );
-
-				return result;    
+				while( baseExponent.compareTo( BigDecimal.ZERO ) > 0 ){
+					newBaseValue = newBaseValue.multiply( baseValue );
+					baseExponent = baseExponent.subtract( BigDecimal.ONE );
+				}
+				return newBaseValue;    
 			}
 		}
 	}
