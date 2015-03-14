@@ -2,6 +2,7 @@ package calculatePartition;
 
 import java.math.RoundingMode;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 import static nthRoot.nthRoot.nthRoot;
 
@@ -23,7 +24,7 @@ public class calculatePartition{
 		}
 
 		try{
-			BigDecimal partitionFactor = calculatePartition( spatialSize, rootFactor );
+			BigInteger partitionFactor = calculatePartition( spatialSize, rootFactor );
 
 			System.out.print( partitionFactor.toString( ) );
 
@@ -32,7 +33,7 @@ public class calculatePartition{
 		}
 	}
 
-	public static final BigDecimal calculatePartition( String spatialSize, String rootFactor )
+	public static final BigInteger calculatePartition( String spatialSize, String rootFactor )
 		throws Exception
 	{
 		/*
@@ -42,8 +43,8 @@ public class calculatePartition{
 		*/
 		
 		BigDecimal partitionFactor = nthRoot( spatialSize, rootFactor, "4", 2 );
-		
-		BigDecimal partitionCount = ( new BigDecimal( spatialSize ) ).divide( partitionFactor, 0, RoundingMode.FLOOR );
+
+		BigInteger partitionCount = ( new BigDecimal( spatialSize ) ).divide( partitionFactor, 0, RoundingMode.FLOOR ).toBigInteger( );
 
 		return partitionCount;
 	}

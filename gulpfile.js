@@ -69,6 +69,8 @@ gulp.task( "default", [
 	"build-image",
 	"deploy-image",
 
+	"deploy-installer",
+	
 	"build-index",
 	"deploy-index"
 ] );
@@ -259,7 +261,7 @@ gulp.task( "build-index",
 	} );
 
 
-gulp.task( "deploy", [ "clean-deploy", "deploy-script", "deploy-library", "deploy-font", "deploy-style", "deploy-image", "deploy-index" ] );
+gulp.task( "deploy", [ "clean-deploy", "deploy-script", "deploy-library", "deploy-font", "deploy-style", "deploy-image", "deploy-index", "deploy-installer" ] );
 
 gulp.task( "clean-deploy",
 	[ "clean-library", "copy-library", "clean-build", "build-library" ],
@@ -323,6 +325,15 @@ gulp.task( "deploy-image",
 			.src( "build/image/*.*" )
 			.pipe( plumber( ) )
 			.pipe( gulp.dest( "deploy/image" ) );
+	} );
+
+gulp.task( "deploy-installer",
+	[ "clean-build", "clean-deploy" ],
+	function deployTask( ){
+		return gulp
+			.src( "installer/*.*" )
+			.pipe( plumber( ) )
+			.pipe( gulp.dest( "deploy/installer" ) );
 	} );
 
 gulp.task( "deploy-index",
